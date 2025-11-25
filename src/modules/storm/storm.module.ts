@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
+import { StormController } from './storm.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [StormController],
 })
 export class StormModule {}
