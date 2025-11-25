@@ -4,15 +4,18 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Allow requests from your app (for now, open to all; we can tighten later)
+  // Allow all CORS (safe for now)
   app.enableCors({
     origin: '*',
   });
 
-  // Optional but recommended: prefix all routes with /api
+  // Prefix all backend routes with /api
   app.setGlobalPrefix('api');
 
-  await app.listen(process.env.PORT || 8080);
+  // Start server (DigitalOcean uses process.env.PORT)
+  const port = process.env.PORT || 8080;
+  await app.listen(port);
+  console.log(`TABZ backend running on port ${port}`);
 }
 
 bootstrap();
