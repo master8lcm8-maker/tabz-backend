@@ -30,7 +30,13 @@ import { HealthController } from './health.controller';
     StaffModule,
     WebsocketModule,
   ],
-  controllers: [AppController, HealthController],
-  providers: [AppService],
+  controllers: [
+    AppController,
+    HealthController,   // ⬅️ FIXED: Now correctly registered
+  ],
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {}
+
