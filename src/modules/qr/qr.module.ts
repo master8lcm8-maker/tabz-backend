@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
+import { QrController } from './qr.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [QrController],
 })
 export class QrModule {}
