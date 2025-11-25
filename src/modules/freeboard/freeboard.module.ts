@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
+import { FreeboardController } from './freeboard.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [FreeboardController],
 })
 export class FreeboardModule {}
