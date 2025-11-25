@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -7,16 +7,25 @@ export class AuthService {
 
   async login(user: any) {
     const payload = { sub: user.id, email: user.email };
+
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
   async validateUser(email: string, password: string) {
-    // TEMPORARY: replace with real DB user lookup later.
-    if (email === 'test@example.com' && password === '123456') {
+    // ✅ TEMPORARY HARDCODED USER
+    // Use exactly these credentials when testing:
+    // email:    test@example.com
+    // password: 123456
+    const validEmail = 'test@example.com';
+    const validPassword = '123456';
+
+    if (email === validEmail && password === validPassword) {
       return { id: 1, email };
     }
-    return null;
+
+    // ❌ If invalid, throw 401 instead of returning null (which caused 500)
+    throw new UnauthorizedException('Invalid email or password');
   }
 }
