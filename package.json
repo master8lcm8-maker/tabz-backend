@@ -1,13 +1,12 @@
 {
   "name": "tabz-backend",
   "version": "1.0.0",
+  "private": true,
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "start": "npm run build && node dist/main.js",
-
+    "start": "node dist/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts"
-
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -22,3 +21,4 @@
     "typescript": "^5.0.0"
   }
 }
+
