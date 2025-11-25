@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
+import { SpotlightController } from './spotlight.controller';
 
 @Module({
-  imports: [],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [SpotlightController],
 })
 export class SpotlightModule {}
