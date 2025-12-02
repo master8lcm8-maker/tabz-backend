@@ -17,6 +17,7 @@ export enum WalletTransactionType {
   TRANSFER_IN = 'transfer_in',
   TRANSFER_OUT = 'transfer_out',
   CASHOUT = 'cashout',
+  CASHOUT_COMPLETE = 'cashout_complete', // ⬅️ added so wallet.service can reference it
 }
 
 @Entity('wallet_transactions')
