@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wallet } from './wallet.entity';
-import { WalletTransaction } from './wallet-transaction.entity';
+import { WalletTransaction, WalletTransactionType } from './wallet-transaction.entity';
 
 @Injectable()
 export class WalletService {
@@ -54,14 +54,12 @@ export class WalletService {
 
   // ---------- Public API ----------
 
-  // GET /wallet/summary
   async getSummary(userId: number): Promise<Wallet> {
     const wallet = await this.getOrCreateWallet(userId);
     this.normalizeWallet(wallet);
     return wallet;
   }
 
-  // POST /wallet/deposit
   async deposit(userId: number, amountCents: number): Promise<Wallet> {
     if (!amountCents || amountCents <= 0) {
       throw new BadRequestException('Deposit amount must be positive.');
@@ -75,20 +73,17 @@ export class WalletService {
 
     await this.walletRepo.save(wallet);
 
-    // optional: record transaction
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: wallet.id,
-        type: 'deposit',
+        wallet,
+        type: WalletTransactionType.DEPOSIT,
         amountCents,
-        metadata: null,
       }),
     );
 
     return wallet;
   }
 
-  // SIMPLE spend (no payout)
   async spend(userId: number, amountCents: number): Promise<Wallet> {
     if (!amountCents || amountCents <= 0) {
       throw new BadRequestException('Spend amount must be positive.');
@@ -107,27 +102,15 @@ export class WalletService {
 
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: wallet.id,
-        type: 'spend',
+        wallet,
+        type: WalletTransactionType.SPEND,
         amountCents,
-        metadata: null,
       }),
     );
 
     return wallet;
   }
 
-  /**
-   * CORE: Spend from buyer and (optionally) credit venue owner.
-   *
-   * - buyerId: user paying
-   * - venueOwnerId: owner who should receive revenue (can be same as buyer)
-   * - amountCents: total amount paid
-   * - platformFeePercent: TABZ fee (0–100)
-   *
-   * Buyer: spendableBalanceCents -= amountCents
-   * Venue owner: cashoutAvailableCents += (amountCents - fee)
-   */
   async spendWithPayout(
     buyerId: number,
     venueOwnerId: number | null | undefined,
@@ -152,24 +135,23 @@ export class WalletService {
     const fee = Math.floor((amountCents * platformFeePercent) / 100);
     const venueShare = amountCents - fee;
 
-    // CASE 1: No venue owner or no share -> just spend from buyer
+    // Case 1: No venue or no share
     if (!venueOwnerId || venueShare <= 0) {
       buyer.spendableBalanceCents -= amountCents;
       await this.walletRepo.save(buyer);
 
       await this.txRepo.save(
         this.txRepo.create({
-          walletId: buyer.id,
-          type: 'spend_no_payout',
+          wallet: buyer,
+          type: WalletTransactionType.SPEND,
           amountCents,
-          metadata: { fee },
         }),
       );
 
       return { buyer };
     }
 
-    // CASE 2: Buyer and venue owner are the SAME user
+    // Case 2: Buyer and venue owner are same user
     if (venueOwnerId === buyerId) {
       buyer.spendableBalanceCents -= amountCents;
       buyer.cashoutAvailableCents += venueShare;
@@ -177,17 +159,16 @@ export class WalletService {
 
       await this.txRepo.save(
         this.txRepo.create({
-          walletId: buyer.id,
-          type: 'spend_self_payout',
+          wallet: buyer,
+          type: WalletTransactionType.SPEND,
           amountCents,
-          metadata: { fee, venueShare },
         }),
       );
 
       return { buyer };
     }
 
-    // CASE 3: Buyer and venue owner are different users
+    // Case 3: Different users
     const venueWallet = await this.getOrCreateWallet(venueOwnerId);
     this.normalizeWallet(venueWallet);
 
@@ -199,22 +180,15 @@ export class WalletService {
 
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: buyer.id,
-        type: 'spend_with_payout',
+        wallet: buyer,
+        type: WalletTransactionType.SPEND,
         amountCents,
-        metadata: {
-          fee,
-          venueShare,
-          venueOwnerId,
-          venueWalletId: venueWallet.id,
-        },
       }),
     );
 
     return { buyer, venueOwner: venueWallet };
   }
 
-  // wrapper used by StoreItemsService
   async chargeStoreItemPurchase(
     buyerId: number,
     venueOwnerId: number | null,
@@ -224,7 +198,6 @@ export class WalletService {
     await this.spendWithPayout(buyerId, venueOwnerId, amountCents, platformFeePercent);
   }
 
-  // POST /wallet/transfer
   async transfer(
     senderId: number,
     receiverId: number,
@@ -256,26 +229,23 @@ export class WalletService {
 
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: sender.id,
-        type: 'transfer_out',
+        wallet: sender,
+        type: WalletTransactionType.TRANSFER_OUT,
         amountCents,
-        metadata: { receiverId },
       }),
     );
 
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: receiver.id,
-        type: 'transfer_in',
+        wallet: receiver,
+        type: WalletTransactionType.TRANSFER_IN,
         amountCents,
-        metadata: { senderId },
       }),
     );
 
     return { sender, receiver };
   }
 
-  // POST /wallet/cashout
   async cashout(userId: number, amountCents: number): Promise<Wallet> {
     if (!amountCents || amountCents <= 0) {
       throw new BadRequestException('Cashout amount must be positive.');
@@ -294,17 +264,15 @@ export class WalletService {
 
     await this.txRepo.save(
       this.txRepo.create({
-        walletId: wallet.id,
-        type: 'cashout',
+        wallet,
+        type: WalletTransactionType.CASHOUT_COMPLETE,
         amountCents,
-        metadata: null,
       }),
     );
 
     return wallet;
   }
 
-  // Convenience
   async getWalletForUser(userId: number): Promise<Wallet> {
     return this.getOrCreateWallet(userId);
   }
