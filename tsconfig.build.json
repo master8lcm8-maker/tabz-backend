@@ -1,3 +1,21 @@
 {
-  "extends": "./tsconfig.json"
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "**/*.spec.ts",
+
+    "src/dev-seed/**",
+
+    "src/modules/owner-orders/**",
+    "src/modules/OwnerOrdersModule/**",
+
+    "src/modules/drinks/**",
+    "src/modules/freeboard/**",
+    "src/modules/staff/**",
+    "src/modules/store-items/**",
+    "src/owner/**"
+  ]
 }

@@ -1,3 +1,4 @@
+// src/modules/venues/venue.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,29 +7,29 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'venues' })
+@Entity('venues')
 export class Venue {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  // 🔑 very important: this must exist so TypeORM sends ownerId to the DB
+  @Column({ type: 'int' })
+  ownerId: number;
+
+  @Column({ type: 'varchar', length: 120 })
   name: string;
 
-  @Column({ nullable: true })
-  address?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  address: string | null;
 
-  @Column({ nullable: true })
-  city?: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  city: string | null;
 
-  @Column({ nullable: true })
-  state?: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  state: string | null;
 
-  @Column({ nullable: true })
-  country?: string;
-
-  // Just a plain column for now – we'll enforce relation in code
-  @Column()
-  ownerId: number;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  country: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

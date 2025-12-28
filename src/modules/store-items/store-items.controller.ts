@@ -1,169 +1,223 @@
+// src/modules/store-items/store-items.controller.ts
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  Headers,
-  Logger,
   BadRequestException,
-  UnauthorizedException,
-  ParseIntPipe,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { StoreItemsService } from './store-items.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('store-items')
 export class StoreItemsController {
-  private readonly logger = new Logger(StoreItemsController.name);
+  constructor(private readonly storeItemsService: StoreItemsService) {}
 
-  constructor(
-    private readonly storeItemsService: StoreItemsService,
-    private readonly jwtService: JwtService, // kept injected but no longer used
-  ) {}
-
-  private extractUserIdFromAuthHeader(authHeader?: string): number {
-    this.logger.log(`[extractUserId] raw Authorization header: ${authHeader}`);
-
-    if (!authHeader) {
-      this.logger.error('[extractUserId] Missing Authorization header');
-      throw new UnauthorizedException('Missing Authorization header');
-    }
-
-    const [scheme, token] = authHeader.split(' ');
-
-    if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
-      this.logger.error(
-        `[extractUserId] Invalid Authorization format: ${authHeader}`,
-      );
-      throw new UnauthorizedException('Invalid Authorization header format');
-    }
-
-    try {
-      const parts = token.split('.');
-      if (parts.length < 2) {
-        throw new Error('Malformed JWT');
-      }
-
-      const payloadJson = Buffer.from(parts[1], 'base64').toString('utf8');
-      const payload: any = JSON.parse(payloadJson);
-
-      this.logger.log(
-        `[extractUserId] JWT payload = ${JSON.stringify(payload)}`,
-      );
-
-      const userId = payload?.sub;
-      if (!userId) {
-        this.logger.error(
-          '[extractUserId] Token payload missing "sub" (user id)',
-        );
-        throw new UnauthorizedException('Token payload missing sub');
-      }
-
-      this.logger.log(`[extractUserId] Resolved userId = ${userId}`);
-      return Number(userId);
-    } catch (err) {
-      this.logger.error(
-        `[extractUserId] Failed to decode JWT: ${(err as Error).message}`,
-      );
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
-
-  @Post('order')
-  async createOrder(
-    @Headers('authorization') authHeader: string,
-    @Body() body: any,
-  ) {
-    const userId = this.extractUserIdFromAuthHeader(authHeader);
-
-    this.logger.log(
-      `[createOrder] userId = ${userId}, body = ${JSON.stringify(body)}`,
-    );
-
-    if (!body?.itemId || !body?.quantity) {
-      this.logger.error(
-        `[createOrder] Missing itemId or quantity in body: ${JSON.stringify(
-          body,
-        )}`,
-      );
-      throw new BadRequestException('itemId and quantity are required');
-    }
-
-    return this.storeItemsService.createOrderForUser(userId, body);
-  }
-
-  @Patch('order/:id/status')
-  async updateOrderStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: { status: string },
-  ) {
-    this.logger.log(
-      `[updateOrderStatus] id=${id}, status=${body?.status}`,
-    );
-    return this.storeItemsService.updateOrderStatus(id, body?.status);
-  }
-
-  @Get('venue-orders')
-  async getVenueOrders(@Headers('authorization') authHeader: string) {
-    this.logger.log('[getVenueOrders] Incoming request');
-
-    const userId = this.extractUserIdFromAuthHeader(authHeader);
-
-    this.logger.log(
-      `[getVenueOrders] Using userId = ${userId} to fetch venue orders`,
-    );
-
-    const result = await this.storeItemsService.getVenueOrdersForUser(userId);
-
-    this.logger.log(
-      `[getVenueOrders] Result count = ${
-        Array.isArray(result) ? result.length : 'unknown'
-      }`,
-    );
-
-    return result;
-  }
-
-  @Post()
-  async createItem(@Body() body: any) {
-    this.logger.log(`[createItem] body = ${JSON.stringify(body)}`);
-
-    if (!body) {
-      this.logger.warn('[createItem] Empty request body');
-    }
-
-    return this.storeItemsService.createItem(body);
-  }
-
+  // -------------------------
+  // PUBLIC ITEMS
+  // -------------------------
   @Get()
-  async findAllItems() {
-    this.logger.log('[findAllItems] Fetching all items');
-    return this.storeItemsService.findAllItems();
+  async getAllItems() {
+    const value = await this.storeItemsService.getAllItems();
+    return { value };
   }
 
-  @Get(':id')
-  async findOneItem(@Param('id', ParseIntPipe) id: number) {
-    this.logger.log(`[findOneItem] id = ${id}`);
-    return this.storeItemsService.findOneItem(id);
+  @Get('venue/:venueId')
+  async getItemsForVenue(@Param('venueId') venueId: string) {
+    const id = Number(venueId);
+    const value = await this.storeItemsService.getItemsForVenue(id);
+    return { value };
   }
 
-  @Patch(':id')
-  async updateItem(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: any,
-  ) {
-    this.logger.log(
-      `[updateItem] id = ${id}, body = ${JSON.stringify(body)}`,
+  // -------------------------
+  // BUYER FLOW
+  // -------------------------
+  @UseGuards(JwtAuthGuard)
+  @Post('order')
+  async createOrder(@Req() req: any, @Body() body: any) {
+    const user = req.user || {};
+    if (user.role !== 'buyer') {
+      throw new ForbiddenException('Only buyers can create orders.');
+    }
+    const value = await this.storeItemsService.createOrderForUser(
+      Number(user.userId),
+      body,
     );
-    return this.storeItemsService.updateItem(id, body);
+    return value;
   }
 
-  @Delete(':id')
-  async removeItem(@Param('id', ParseIntPipe) id: number) {
-    this.logger.log(`[removeItem] id = ${id}`);
-    return this.storeItemsService.removeItem(id);
+  @UseGuards(JwtAuthGuard)
+  @Get('my-orders')
+  async myOrders(@Req() req: any) {
+    const user = req.user || {};
+    if (user.role !== 'buyer') {
+      throw new ForbiddenException('Only buyers can view their orders.');
+    }
+    const value = await this.storeItemsService.findOrdersForBuyer(
+      Number(user.userId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('orders/:orderId')
+  async myOrderDetail(@Req() req: any, @Param('orderId') orderId: string) {
+    const user = req.user || {};
+    if (user.role !== 'buyer') {
+      throw new ForbiddenException('Only buyers can view order detail.');
+    }
+    const value = await this.storeItemsService.findOrderForBuyerById(
+      Number(user.userId),
+      Number(orderId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('my-orders/:orderId/cancel')
+  async cancelMyOrder(@Req() req: any, @Param('orderId') orderId: string) {
+    const user = req.user || {};
+    if (user.role !== 'buyer') {
+      throw new ForbiddenException('Only buyers can cancel orders.');
+    }
+    const value = await this.storeItemsService.cancelOrderForBuyer(
+      Number(user.userId),
+      Number(orderId),
+    );
+    return value;
+  }
+
+  // -------------------------
+  // OWNER FLOW (LIVE)
+  // -------------------------
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/orders')
+  async ownerOrders(@Req() req: any) {
+    const user = req.user || {};
+    if (user.role !== 'owner') {
+      throw new ForbiddenException('Only owners can view owner orders.');
+    }
+    const value = await this.storeItemsService.findOrdersByOwnerLive(
+      Number(user.userId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/orders/:orderId')
+  async ownerOrderDetail(@Req() req: any, @Param('orderId') orderId: string) {
+    const user = req.user || {};
+    if (user.role !== 'owner') {
+      throw new ForbiddenException('Only owners can view owner order detail.');
+    }
+    const value = await this.storeItemsService.findOwnerOrderByIdLive(
+      Number(user.userId),
+      Number(orderId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/stats')
+  async ownerStats(@Req() req: any) {
+    const user = req.user || {};
+    if (user.role !== 'owner') {
+      throw new ForbiddenException('Only owners can view stats.');
+    }
+    const value = await this.storeItemsService.getOwnerStats(Number(user.userId));
+    return { value };
+  }
+
+  // -------------------------
+  // STAFF FLOW (venue-scoped)
+  // -------------------------
+  @UseGuards(JwtAuthGuard)
+  @Get('staff/orders')
+  async staffOrders(@Req() req: any) {
+    const user = req.user || {};
+    if (user.role !== 'staff') {
+      throw new ForbiddenException('Only staff can view staff orders.');
+    }
+    const venueId = Number(user.venueId);
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venueId on staff token.');
+    }
+    const value = await this.storeItemsService.findOrdersForStaff(venueId);
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('staff/orders/:orderId')
+  async staffOrderDetail(@Req() req: any, @Param('orderId') orderId: string) {
+    const user = req.user || {};
+    if (user.role !== 'staff') {
+      throw new ForbiddenException('Only staff can view staff order detail.');
+    }
+    const venueId = Number(user.venueId);
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venueId on staff token.');
+    }
+    const value = await this.storeItemsService.findStaffOrderById(
+      venueId,
+      Number(orderId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('staff/orders/:orderId/mark')
+  async staffMark(
+    @Req() req: any,
+    @Param('orderId') orderId: string,
+    @Body() body: { status?: string },
+  ) {
+    const user = req.user || {};
+    if (user.role !== 'staff') {
+      throw new ForbiddenException('Only staff can mark orders.');
+    }
+    const venueId = Number(user.venueId);
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venueId on staff token.');
+    }
+
+    const status = String(body?.status || '').toLowerCase().trim();
+    const value = await this.storeItemsService.staffMarkOrder(
+      venueId,
+      Number(orderId),
+      status,
+    );
+    return value;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('staff/orders/:orderId/cancel')
+  async staffCancel(@Req() req: any, @Param('orderId') orderId: string) {
+    const user = req.user || {};
+    if (user.role !== 'staff') {
+      throw new ForbiddenException('Only staff can cancel orders.');
+    }
+    const venueId = Number(user.venueId);
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venueId on staff token.');
+    }
+
+    const value = await this.storeItemsService.staffCancelOrder(
+      venueId,
+      Number(orderId),
+    );
+    return value;
+  }
+
+  // -------------------------
+  // PUBLIC: SINGLE ITEM (MUST BE LAST so it doesn't steal routes)
+  // -------------------------
+  @Get(':id(\\d+)')
+  async getItemById(@Param('id') id: string) {
+    const value = await this.storeItemsService.getItemById(Number(id));
+    return { value };
   }
 }

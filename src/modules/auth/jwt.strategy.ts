@@ -1,45 +1,46 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+// src/modules/auth/jwt.strategy.ts
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserRole } from './auth.service';
+
+export interface JwtPayload {
+  sub: number;
+  email: string;
+  role?: UserRole;
+  venueId?: number; // ✅ for staff tokens
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'defaultsecret',
+      secretOrKey:
+        configService.get<string>('JWT_SECRET') || 'dev_jwt_secret_fallback',
     });
   }
 
-  async validate(payload: any) {
-    // -----------------------------------------
-    // CASE 1: REGULAR USER TOKEN
-    // -----------------------------------------
-    if (payload.sub && payload.email) {
-      return {
-        userId: payload.sub,
-        email: payload.email,
-        type: 'USER',
-      };
-    }
+  async validate(payload: JwtPayload) {
+    const userId = Number(payload.sub);
+    const email = payload.email;
+    const role = payload.role;
+    const venueId = Number((payload as any).venueId || 0) || undefined;
 
-    // -----------------------------------------
-    // CASE 2: STAFF TOKEN
-    // -----------------------------------------
-    if (payload.staffId && payload.venueId) {
-      return {
-        staffId: payload.staffId,
-        venueId: payload.venueId,
-        role: payload.role,
-        email: payload.email,
-        type: 'STAFF',
-      };
-    }
+    // This is what becomes req.user
+    return {
+      sub: userId,
+      id: userId,
+      userId: userId,
+      ownerUserId: userId,
+      ownerId: userId,
+      email,
+      role,
 
-    // -----------------------------------------
-    // INVALID TOKEN
-    // -----------------------------------------
-    throw new UnauthorizedException('Invalid JWT payload');
+      // ✅ for staff endpoints
+      venueId,
+    };
   }
 }

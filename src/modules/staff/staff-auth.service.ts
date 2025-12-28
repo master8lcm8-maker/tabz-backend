@@ -1,53 +1,46 @@
+// src/modules/staff/staff-auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-interface StaffLoginDto {
-  email: string;
-  password: string;
-}
+import { StaffService } from './staff.service';
 
 @Injectable()
 export class StaffAuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly staffService: StaffService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   /**
-   * DEV-ONLY LOGIN
+   * DEV STAFF LOGIN
    *
-   * Accept exactly:
-   *   email:    demo@tabz.app
-   *   password: password123
-   *
-   * Ignore the database completely. Return a fake staff user + real JWT.
+   * Called from StaffAuthController:
+   *   this.staffAuthService.login(email, password)
    */
-  async login(dto: StaffLoginDto) {
-    const { email, password } = dto;
+  async login(email: string, password: string) {
+    const staff = await this.staffService.validateCredentials(email, password);
 
-    // ✅ Hard-coded dev credentials
-    if (email !== 'demo@tabz.app' || password !== 'password123') {
-      throw new UnauthorizedException('Invalid staff email or password');
+    if (!staff) {
+      throw new UnauthorizedException('Invalid staff credentials');
     }
-
-    // Minimal staff object the rest of app can rely on
-    const staff = {
-      id: 1,
-      email: 'demo@tabz.app',
-      name: 'Demo Staff',
-      role: 'staff',
-      venueId: 1,
-    };
 
     const payload = {
       sub: staff.id,
       email: staff.email,
       venueId: staff.venueId,
-      role: staff.role,
+      role: 'STAFF',
+      type: 'STAFF',
     };
 
     const accessToken = this.jwtService.sign(payload);
 
     return {
       accessToken,
-      staff,
+      staff: {
+        id: staff.id,
+        name: staff.name,
+        email: staff.email,
+        venueId: staff.venueId,
+      },
     };
   }
 }
