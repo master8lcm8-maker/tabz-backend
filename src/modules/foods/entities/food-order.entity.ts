@@ -48,17 +48,27 @@ export class FoodOrder {
   @Column({ type: 'varchar', length: 120 })
   foodName: string;
 
+  /**
+   * Total amount charged in cents.
+   */
   @Column({ type: 'integer' })
   amountCents: number;
 
+  /**
+   * Currency code, e.g. "USD".
+   */
   @Column({ type: 'varchar', length: 3, default: 'USD' })
   currency: string;
 
+  /**
+   * Optional message shown to the recipient.
+   */
   @Column({ type: 'varchar', length: 255, nullable: true })
   message?: string | null;
 
   /**
-   * Stored as a simple string.
+   * Logical status of the order.
+   * Stored as a simple string so it works on SQLite and Postgres.
    */
   @Column({
     type: 'varchar',
@@ -76,15 +86,17 @@ export class FoodOrder {
   redemptionCode: string;
 
   /**
-   * When the food order was redeemed (Postgres-safe type).
+   * When the food order was redeemed.
+   * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   redeemedAt?: Date | null;
 
   /**
-   * When the food order expires (Postgres-safe type).
+   * When the food order expires.
+   * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   expiresAt?: Date | null;
 
   /**

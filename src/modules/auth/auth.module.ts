@@ -1,32 +1,34 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 
+import { UsersModule } from '../users/users.module';
+import { Staff } from '../staff/staff.entity';
+
 @Module({
   imports: [
-    // Set default auth strategy to 'jwt'
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    UsersModule,
+    TypeOrmModule.forFeature([Staff]),
 
-    // JWT configuration
+    // ✅ REQUIRED: ensures ConfigService exists here even if global wiring gets weird
+    ConfigModule,
+
     JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.JWT_SECRET || 'defaultsecret',
-        signOptions: { expiresIn: '7d' },
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        // ✅ HARD GUARANTEE: never undefined
+        secret: config.get<string>('JWT_SECRET') || 'dev_jwt_secret_fallback',
+        signOptions: { expiresIn: config.get<string>('JWT_EXPIRES_IN') || '7d' },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy, // <— CRITICAL: strategy must be a provider
-  ],
-  exports: [
-    PassportModule,
-    JwtModule,
-  ],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

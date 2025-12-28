@@ -1,30 +1,21 @@
+// src/modules/store-items/store-items.module.ts
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StoreItemsController } from './store-items.controller';
-import { StoreItemsAdminController } from './store-items.admin.controller';
 import { StoreItemsService } from './store-items.service';
-import { WalletModule } from '../../wallet/wallet.module';
-
-// 👇 Import the entities so TypeORM can register metadata
 import { StoreItem } from './store-item.entity';
 import { StoreItemOrder } from './store-item-order.entity';
 
+import { WalletModule } from '../../wallet/wallet.module';
+
+// ✅ IMPORTANT: provide the gateway so StoreItemsService can inject it
+import { WebsocketGateway } from '../websocket/websocket.gateway';
+
 @Module({
-  imports: [
-    // ✅ Register StoreItem + StoreItemOrder with TypeORM in this module
-    TypeOrmModule.forFeature([StoreItem, StoreItemOrder]),
-
-    JwtModule.register({
-      secret: 'secret123', // same as before, used for manual JWT in controller
-    }),
-
-    // ✅ Gives StoreItemsService access to WalletService
-    WalletModule,
-  ],
-  controllers: [StoreItemsController, StoreItemsAdminController],
-  providers: [StoreItemsService],
+  imports: [TypeOrmModule.forFeature([StoreItem, StoreItemOrder]), WalletModule],
+  controllers: [StoreItemsController],
+  providers: [StoreItemsService, WebsocketGateway],
   exports: [StoreItemsService],
 })
 export class StoreItemsModule {}

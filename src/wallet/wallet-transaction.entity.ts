@@ -1,43 +1,59 @@
+// src/wallet/wallet-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Wallet } from './wallet.entity';
 
-export enum WalletTransactionType {
-  DEPOSIT = 'DEPOSIT',
-  SPEND = 'SPEND',
-  TRANSFER_IN = 'TRANSFER_IN',
-  TRANSFER_OUT = 'TRANSFER_OUT',
-  TRANSFER_FEE = 'TRANSFER_FEE',
-  CASHOUT_REQUEST = 'CASHOUT_REQUEST',
-  CASHOUT_FEE = 'CASHOUT_FEE',
-  CASHOUT_COMPLETE = 'CASHOUT_COMPLETE',
-  LOCK_MOVEMENT = 'LOCK_MOVEMENT',
-}
+export type WalletTransactionType =
+  | 'deposit'
+  | 'spend'
+  | 'spend_no_payout'
+  | 'spend_self_payout'
+  | 'spend_with_payout'
+  | 'payout_credit'
+  | 'transfer_in'
+  | 'transfer_out'
+  | 'cashout';
 
 @Entity('wallet_transactions')
 export class WalletTransaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {
-    onDelete: 'CASCADE',
-  })
+  /**
+   * Foreign key to the wallet that owns this transaction.
+   * Existing rows may have this null (from before we added it),
+   * but all new rows created by WalletService will set it.
+   */
+  @Column({ nullable: true })
+  walletId: number | null;
+
+  @ManyToOne(() => Wallet)
+  @JoinColumn({ name: 'walletId' })
   wallet: Wallet;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   type: WalletTransactionType;
 
   @Column({ type: 'bigint' })
   amountCents: number;
 
-  @Column({ nullable: true })
-  referenceId: string;
+  /**
+   * Extra info about the transaction:
+   * - fee, venueShare, receiverId, itemId, venueId, etc
+   */
+  @Column({ type: 'simple-json', nullable: true })
+  metadata: any | null;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

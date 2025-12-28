@@ -1,0 +1,300 @@
+C// src/modules/store-items/store-items.controller.ts
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { StoreItemsService } from './store-items.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+@Controller('store-items')
+export class StoreItemsController {
+  constructor(private readonly storeItemsService: StoreItemsService) {}
+
+  // ----------------------------------------------------
+  // PUBLIC
+  // ----------------------------------------------------
+  @Get()
+  async getAllItems() {
+    const value = await this.storeItemsService.getAllItems();
+    return { value, Count: value.length };
+  }
+
+  @Get('venue/:venueId')
+  async getItemsForVenue(@Param('venueId') venueId: string) {
+    const value = await this.storeItemsService.getItemsForVenue(Number(venueId));
+    return { value, Count: value.length };
+  }
+
+  // ----------------------------------------------------
+  // BUYER
+  // ----------------------------------------------------
+  @UseGuards(JwtAuthGuard)
+  @Post('order')
+  async createOrder(@Req() req: Request, @Body() body: any) {
+    const buyerId = (req as any).user?.sub;
+
+    if (!buyerId || buyerId <= 0) {
+      throw new BadRequestException('Invalid buyer id from auth token.');
+    }
+
+    const value = await this.storeItemsService.createOrderForUser(buyerId, body);
+    return value; // keep existing behavior
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-orders')
+  async getMyOrders(@Req() req: Request) {
+    const buyerId = (req as any).user?.sub;
+
+    if (!buyerId || buyerId <= 0) {
+      throw new BadRequestException('Invalid buyer id from auth token.');
+    }
+
+    const value = await this.storeItemsService.findOrdersForBuyer(buyerId);
+    return { value, Count: value.length };
+  }
+
+  // ✅ Buyer order detail
+  @UseGuards(JwtAuthGuard)
+  @Get('orders/:orderId')
+  async getBuyerOrderById(
+    @Req() req: Request,
+    @Param('orderId') orderId: string,
+  ) {
+    const buyerId = (req as any).user?.sub;
+
+    if (!buyerId || buyerId <= 0) {
+      throw new BadRequestException('Invalid buyer id from auth token.');
+    }
+
+    const value = await this.storeItemsService.findOrderForBuyerById(
+      buyerId,
+      Number(orderId),
+    );
+
+    return { value };
+  }
+
+  // ✅ Buyer cancel (pending only)
+  @UseGuards(JwtAuthGuard)
+  @Post('my-orders/:orderId/cancel')
+  async cancelMyOrder(@Req() req: Request, @Param('orderId') orderId: string) {
+    const buyerId = (req as any).user?.sub;
+
+    if (!buyerId || buyerId <= 0) {
+      throw new BadRequestException('Invalid buyer id from auth token.');
+    }
+
+    return this.storeItemsService.cancelOrderForBuyer(buyerId, Number(orderId));
+  }
+
+  // ----------------------------------------------------
+  // STAFF (venue-scoped)
+  // ----------------------------------------------------
+  @UseGuards(JwtAuthGuard)
+  @Get('staff/orders')
+  async staffOrders(@Req() req: Request) {
+    const staffId = (req as any).user?.sub;
+    const role = (req as any).user?.role;
+    const venueId = Number((req as any).user?.venueId || 0);
+
+    if (!staffId || staffId <= 0) {
+      throw new BadRequestException('Invalid staff id from auth token.');
+    }
+    if (role !== 'staff') {
+      throw new ForbiddenException('Staff role required.');
+    }
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venue id from staff token.');
+    }
+
+    const value = await this.storeItemsService.findOrdersForStaffVenue(venueId);
+    return { value, Count: value.length };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('staff/orders/:orderId')
+  async staffOrderDetail(@Req() req: Request, @Param('orderId') orderId: string) {
+    const staffId = (req as any).user?.sub;
+    const role = (req as any).user?.role;
+    const venueId = Number((req as any).user?.venueId || 0);
+
+    if (!staffId || staffId <= 0) {
+      throw new BadRequestException('Invalid staff id from auth token.');
+    }
+    if (role !== 'staff') {
+      throw new ForbiddenException('Staff role required.');
+    }
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venue id from staff token.');
+    }
+
+    const value = await this.storeItemsService.findOrderForStaffVenueById(
+      venueId,
+      Number(orderId),
+    );
+
+    return { value };
+  }
+
+  // ✅ NEW: staff mark (pending -> completed/canceled)
+  @UseGuards(JwtAuthGuard)
+  @Post('staff/orders/:orderId/mark')
+  async staffMark(
+    @Req() req: Request,
+    @Param('orderId') orderId: string,
+    @Body() body: any,
+  ) {
+    const staffId = (req as any).user?.sub;
+    const role = (req as any).user?.role;
+    const venueId = Number((req as any).user?.venueId || 0);
+
+    if (!staffId || staffId <= 0) {
+      throw new BadRequestException('Invalid staff id from auth token.');
+    }
+    if (role !== 'staff') {
+      throw new ForbiddenException('Staff role required.');
+    }
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venue id from staff token.');
+    }
+
+    const status = String(body?.status ?? '');
+    const value = await this.storeItemsService.staffMarkOrder(
+      venueId,
+      Number(orderId),
+      status,
+    );
+    return { value };
+  }
+
+  // ✅ NEW: staff cancel (pending -> canceled)
+  @UseGuards(JwtAuthGuard)
+  @Post('staff/orders/:orderId/cancel')
+  async staffCancel(@Req() req: Request, @Param('orderId') orderId: string) {
+    const staffId = (req as any).user?.sub;
+    const role = (req as any).user?.role;
+    const venueId = Number((req as any).user?.venueId || 0);
+
+    if (!staffId || staffId <= 0) {
+      throw new BadRequestException('Invalid staff id from auth token.');
+    }
+    if (role !== 'staff') {
+      throw new ForbiddenException('Staff role required.');
+    }
+    if (!venueId || venueId <= 0) {
+      throw new BadRequestException('Invalid venue id from staff token.');
+    }
+
+    const value = await this.storeItemsService.staffCancelOrder(
+      venueId,
+      Number(orderId),
+    );
+    return { value };
+  }
+
+  // ----------------------------------------------------
+  // OWNER
+  // ----------------------------------------------------
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/items')
+  async ownerItems(@Req() req: Request) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    const value = await this.storeItemsService.findItemsByOwner(ownerId);
+    return { value, Count: value.length };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/orders')
+  async ownerOrders(@Req() req: Request) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    const value = await this.storeItemsService.findOrdersByOwnerLive(ownerId);
+    return { value, Count: value.length };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('owner/orders/:orderId/mark')
+  async ownerMark(
+    @Req() req: Request,
+    @Param('orderId') orderId: string,
+    @Body() body: any,
+  ) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    const status = String(body?.status ?? '');
+    return this.storeItemsService.ownerMarkOrder(ownerId, Number(orderId), status);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('owner/orders/:orderId/cancel')
+  async ownerCancel(@Req() req: Request, @Param('orderId') orderId: string) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    return this.storeItemsService.ownerCancelOrder(ownerId, Number(orderId));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/orders/:orderId')
+  async ownerOrderDetail(@Req() req: Request, @Param('orderId') orderId: string) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    const value = await this.storeItemsService.findOwnerOrderByIdLive(
+      ownerId,
+      Number(orderId),
+    );
+    return { value };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('owner/stats')
+  async ownerStats(@Req() req: Request) {
+    const ownerId = (req as any).user?.sub;
+
+    if (!ownerId || ownerId <= 0) {
+      throw new BadRequestException('Invalid owner id from auth token.');
+    }
+
+    const value = await this.storeItemsService.getOwnerStats(ownerId);
+    return { value };
+  }
+
+  // ----------------------------------------------------
+  // PUBLIC (must stay LAST to avoid collisions)
+  // ----------------------------------------------------
+  @Get(':id')
+  async getItemById(@Param('id') id: string) {
+    const value = await this.storeItemsService.getItemById(Number(id));
+    return { value };
+  }
+}
+

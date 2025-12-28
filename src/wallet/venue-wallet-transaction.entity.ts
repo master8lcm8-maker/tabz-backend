@@ -1,37 +1,44 @@
+// src/wallet/venue-wallet-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
   ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { VenueWallet } from './venue-wallet.entity';
 
-export enum VenueWalletTransactionType {
-  EARNING = 'EARNING',
-  PLATFORM_FEE = 'PLATFORM_FEE',
-  ADJUSTMENT = 'ADJUSTMENT',
-  PAYOUT = 'PAYOUT',
-}
+export type VenueWalletTransactionType =
+  | 'deposit'
+  | 'spend'
+  | 'payout_credit'
+  | 'transfer_in'
+  | 'transfer_out'
+  | 'cashout';
 
 @Entity('venue_wallet_transactions')
 export class VenueWalletTransaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => VenueWallet, (wallet) => wallet.transactions, {
-    onDelete: 'CASCADE',
-  })
+  @Column()
+  venueWalletId: number;
+
+  // IMPORTANT: no inverse-side reference here
+  // (because your VenueWallet entity doesn't define `transactions`)
+  @ManyToOne(() => VenueWallet, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'venueWalletId' })
   venueWallet: VenueWallet;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   type: VenueWalletTransactionType;
 
   @Column({ type: 'bigint' })
   amountCents: number;
 
-  @Column({ nullable: true })
-  referenceId: string;
+  @Column({ type: 'simple-json', nullable: true })
+  metadata: any | null;
 
   @CreateDateColumn()
   createdAt: Date;

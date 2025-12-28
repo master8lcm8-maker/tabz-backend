@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
@@ -34,14 +34,13 @@ export class StoreItemOrder {
   // Optional venue that owns the item
   @Column({ type: 'int', nullable: true })
   venueId: number | null;
-
   // Snapshot of the item at the time of purchase
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   itemSnapshot: any | null;
-
-  @CreateDateColumn()
+@CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 }
+

@@ -39,7 +39,7 @@ export class FreeboardDrop {
   rewardCents: string;
 
   // Status: ACTIVE (available), CLAIMED, EXPIRED
-  @Column({ default: 'ACTIVE' })
+  @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
   status: FreeboardDropStatus;
 
   // User who claimed it (null if not claimed yet)
@@ -50,15 +50,17 @@ export class FreeboardDrop {
   @Column({ nullable: true })
   claimCode: string | null;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  // ⚠ FIXED FOR SQLITE — was timestamptz
+  @Column({ type: 'datetime', nullable: true })
   expiresAt: Date | null;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  // ⚠ FIXED FOR SQLITE — was timestamptz
+  @Column({ type: 'datetime', nullable: true })
   claimedAt: Date | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'datetime' })
   updatedAt: Date;
 }
