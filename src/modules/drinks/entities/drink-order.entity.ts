@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
-import { Venue } from '../../venues/venue.entity'; // <-- FIXED PATH
+import { Venue } from '../../venues/venue.entity';
 
 export enum DrinkOrderStatus {
   PENDING = 'PENDING',
@@ -14,49 +14,58 @@ export enum DrinkOrderStatus {
   CANCELLED = 'CANCELLED',
 }
 
-@Entity('drink_orders')
+@Entity({ name: 'drink_orders' })
 export class DrinkOrder {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
-  @Column()
-  senderId: number;
+  // User who bought the drink
+  @Column({ type: 'int' })
+  buyerId: number;
 
-  @Index()
-  @Column({ type: 'int', nullable: true })
-  recipientId: number | null;
-
-  @ManyToOne(() => Venue, (venue) => venue.drinkOrders, { nullable: false })
+  // Venue where the drink will be redeemed
+  @ManyToOne(() => Venue, { nullable: false })
   venue: Venue;
 
-  @Column()
+  // Foreign key column for the venue
+  @Column({ type: 'int' })
+  venueId: number;
+
+  // Display name for the buyer (optional; useful for staff screens)
+  @Column({ type: 'varchar', length: 100 })
+  customerName: string;
+
+  // Name of the drink item that was purchased
+  @Column({ type: 'varchar', length: 100 })
   drinkName: string;
 
-  @Column({ type: 'bigint' })
-  amountCents: number;
+  // Price in cents charged to the user (before platform fee split)
+  @Column({ type: 'int' })
+  priceCents: number;
 
-  @Column({ default: 'USD' })
-  currency: string;
-
+  // Optional note (e.g. “no ice”, “extra lime”)
   @Column({ type: 'text', nullable: true })
-  message: string | null;
+  note?: string | null;
 
+  // Logical status of the order.
+  // Stored as TEXT so it works on SQLite AND Postgres.
   @Column({
-    type: 'enum',
-    enum: DrinkOrderStatus,
+    type: 'text',
     default: DrinkOrderStatus.PENDING,
   })
   status: DrinkOrderStatus;
 
+  // Unique redemption code used by staff to redeem the drink
   @Index({ unique: true })
-  @Column()
+  @Column({ type: 'varchar', length: 64 })
   redemptionCode: string;
 
+  // When the order was created (TypeORM chooses proper type)
   @CreateDateColumn()
   createdAt: Date;
 
-  // Postgres-safe timestamp type (no "datetime")
-  @Column({ type: 'timestamp', nullable: true })
+  // When the drink was actually redeemed by staff
+  // Use 'datetime' so it's supported by SQLite.
+  @Column({ type: 'datetime', nullable: true })
   redeemedAt: Date | null;
 }

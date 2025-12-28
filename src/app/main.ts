@@ -3,16 +3,33 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.getHttpAdapter().getInstance().set('etag', false);
 
-  // Enable CORS for web (Expo web at localhost:8081)
+  // Enable CORS for web (Expo web at localhost:8081/8082/8083)
   app.enableCors({
-    origin: true, // reflect the request origin (http://localhost:8081, etc.)
+    origin: [
+      'http://localhost:8081',
+      'http://localhost:8082',
+      'http://localhost:8083',
+    ],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-user-id',
+      'Cache-Control',
+      'Pragma',
+      'If-None-Match',
+    ],
   });
 
   const port = 3000;
-  await app.listen(port);
-  console.log(`TABZ backend listening on http://localhost:${port}`);
+
+  // 🔒 Explicit bind to all interfaces (fixes Windows ambiguity)
+  const server = await app.listen(port, '0.0.0.0');
+
+  // 🔍 Log the real bound address (source of truth)
+  const addr = server.address();
+  console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
