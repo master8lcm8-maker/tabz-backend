@@ -98,9 +98,17 @@ export class AuthService {
       throw new UnauthorizedException('Staff user missing venueId');
     }
 
+    // ✅ CRITICAL FIX:
+    // Staff tokens must use the USERS table id as JWT "sub"
+    // so that /auth/me + profile lookups resolve correctly.
+    const user = await this.usersService.findByEmail?.(email);
+    if (!user?.id) {
+      throw new UnauthorizedException('Staff user missing Users row');
+    }
+
     // return "user-like" object for signing
     return {
-      id: staff.id,
+      id: user.id, // ✅ was staff.id before
       email: staff.email,
       role: 'staff' as const,
       venueId: staff.venueId,
@@ -129,7 +137,6 @@ export class AuthService {
       ...(extras?.venueId ? { venueId: extras.venueId } : {}),
     };
 
-    // If JWT secret is misconfigured, jwtService.sign throws.
     const access_token = this.jwtService.sign(payload);
     return { access_token };
   }

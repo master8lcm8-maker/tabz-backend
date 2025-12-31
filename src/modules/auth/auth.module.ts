@@ -1,34 +1,55 @@
+// src/modules/auth/auth.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 import { UsersModule } from '../users/users.module';
 import { Staff } from '../staff/staff.entity';
 
+// ✅ allows /auth/me to resolve profile context (you already have this)
+import { ProfileModule } from '../../profile/profile.module';
+
 @Module({
   imports: [
-    UsersModule,
-    TypeOrmModule.forFeature([Staff]),
-
-    // ✅ REQUIRED: ensures ConfigService exists here even if global wiring gets weird
+    // ✅ make sure ConfigService exists here
     ConfigModule,
 
+    UsersModule,
+    TypeOrmModule.forFeature([Staff]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+
+    // ✅ CRITICAL FIX: signing secret comes from the SAME source as JwtStrategy
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        // ✅ HARD GUARANTEE: never undefined
-        secret: config.get<string>('JWT_SECRET') || 'dev_jwt_secret_fallback',
-        signOptions: { expiresIn: config.get<string>('JWT_EXPIRES_IN') || '7d' },
-      }),
+      useFactory: (config: ConfigService) => {
+        const secret =
+          process.env.JWT_SECRET ||
+          config.get<string>('JWT_SECRET') ||
+          'dev_jwt_secret_fallback';
+
+        return {
+          secret,
+          signOptions: { expiresIn: '7d' },
+        };
+      },
     }),
+
+    ProfileModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy, // registers passport "jwt"
+    JwtAuthGuard,
+  ],
+  exports: [AuthService],
 })
 export class AuthModule {}
