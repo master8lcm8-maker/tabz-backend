@@ -14,6 +14,9 @@ import { DevSeedModule } from '../dev-seed/dev-seed.module';
 // ✅ ADD
 import { IdentityModule } from '../identity/identity.module';
 
+// ✅ ADD (HEALTH)
+import { HealthModule } from '../health/health.module';
+
 @Module({
   imports: [
     // Global config
@@ -38,6 +41,9 @@ import { IdentityModule } from '../identity/identity.module';
 
     // Identity
     IdentityModule,
+
+    // Health (liveness / readiness)
+    HealthModule,      // ✅ ENABLES GET /health
 
     // Dev tools
     DevSeedModule,     // ✅ enables /dev-seed/*
