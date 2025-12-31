@@ -15,11 +15,10 @@ export interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
-    // ✅ SINGLE SOURCE OF TRUTH for JWT secret:
-    // Match AuthModule JwtModule.register({ secret: process.env.JWT_SECRET || 'dev_jwt_secret_fallback' })
+    // ✅ SINGLE SOURCE OF TRUTH for JWT secret (matches auth.module.ts)
     const secret =
       process.env.JWT_SECRET ||
-      this.configService.get<string>('JWT_SECRET') ||
+      configService.get<string>('JWT_SECRET') ||
       'dev_jwt_secret_fallback';
 
     super({
@@ -35,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const role = payload.role;
     const venueId = Number((payload as any).venueId || 0) || undefined;
 
-    // This is what becomes req.user
+    // This becomes req.user
     return {
       sub: userId,
       id: userId,

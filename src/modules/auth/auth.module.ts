@@ -13,19 +13,19 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsersModule } from '../users/users.module';
 import { Staff } from '../staff/staff.entity';
 
-// ✅ allows /auth/me to resolve profile context (you already have this)
+// ✅ allows /auth/me to resolve profile context
 import { ProfileModule } from '../../profile/profile.module';
 
 @Module({
   imports: [
-    // ✅ make sure ConfigService exists here
+    // ✅ ensure ConfigService is available
     ConfigModule,
 
     UsersModule,
     TypeOrmModule.forFeature([Staff]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
-    // ✅ CRITICAL FIX: signing secret comes from the SAME source as JwtStrategy
+    // ✅ SINGLE SOURCE OF TRUTH: same secret used by JwtStrategy
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
