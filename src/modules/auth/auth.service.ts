@@ -100,7 +100,7 @@ export class AuthService {
 
     // ✅ CRITICAL FIX:
     // Staff tokens must use the USERS table id as JWT "sub"
-    // so that /auth/me + profile lookups resolve correctly.
+    // so /auth/me + profile lookups resolve correctly.
     const user = await this.usersService.findByEmail?.(email);
     if (!user?.id) {
       throw new UnauthorizedException('Staff user missing Users row');
@@ -108,7 +108,7 @@ export class AuthService {
 
     // return "user-like" object for signing
     return {
-      id: user.id, // ✅ was staff.id before
+      id: user.id, // ✅ MUST be Users.id (NOT staff.id)
       email: staff.email,
       role: 'staff' as const,
       venueId: staff.venueId,
@@ -177,7 +177,7 @@ export class AuthService {
     return this.signTokenFromUser(owner, 'owner');
   }
 
-  // ✅ staff login now uses Staff table
+  // ✅ staff login uses Staff table, but JWT sub = Users.id
   async loginStaff(dto: LoginDto): Promise<{ access_token: string }> {
     const staff = await this.validateStaff(dto.email, dto.password);
     return this.signTokenFromUser(staff, 'staff', { venueId: staff.venueId });
