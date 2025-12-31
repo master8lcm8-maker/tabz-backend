@@ -5,7 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, DeepPartial } from 'typeorm';
+
 
 import { Wallet } from './wallet.entity';
 import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
@@ -699,7 +700,6 @@ export class WalletService {
         throw new BadRequestException('Invalid cashout amount');
       }
 
-      // Pull all cashout-type ledger rows for this wallet and filter by metadata.cashoutId
       const all = await txRepo.find({
         where: {
           walletId: cashout.walletId as any,
@@ -722,12 +722,10 @@ export class WalletService {
         0,
       );
 
-      // Idempotent: already fixed (net zero) OR already has refund-only sum=+amount
       if (sum === 0 || sum === amount) {
         return cashout;
       }
 
-      // Only repair the exact broken pattern: debit-only == -amount
       if (sum !== -amount) {
         throw new BadRequestException(
           `Not a debit-only FAILED cashout (sum=${sum}, amount=${amount})`,
@@ -746,7 +744,7 @@ export class WalletService {
         txRepo.create({
           walletId: wallet.id,
           type: 'cashout',
-          amountCents: amount, // +amount refund
+          amountCents: amount,
           metadata: {
             reason: 'cashout_repair_refund',
             cashoutId: cashout.id,
@@ -762,7 +760,6 @@ export class WalletService {
       return updated;
     });
 
-    // emit after txn (consistent with your other flows)
     const wallet = await this.walletRepo.findOne({
       where: { id: saved.walletId },
     });
@@ -782,7 +779,7 @@ export class WalletService {
     const savedCashout = await this.dataSource.transaction(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
-      const txRepo = manager.getRepository(WalletTransaction); // ✅ ADD (ledger repo inside txn)
+      const txRepo = manager.getRepository(WalletTransaction);
 
       const cashout = await cashoutRepo.findOne({
         where: { id: cashoutId },
@@ -850,12 +847,12 @@ export class WalletService {
     userId: number,
     cashoutId: number,
   ): Promise<CashoutRequest> {
-    return this.dataSource.transaction(async (manager) => {
+    // ✅ ADDED: generic return type to stop TS inferring CashoutRequest | CashoutRequest[]
+    return this.dataSource.transaction<CashoutRequest>(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
       const txRepo = manager.getRepository(WalletTransaction);
 
-      // 1) Load the FAILED cashout (NO LOCKS - SQLite safe)
       const original = await cashoutRepo.findOne({
         where: { id: cashoutId },
         relations: ['wallet'],
@@ -874,9 +871,6 @@ export class WalletService {
         throw new BadRequestException('Invalid cashout amount on original');
       }
 
-      // 2) IDEMPOTENCY WITHOUT LOCKS:
-      // If we already created a retry PENDING, return it.
-      // This requires CashoutRequest.retryOfCashoutId column to exist.
       const existingPending = await cashoutRepo.findOne({
         where: {
           retryOfCashoutId: original.id as any,
@@ -886,7 +880,6 @@ export class WalletService {
 
       if (existingPending) return existingPending;
 
-      // 3) Wallet debit
       const wallet = await walletRepo.findOne({
         where: { id: original.walletId },
       });
@@ -900,19 +893,20 @@ export class WalletService {
         Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
-      // 4) Create the retry cashout
-      const retry = await cashoutRepo.save(
-        cashoutRepo.create({
-          walletId: wallet.id,
-          amountCents: amount,
-          status: 'PENDING',
-          failureReason: null,
-          destinationLast4: original.destinationLast4 ?? null,
-          retryOfCashoutId: original.id as any,
-        } as any),
-      );
+     // ✅ Single-object DeepPartial prevents TS from selecting the array overload
+const retryPartial: DeepPartial<CashoutRequest> = {
+  walletId: wallet.id,
+  amountCents: amount,
+  status: 'PENDING',
+  failureReason: null,
+  destinationLast4: original.destinationLast4 ?? null,
+  retryOfCashoutId: original.id as any,
+};
 
-      // 5) Ledger: exactly one cashout_request row for the retry
+const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
+
+
+
       await txRepo.save(
         txRepo.create({
           walletId: wallet.id,

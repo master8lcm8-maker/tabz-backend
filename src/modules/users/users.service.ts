@@ -71,14 +71,16 @@ export class UsersService {
       return this.usersRepository.save(existing);
     }
 
-    const newUser = this.usersRepository.create({
-      email,
-      passwordHash,
-      displayName,
-      // NOTE: this line requires User.role to exist
-      role,
-    } as any);
+   const newUser = this.usersRepository.create({
+  email,
+  passwordHash,
+  displayName,
+  // NOTE: this line requires User.role to exist
+  role,
+} as any);
 
-    return this.usersRepository.save(newUser);
+// ✅ force single-entity overload
+return this.usersRepository.save(newUser as any);
+
   }
 }
