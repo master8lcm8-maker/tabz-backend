@@ -13,9 +13,14 @@ import { StaffAuthService } from './staff-auth.service';
 import { StaffStrategy } from './staff.strategy';
 import { StaffAuthStrategy } from './staff-auth.strategy';
 
+// ✅ ADD: bring Venue entity into the TypeORM module graph
+import { VenuesModule } from '../venues/venues.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([Staff]),
+    // ✅ ADD
+    VenuesModule,
     PassportModule.register({ defaultStrategy: 'staff-jwt' }),
     JwtModule.register({
       secret: process.env.STAFF_JWT_SECRET || 'TABZ_STAFF_JWT_SECRET',

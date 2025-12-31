@@ -10,6 +10,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Staff } from '../modules/staff/staff.entity';
 import * as bcrypt from 'bcrypt';
 
+import { ProfileService } from '../profile/profile.service';
+import { ProfileType } from '../profile/profile.types';
+
 @Controller('dev-seed')
 export class DevSeedController {
   constructor(
@@ -17,10 +20,11 @@ export class DevSeedController {
     private readonly dataSource: DataSource,
     @InjectRepository(Staff)
     private readonly staffRepo: Repository<Staff>,
+    private readonly profileService: ProfileService,
   ) {}
 
   // ------------------------------------------------------------
-  // Helper: create user if missing, otherwise return existing
+  // Helper: create user if missing
   // ------------------------------------------------------------
   private async ensureUser(params: {
     email: string;
@@ -38,7 +42,7 @@ export class DevSeedController {
 
     if (typeof createFn !== 'function') {
       throw new InternalServerErrorException(
-        'UsersService is missing a create method (createUser/create/createDemoUser/createWithPassword).',
+        'UsersService is missing a create method.',
       );
     }
 
@@ -59,6 +63,33 @@ export class DevSeedController {
   }
 
   // ------------------------------------------------------------
+  // Helper: ensure profile exists (idempotent)
+  // ------------------------------------------------------------
+  private async ensureProfile(params: {
+    userId: number;
+    displayName: string;
+    type: ProfileType;
+  }) {
+    const userId = Number(params.userId);
+    if (!Number.isFinite(userId) || userId <= 0) return null;
+
+    const existing = await this.profileService.listForUser(userId);
+    const found = existing?.find((p: any) => String(p?.type) === params.type);
+    if (found) return found;
+
+    const typeStr = String(params.type).toLowerCase();
+    const slug = `${typeStr}-${userId}`;
+
+    return this.profileService.createForUser(userId, {
+      type: params.type,
+      displayName: params.displayName,
+      slug,
+      bio: null,
+      avatarUrl: null,
+    });
+  }
+
+  // ------------------------------------------------------------
   // BUYER seed
   // ------------------------------------------------------------
   @Post('buyer')
@@ -68,6 +99,14 @@ export class DevSeedController {
     const displayName = 'Demo Buyer';
 
     const user = await this.ensureUser({ email, password, displayName });
+
+    if (user?.id) {
+      await this.ensureProfile({
+        userId: user.id,
+        displayName,
+        type: ProfileType.BUYER,
+      });
+    }
 
     return { ok: true, createdOrExists: true, email, userId: user?.id ?? null };
   }
@@ -83,11 +122,19 @@ export class DevSeedController {
 
     const user = await this.ensureUser({ email, password, displayName });
 
+    if (user?.id) {
+      await this.ensureProfile({
+        userId: user.id,
+        displayName,
+        type: ProfileType.OWNER,
+      });
+    }
+
     return { ok: true, createdOrExists: true, email, userId: user?.id ?? null };
   }
 
   // ------------------------------------------------------------
-  // OWNER2 seed (for cross-owner isolation testing)
+  // OWNER2 seed
   // ------------------------------------------------------------
   @Post('owner2')
   async seedOwner2() {
@@ -97,11 +144,19 @@ export class DevSeedController {
 
     const user = await this.ensureUser({ email, password, displayName });
 
+    if (user?.id) {
+      await this.ensureProfile({
+        userId: user.id,
+        displayName,
+        type: ProfileType.OWNER,
+      });
+    }
+
     return { ok: true, createdOrExists: true, email, userId: user?.id ?? null };
   }
 
   // ------------------------------------------------------------
-  // ✅ STAFF seed (FINAL – writes REAL bcrypt hash)
+  // STAFF seed
   // ------------------------------------------------------------
   @Post('staff')
   async seedStaff() {
@@ -117,8 +172,16 @@ export class DevSeedController {
       displayName: name,
     });
 
-    let staff = await this.staffRepo.findOne({ where: { email } });
+    // ✅ profile guarantee (matches your exit condition rule)
+    if (user?.id) {
+      await this.ensureProfile({
+        userId: user.id,
+        displayName: name,
+        type: ProfileType.STAFF,
+      });
+    }
 
+    let staff = await this.staffRepo.findOne({ where: { email } });
     const passwordHash = await bcrypt.hash(password, 10);
 
     if (!staff) {
@@ -147,14 +210,15 @@ export class DevSeedController {
   }
 
   // ------------------------------------------------------------
-  // Seed everything
+  // Seed everything (MUST include owner2 per your exit conditions)
   // ------------------------------------------------------------
   @Post('all')
   async seedAll() {
     const buyer = await this.seedBuyer();
     const owner = await this.seedOwner();
+    const owner2 = await this.seedOwner2();
     const staff = await this.seedStaff();
 
-    return { ok: true, buyer, owner, staff };
+    return { ok: true, buyer, owner, owner2, staff };
   }
 }

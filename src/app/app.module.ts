@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WalletModule } from '../wallet/wallet.module';
+import { ProfileModule } from '../profile/profile.module'; // ✅ ADDED
+
 import { AuthModule } from '../modules/auth/auth.module';
 import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
@@ -29,15 +31,16 @@ import { IdentityModule } from '../identity/identity.module';
 
     // Core modules
     UsersModule,
-    AuthModule,       // ✅ enables /auth/login and registers jwt strategy
+    AuthModule,        // ✅ enables /auth/login and registers jwt strategy
     WalletModule,
-    StoreItemsModule, // ✅ enables /store-items/*
+    StoreItemsModule,  // ✅ enables /store-items/*
+    ProfileModule,     // ✅ ENABLES profiles table + DI
 
-    // ✅ ADD
+    // Identity
     IdentityModule,
 
     // Dev tools
-    DevSeedModule,    // ✅ enables /dev-seed/*
+    DevSeedModule,     // ✅ enables /dev-seed/*
   ],
 })
 export class AppModule {}
