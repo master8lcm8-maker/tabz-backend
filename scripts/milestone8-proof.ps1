@@ -1,14 +1,15 @@
-# =========================================================
-# TABZ — Milestone 8 — Owner Orders (LIVE)
-# PROOF HARNESS — deterministic, repeatable, no UI guessing
+﻿# =========================================================
+# TABZ â€” Milestone 8 â€” Owner Orders (LIVE)
+# PROOF HARNESS â€” deterministic, repeatable, no UI guessing
 # =========================================================
 
 $ErrorActionPreference = "Stop"
 
-$BASE_URL    = "http://10.0.0.239:3000"
-$OWNER_EMAIL = "owner@tabz.app"
-$BUYER_EMAIL = "buyer@tabz.app"
-$PASSWORD    = "password"
+$BASE_URL     = "http://10.0.0.239:3000"
+$OWNER_EMAIL  = "owner@tabz.app"
+$BUYER_EMAIL  = "buyer@tabz.app"
+$STAFF_EMAIL  = "staff@tabz.app"
+$PASSWORD     = "password"
 
 function Json($obj, $depth = 20) {
   $obj | ConvertTo-Json -Depth $depth
@@ -20,24 +21,28 @@ function Get-Token($resp) {
   throw "No access token in response"
 }
 
-Write-Host "`n=== MILESTONE 8 — OWNER ORDERS — PROOF ===`n"
+function DevSeedHeaders() {
+  return @{ "x-dev-seed-secret" = $env:DEV_SEED_SECRET }
+}
+
+Write-Host "`n=== MILESTONE 8 â€” OWNER ORDERS â€” PROOF ===`n"
 
 # ---------------------------------------------------------
 # 1) Seed demo buyer + owner
 # ---------------------------------------------------------
 Write-Host "[1] Ensure demo buyer"
-$buyerSeed = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/ensure-demo-buyer"
+$buyerSeed = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/buyer" -Headers (DevSeedHeaders)
 Write-Host (Json $buyerSeed)
 
 Write-Host "[2] Ensure demo owner"
-$ownerSeed = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/ensure-demo-owner"
+$ownerSeed = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/owner" -Headers (DevSeedHeaders)
 Write-Host (Json $ownerSeed)
 
 # ---------------------------------------------------------
 # 2) Ensure owner venue + item
 # ---------------------------------------------------------
 Write-Host "[3] Ensure demo owner venue + item"
-$seedItem = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/ensure-demo-owner-item"
+$seedItem = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/owner-item" -Headers (DevSeedHeaders)
 Write-Host (Json $seedItem)
 
 $itemId  = [int]$seedItem.item.id
@@ -67,6 +72,22 @@ $ownerLogin = Invoke-RestMethod -Method POST `
 
 $ownerToken = Get-Token $ownerLogin
 Write-Host "Owner token OK"
+
+# ---------------------------------------------------------
+# 3b) Ensure staff + login staff
+# ---------------------------------------------------------
+Write-Host "[5a] Ensure demo staff"
+$staffSeed = Invoke-RestMethod -Method POST -Uri "$BASE_URL/dev-seed/staff" -Headers (DevSeedHeaders)
+Write-Host (Json $staffSeed)
+
+Write-Host "[5b] Login staff"
+$staffLogin = Invoke-RestMethod -Method POST `
+  -Uri "$BASE_URL/auth/login-staff" `
+  -Body (@{ email=$STAFF_EMAIL; password=$PASSWORD } | ConvertTo-Json) `
+  -ContentType "application/json"
+
+$staffToken = Get-Token $staffLogin
+Write-Host "Staff token OK"
 
 # ---------------------------------------------------------
 # 4) Identity proof
@@ -115,19 +136,19 @@ $orders1 = Invoke-RestMethod -Method GET `
 Write-Host (Json $orders1)
 
 # ---------------------------------------------------------
-# 8) Owner mark → pending → cancel
+# 8) Staff mark â†’ pending â†’ cancel
 # ---------------------------------------------------------
-Write-Host "[11] Owner mark order pending"
+Write-Host "[11] Staff mark order pending"
 Invoke-RestMethod -Method POST `
-  -Uri "$BASE_URL/store-items/owner/orders/$orderId/mark" `
-  -Headers @{ Authorization="Bearer $ownerToken" } `
+  -Uri "$BASE_URL/store-items/staff/orders/$orderId/mark" `
+  -Headers @{ Authorization="Bearer $staffToken" } `
   -Body (@{ status="pending" } | ConvertTo-Json) `
   -ContentType "application/json" | Out-Null
 
-Write-Host "[12] Owner cancel order"
+Write-Host "[12] Staff cancel order"
 Invoke-RestMethod -Method POST `
-  -Uri "$BASE_URL/store-items/owner/orders/$orderId/cancel" `
-  -Headers @{ Authorization="Bearer $ownerToken" } `
+  -Uri "$BASE_URL/store-items/staff/orders/$orderId/cancel" `
+  -Headers @{ Authorization="Bearer $staffToken" } `
   -ContentType "application/json" | Out-Null
 
 # ---------------------------------------------------------
@@ -140,4 +161,5 @@ $orders2 = Invoke-RestMethod -Method GET `
 
 Write-Host (Json $orders2)
 
-Write-Host "`n✅ MILESTONE 8 — OWNER ORDERS — PROVEN`n"
+Write-Host "`nâœ… MILESTONE 8 â€” OWNER ORDERS â€” PROVEN`n"
+

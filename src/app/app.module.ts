@@ -4,12 +4,15 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WalletModule } from '../wallet/wallet.module';
-import { ProfileModule } from '../profile/profile.module'; // ✅ ADDED
+import { ProfileModule } from '../profile/profile.module';
 
 import { AuthModule } from '../modules/auth/auth.module';
 import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
+
+// ✅ ADD
+import { VenuesModule } from '../modules/venues/venues.module';
 
 // ✅ ADD
 import { IdentityModule } from '../identity/identity.module';
@@ -34,19 +37,22 @@ import { HealthModule } from '../health/health.module';
 
     // Core modules
     UsersModule,
-    AuthModule,        // ✅ enables /auth/login and registers jwt strategy
+    AuthModule,
     WalletModule,
-    StoreItemsModule,  // ✅ enables /store-items/*
-    ProfileModule,     // ✅ ENABLES profiles table + DI
+    StoreItemsModule,
+    ProfileModule,
+
+    // ✅ FV-17 — venues endpoints
+    VenuesModule,
 
     // Identity
     IdentityModule,
 
     // Health (liveness / readiness)
-    HealthModule,      // ✅ ENABLES GET /health
+    HealthModule,
 
     // Dev tools
-    DevSeedModule,     // ✅ enables /dev-seed/*
+    DevSeedModule,
   ],
 })
 export class AppModule {}
