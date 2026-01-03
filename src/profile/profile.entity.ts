@@ -41,6 +41,10 @@ export class Profile {
   @Column({ nullable: true })
   avatarUrl?: string | null;
 
+  // ✅ Optional cover/banner image (NEW for M27)
+  @Column({ nullable: true })
+  coverUrl?: string | null;
+
   // Soft visibility control
   @Column({ default: true })
   isActive: boolean;

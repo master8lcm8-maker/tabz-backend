@@ -16,6 +16,13 @@ export class Venue {
   @Column({ type: 'int' })
   ownerId: number;
 
+  @Column({ type: 'int', nullable: true })
+  ownerProfileId: number | null;
+
+  // ✅ FV-17.1.A — venue slug
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  slug: string | null;
+
   @Column({ type: 'varchar', length: 120 })
   name: string;
 
@@ -30,6 +37,14 @@ export class Venue {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   country: string | null;
+
+  // ✅ FV-25 — Optional venue avatar
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  avatarUrl: string | null;
+
+  // ✅ FV-25 — Optional venue cover/banner
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  coverUrl: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -27,19 +27,31 @@ export class WalletController {
   ) {}
 
   // --------------------------------------------------
-  // User resolver (JWT-first, with safe fallbacks)
+  // Auth/role gate: Wallet is OWNER/BUYER only (STAFF forbidden)
+  // --------------------------------------------------
+  private assertWalletRole(req: any) {
+    const role = String(req?.user?.role || '').toLowerCase();
+    // If role missing, treat as unsafe
+    if (!role) throw new ForbiddenException('forbidden_role');
+
+    // STAFF must never access wallet/bank/cashouts
+    if (role === 'staff') throw new ForbiddenException('staff_forbidden');
+
+    // Allow buyer/owner only
+    if (role !== 'buyer' && role !== 'owner') {
+      throw new ForbiddenException('forbidden_role');
+    }
+  }
+
+  // --------------------------------------------------
+  // User resolver (JWT-first, NO header fallbacks)
   // --------------------------------------------------
   private getUserId(req: any): number {
     const jwtUser = req?.user as any;
-
-    // ✅ FIX: support common payload shapes: { id }, { userId }, { sub }
     const jwtVal = Number(jwtUser?.userId ?? jwtUser?.sub ?? jwtUser?.id);
 
-    // If JwtAuthGuard passed, we MUST have a valid user id.
     if (Number.isFinite(jwtVal) && jwtVal > 0) return jwtVal;
 
-    // ❌ Do NOT allow x-user-id fallback in guarded routes.
-    // If this happens, your JwtStrategy validate() is not returning an id.
     throw new ForbiddenException('Invalid auth context: missing user id');
   }
 
@@ -48,6 +60,7 @@ export class WalletController {
   // --------------------------------------------------
   @Get('summary')
   async getSummary(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
     return this.walletService.getSummary(userId);
   }
@@ -57,6 +70,7 @@ export class WalletController {
   // --------------------------------------------------
   @Post('deposit')
   async deposit(@Req() req, @Body() body: { amountCents: number }) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
     const amount = Number(body?.amountCents);
 
@@ -75,6 +89,7 @@ export class WalletController {
     @Req() req,
     @Body() body: { receiverId: number; amountCents: number },
   ) {
+    this.assertWalletRole(req);
     const senderId = this.getUserId(req);
     const receiverId = Number(body?.receiverId);
     const amount = Number(body?.amountCents);
@@ -96,6 +111,7 @@ export class WalletController {
   // --------------------------------------------------
   @Post('cashout')
   async cashout(@Req() req, @Body() body: { amountCents: number }) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
 
     // ===== GATE 1: Identity must be verified =====
@@ -114,7 +130,6 @@ export class WalletController {
       );
     }
 
-    // 1) Parse amount safely
     const rawAmount = body?.amountCents;
     const amount = Math.floor(Number(rawAmount));
 
@@ -124,7 +139,6 @@ export class WalletController {
       );
     }
 
-    // 2) Enforce a minimum cashout (e.g. $5.00)
     const minAmountCents = 500;
     if (amount < minAmountCents) {
       throw new BadRequestException(
@@ -134,7 +148,6 @@ export class WalletController {
       );
     }
 
-    // 3) Enforce "not more than available cashout balance"
     const summary = await this.walletService.getSummary(userId);
     const available = Number(summary.cashoutAvailableCents);
 
@@ -148,7 +161,6 @@ export class WalletController {
       );
     }
 
-    // 4) Delegate to WalletService
     const cashout: CashoutRequest = await this.walletService.cashout(
       userId,
       amount,
@@ -171,6 +183,7 @@ export class WalletController {
   // --------------------------------------------------
   @Get('cashouts')
   async getCashouts(@Req() req, @Query('status') status?: string) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
     return this.walletService.listCashoutsCanonical(userId, status ?? null);
   }
@@ -180,7 +193,8 @@ export class WalletController {
   // --------------------------------------------------
   @Get('cashouts/:id')
   async getCashoutById(@Req() req, @Param('id') id: string) {
-    // ✅ FIX: log must be INSIDE the function body
+    this.assertWalletRole(req);
+
     console.log(
       '[GET /wallet/cashouts/:id]',
       'jwtUser=',
@@ -205,15 +219,19 @@ export class WalletController {
   // --------------------------------------------------
   @Get('cashouts/failed')
   async getFailedCashouts(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
     return this.walletService.listCashoutsCanonical(userId, 'failed');
   }
 
   // --------------------------------------------------
   // 🔥 ADMIN: COMPLETE CASHOUT
+  // NOTE: still role-gated here; staff blocked.
   // --------------------------------------------------
   @Post('cashouts/:id/complete')
-  async completeCashout(@Param('id') id: string) {
+  async completeCashout(@Req() req, @Param('id') id: string) {
+    this.assertWalletRole(req);
+
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
@@ -237,16 +255,18 @@ export class WalletController {
   // --------------------------------------------------
   @Post('cashouts/:id/fail')
   async failCashout(
+    @Req() req,
     @Param('id') id: string,
     @Body() body: { failureReason?: string },
   ) {
+    this.assertWalletRole(req);
+
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
 
     const reason = body.failureReason ?? 'Cashout failed';
-
     const cashout = await this.walletService.adminFailCashout(cashoutId, reason);
 
     return {
@@ -262,10 +282,11 @@ export class WalletController {
 
   // --------------------------------------------------
   // ✅ ADMIN/DEV: REPAIR FAILED CASHOUT REFUND (FV-10)
-  // POST /wallet/cashouts/:id/repair-refund
   // --------------------------------------------------
   @Post('cashouts/:id/repair-refund')
-  async repairFailedCashoutRefund(@Param('id') id: string) {
+  async repairFailedCashoutRefund(@Req() req, @Param('id') id: string) {
+    this.assertWalletRole(req);
+
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
@@ -287,11 +308,13 @@ export class WalletController {
   }
 
   // --------------------------------------------------
-  // OWNER: CANCEL OWN CASHOUT (PENDING → FAILED + REFUND)
+  // OWNER: CANCEL OWN CASHOUT
   // --------------------------------------------------
   @Post('cashouts/:id/cancel')
   async cancelOwnCashout(@Req() req, @Param('id') id: string) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
@@ -311,11 +334,13 @@ export class WalletController {
   }
 
   // --------------------------------------------------
-  // OWNER: RETRY FAILED CASHOUT (CREATES NEW PENDING)
+  // OWNER: RETRY FAILED CASHOUT
   // --------------------------------------------------
   @Post('cashouts/:id/retry')
   async retryOwnCashout(@Req() req, @Param('id') id: string) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
@@ -339,7 +364,9 @@ export class WalletController {
   // --------------------------------------------------
   @Post('dev/add-cashout-balance')
   async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     const amount = Number(body?.amountCents);
     if (!Number.isFinite(amount) || amount <= 0) {
       throw new BadRequestException('Invalid amount');
@@ -348,46 +375,55 @@ export class WalletController {
   }
 
   // --------------------------------------------------
-  // 🔥 OWNER METRICS FOR DASHBOARD
+  // OWNER METRICS FOR DASHBOARD
   // --------------------------------------------------
   @Get('metrics')
   async getMetrics(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
     return this.walletService.getCashoutMetrics(userId);
   }
 
   // --------------------------------------------------
-  // 🔥 NEXT PAYOUT
+  // NEXT PAYOUT
   // --------------------------------------------------
   @Get('next-payout')
   async getNextPayout(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     const next = await this.walletService.getNextPayout(userId);
     return { next: next ?? null };
   }
 
   // --------------------------------------------------
-  // ✅ TRANSACTIONS (THIS WAS MISSING — causes 404)
+  // TRANSACTIONS
   // GET /wallet/transactions
   // --------------------------------------------------
   @Get('transactions')
   async getTransactions(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     return this.walletService.getTransactionsForUser(userId);
   }
 
   // --------------------------------------------------
-  // M6: BACK-COMPAT / UI ENDPOINTS (canonical, user-scoped)
+  // BACK-COMPAT / UI ENDPOINTS (canonical, user-scoped)
   // --------------------------------------------------
   @Get('cashouts/pending')
   async getPendingCashouts(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     return this.walletService.listCashoutsCanonical(userId, 'pending');
   }
 
   @Get('cashouts/completed')
   async getCompletedCashouts(@Req() req) {
+    this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }

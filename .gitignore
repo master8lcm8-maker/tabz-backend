@@ -1,3 +1,13 @@
 node_modules/
 dist/
 .env
+
+.env.local
+
+# Local dev artifacts
+dev.sqlite
+src/storage/
+
+# Local dev artifacts (DO NOT COMMIT)
+dev.sqlite
+src/storage/
