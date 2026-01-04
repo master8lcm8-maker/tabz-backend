@@ -6,8 +6,8 @@ dist/
 
 # Local dev artifacts
 dev.sqlite
-src/storage/
+
 
 # Local dev artifacts (DO NOT COMMIT)
 dev.sqlite
-src/storage/
+
