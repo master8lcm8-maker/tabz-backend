@@ -11,3 +11,7 @@ dev.sqlite
 # Local dev artifacts (DO NOT COMMIT)
 dev.sqlite
 
+
+# Local convenience scripts
+scripts/start-backend-dev.ps1
+
