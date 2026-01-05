@@ -25,9 +25,8 @@ export class VenueWalletTransaction {
   @Column()
   venueWalletId: number;
 
-  // IMPORTANT: no inverse-side reference here
-  // (because your VenueWallet entity doesn't define `transactions`)
-  @ManyToOne(() => VenueWallet, { onDelete: 'CASCADE' })
+  // ✅ MUST declare inverse side because VenueWallet has OneToMany(transactions)
+  @ManyToOne(() => VenueWallet, (vw) => vw.transactions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'venueWalletId' })
   venueWallet: VenueWallet;
 

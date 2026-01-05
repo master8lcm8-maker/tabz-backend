@@ -386,7 +386,8 @@ export class DevSeedController {
     for (const ownerId of ownerIds) {
       let displayName = `Legacy Owner ${ownerId}`;
       try {
-        const user = await this.usersService.findById?.(ownerId);
+        const user = await this.usersService.findOneById(ownerId);
+
         if (user?.displayName) displayName = String(user.displayName);
         else if (user?.email) displayName = `Legacy ${String(user.email)}`;
       } catch {}
