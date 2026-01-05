@@ -15,3 +15,19 @@ dev.sqlite
 # Local convenience scripts
 scripts/start-backend-dev.ps1
 
+# local dev DBs / artifacts (never commit)
+tabz-dev.sqlite
+tabz.sqlite
+dev.sqlite
+*.localblock
+*.bak_*
+server.log
+fail_body.json
+failed-cashouts.js
+cashouts-by-status.js
+debug-cancel-ledger.js
+inspect-db.js
+ledger-*.js
+tmp-*.js
+wallet-row.js
+_quarantine/
