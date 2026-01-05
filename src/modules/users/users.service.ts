@@ -18,6 +18,11 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  // ✅ added: used by dev-seed to fetch by id
+  async findOneById(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
   /**
    * Strict create – will fail if email already exists (because of UNIQUE).
    */
@@ -71,16 +76,15 @@ export class UsersService {
       return this.usersRepository.save(existing);
     }
 
-   const newUser = this.usersRepository.create({
-  email,
-  passwordHash,
-  displayName,
-  // NOTE: this line requires User.role to exist
-  role,
-} as any);
+    const newUser = this.usersRepository.create({
+      email,
+      passwordHash,
+      displayName,
+      // NOTE: this line requires User.role to exist
+      role,
+    } as any);
 
-// ✅ force single-entity overload
-return this.usersRepository.save(newUser as any);
-
+    // ✅ force single-entity overload
+    return this.usersRepository.save(newUser as any);
   }
 }

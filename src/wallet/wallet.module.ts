@@ -8,6 +8,8 @@ import { WalletTransaction } from '../wallet/wallet-transaction.entity';
 import { VenueWallet } from '../wallet/venue-wallet.entity';
 import { CashoutLock } from '../wallet/cashout-lock.entity';
 import { Transfer } from '../wallet/transfer.entity';
+import { VenueWalletTransaction } from '../wallet/venue-wallet-transaction.entity';
+
 import { BankInfo } from '../wallet/bank-info.entity';
 
 import { WalletService } from '../wallet/wallet.service';
@@ -29,6 +31,7 @@ import { IdentityModule } from '../identity/identity.module';
       CashoutRequest,
       WalletTransaction,
       VenueWallet,
+      VenueWalletTransaction,
       CashoutLock,
       Transfer,
       BankInfo,
@@ -45,11 +48,7 @@ import { IdentityModule } from '../identity/identity.module';
   ],
 
   controllers: [WalletController, BankInfoController],
-  providers: [
-    WalletService,
-    CashoutSchedulerService,
-    BankInfoService,
-  ],
+  providers: [WalletService, CashoutSchedulerService, BankInfoService],
   exports: [WalletService],
 })
 export class WalletModule {}
