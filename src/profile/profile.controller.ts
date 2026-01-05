@@ -23,11 +23,11 @@ import { SpacesUploadService } from '../storage/spaces-upload.service';
 type PatchMeBody = {
   displayName?: string;
   bio?: string | null;
-  avatarUrl?: string | null;
-  coverUrl?: string | null;
 };
 
-const PATCH_ME_ALLOWLIST = new Set(['displayName', 'bio', 'avatarUrl', 'coverUrl']);
+// ✅ M27.2: ONLY allow text identity fields here.
+// Avatar/Cover MUST be updated ONLY via upload endpoints (M27.4) to prevent URL injection.
+const PATCH_ME_ALLOWLIST = new Set(['displayName', 'bio']);
 
 @Controller('profiles')
 export class ProfileController {
@@ -60,6 +60,20 @@ export class ProfileController {
     // fallback: first active profile (stable)
     const active = profiles.find((p: any) => p?.isActive !== false);
     return active ?? profiles[0];
+  }
+
+  // ✅ Public-safe projection (NO internal fields)
+  // IMPORTANT: used for all PUBLIC reads so we never leak:
+  // userId, id, isActive, createdAt, updatedAt, etc.
+  private toPublicProfile(p: any) {
+    return {
+      type: p?.type ?? null,
+      displayName: p?.displayName ?? null,
+      slug: p?.slug ?? null,
+      bio: p?.bio ?? null,
+      avatarUrl: p?.avatarUrl ?? null,
+      coverUrl: (p as any)?.coverUrl ?? null,
+    };
   }
 
   // ✅ GET /profiles/me (auth read)
@@ -116,10 +130,6 @@ export class ProfileController {
     if (body && typeof body === 'object') {
       if (typeof body.displayName === 'string') safe.displayName = body.displayName;
       if (body.bio === null || typeof body.bio === 'string') safe.bio = body.bio;
-      if (body.avatarUrl === null || typeof body.avatarUrl === 'string')
-        safe.avatarUrl = body.avatarUrl;
-      if (body.coverUrl === null || typeof body.coverUrl === 'string')
-        safe.coverUrl = body.coverUrl;
     }
 
     // no-op guard
@@ -127,7 +137,11 @@ export class ProfileController {
       throw new BadRequestException('no_fields_to_update');
     }
 
-    const updated = await this.profileService.updateForUser(userId, primary.id, safe);
+    const updated = await this.profileService.updateForUser(
+      userId,
+      primary.id,
+      safe,
+    );
 
     // refresh list after update (keeps /profiles/me consistent)
     const refreshed = await this.profileService.listForUser(userId);
@@ -272,24 +286,16 @@ export class ProfileController {
 
     return {
       ok: true,
-      profile: {
-        id: profile.id,
-        type: profile.type,
-        displayName: profile.displayName,
-        slug: profile.slug,
-        bio: profile.bio,
-        avatarUrl: profile.avatarUrl,
-        coverUrl: (profile as any).coverUrl ?? null,
-        isActive: profile.isActive,
-      },
+      profile: this.toPublicProfile(profile),
     };
   }
 
   // ✅ GET /profiles/:slug (legacy read)
+  // IMPORTANT: keep route for backwards compatibility, but do NOT leak internal fields
   @Get(':slug')
   async bySlug(@Req() req: any) {
     const slug = String(req?.params?.slug || '').trim();
     const profile = await this.profileService.getBySlug(slug);
-    return { ok: true, profile };
+    return { ok: true, profile: this.toPublicProfile(profile) };
   }
 }
