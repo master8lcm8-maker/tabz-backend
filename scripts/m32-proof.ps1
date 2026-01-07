@@ -74,5 +74,18 @@ $res6 = HttpPostJson "$BASE_URL/wallet/unlock-spendable" $token "{}" $DEV
 Say ("wallet/unlock-spendable WITH secret HTTP=" + $res6.status + " RAW=" + $res6.raw)
 Must $res6.status -ne 401 "FAIL: still 401 with secret for wallet/unlock-spendable"
 
+# 5) dev-seed/buyer must be 401 without secret (NO JWT)
+$resDS1 = HttpPostJson "$BASE_URL/dev-seed/buyer" $null "{}" $null
+Say ("dev-seed/buyer no-secret HTTP=" + $resDS1.status + " RAW=" + $resDS1.raw)
+Must $resDS1.status -eq 401 "FAIL: expected 401 without secret for dev-seed/buyer"
+
+# Positive reachability (not 401) — requires DEV_SEED_SECRET in your shell
+$resDS2 = HttpPostJson "$BASE_URL/dev-seed/buyer" $null "{}" $DEV
+Say ("dev-seed/buyer WITH secret HTTP=" + $resDS2.status + " RAW=" + $resDS2.raw)
+Must $resDS2.status -ne 401 "FAIL: still 401 with secret for dev-seed/buyer"
+
 Say "✅ M32 PASS — DEV endpoints are secret-gated (401 without secret; reachable with secret)"
+
+
+
 
