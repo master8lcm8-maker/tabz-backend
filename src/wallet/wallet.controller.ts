@@ -1,4 +1,4 @@
-// src/wallet/wallet.controller.ts
+﻿// src/wallet/wallet.controller.ts
 import {
   BadRequestException,
   Body,
@@ -10,8 +10,9 @@ import {
   UseGuards,
   ForbiddenException,
   Query,
-  HttpException, // ✅ M31.1: preserve upstream status codes
+  HttpException, // âœ… M31.1: preserve upstream status codes
 } from '@nestjs/common';
+import { DevEndpointGuard } from '../app/dev-endpoint.guard';
 import { WalletService } from './wallet.service';
 import { CashoutRequest } from './cashout-request.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt-auth.guard';
@@ -171,13 +172,13 @@ export class WalletController {
         createdAt: cashout.createdAt,
       };
     } catch (e: any) {
-      // 🔒 M30: FORCE JSON ERROR BODY (NO BEHAVIOR CHANGE)
+      // ðŸ”’ M30: FORCE JSON ERROR BODY (NO BEHAVIOR CHANGE)
       // eslint-disable-next-line no-console
       console.error('[wallet.cashout] error', e);
 
       const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
 
-      // ✅ M31.1 FIX:
+      // âœ… M31.1 FIX:
       // Preserve the original status code on the HTTP transport
       // while still returning our structured JSON body.
       const status = Number(e?.status);
@@ -283,7 +284,8 @@ export class WalletController {
     return this.walletService.retryCashout(userId, cashoutId);
   }
 
-  @Post('dev/add-cashout-balance')
+  @UseGuards(DevEndpointGuard)
+@Post('dev/add-cashout-balance')
   async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
@@ -294,7 +296,8 @@ export class WalletController {
     return this.walletService.devAddCashoutBalance(userId, amount);
   }
 
-  @Post('unlock-spendable')
+  @UseGuards(DevEndpointGuard)
+@Post('unlock-spendable')
   async unlockSpendable(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     if (String(req?.user?.role).toLowerCase() !== 'buyer') {
@@ -343,3 +346,4 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }
+

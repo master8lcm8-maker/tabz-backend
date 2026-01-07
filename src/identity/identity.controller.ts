@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+﻿import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { DevEndpointGuard } from "../app/dev-endpoint.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { IdentityService, VerifyStatus } from "./identity.service";
 
@@ -22,7 +23,8 @@ export class IdentityController {
   // =========================================================
   // DEV ONLY: lets us simulate provider status updates
   // =========================================================
-  @Post("dev-set-status")
+  @UseGuards(DevEndpointGuard)
+@Post("dev-set-status")
   async devSetStatus(
     @Req() req: any,
     @Body() body: { status?: VerifyStatus }
@@ -53,9 +55,12 @@ export class IdentityController {
   // =========================================================
   // DEV ONLY: simulate successful provider completion
   // =========================================================
-  @Post("dev-complete")
+  @UseGuards(DevEndpointGuard)
+@Post("dev-complete")
   async devComplete(@Req() req: any) {
     const userId = req?.user?.sub ?? req?.user?.id;
     return this.identityService.completeDev(userId);
   }
 }
+
+

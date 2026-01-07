@@ -24,6 +24,7 @@ app.getHttpAdapter().getInstance().set('etag', false);
       'Cache-Control',
       'Pragma',
       'If-None-Match',
+      'x-dev-seed-secret',
     ],
   });
 
@@ -37,4 +38,5 @@ app.getHttpAdapter().getInstance().set('etag', false);
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
