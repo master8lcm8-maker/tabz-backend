@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+﻿import {Controller, Get, BadRequestException} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -9,4 +9,19 @@ export class AppController {
   getHealth() {
     return this.appService.getHealth();
   }
+  
+  // --------------------------------------------------
+  // DEV ONLY — M31.2 proof: transport status must sync to payload.status
+  // Expected: HTTP 403 with JSON { status: 403, ... }
+  // --------------------------------------------------
+  @Get('dev/m31-2-status-sync')
+  devM312StatusSync() {
+    throw new BadRequestException({
+      message: 'm31_2_probe',
+      detail: 'This is intentional.',
+      status: 403,
+    });
+  }
 }
+
+

@@ -1,5 +1,9 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
+
+
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -11,16 +15,18 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// ✅ ADD
+// âœ… ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// ✅ ADD
+// âœ… ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// ✅ ADD (HEALTH)
+// âœ… ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
 @Module({
+  providers: [AppService],
+  controllers: [AppController],
   imports: [
     // Global config
     ConfigModule.forRoot({
@@ -42,7 +48,7 @@ import { HealthModule } from '../health/health.module';
     StoreItemsModule,
     ProfileModule,
 
-    // ✅ FV-17 — venues endpoints
+    // âœ… FV-17 â€” venues endpoints
     VenuesModule,
 
     // Identity
@@ -56,3 +62,7 @@ import { HealthModule } from '../health/health.module';
   ],
 })
 export class AppModule {}
+
+
+
+

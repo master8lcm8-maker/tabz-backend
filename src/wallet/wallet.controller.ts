@@ -10,6 +10,7 @@ import {
   UseGuards,
   ForbiddenException,
   Query,
+  HttpException, // ✅ M31.1: preserve upstream status codes
 } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { CashoutRequest } from './cashout-request.entity';
@@ -31,13 +32,8 @@ export class WalletController {
   // --------------------------------------------------
   private assertWalletRole(req: any) {
     const role = String(req?.user?.role || '').toLowerCase();
-    // If role missing, treat as unsafe
     if (!role) throw new ForbiddenException('forbidden_role');
-
-    // STAFF must never access wallet/bank/cashouts
     if (role === 'staff') throw new ForbiddenException('staff_forbidden');
-
-    // Allow buyer/owner only
     if (role !== 'buyer' && role !== 'owner') {
       throw new ForbiddenException('forbidden_role');
     }
@@ -49,9 +45,7 @@ export class WalletController {
   private getUserId(req: any): number {
     const jwtUser = req?.user as any;
     const jwtVal = Number(jwtUser?.userId ?? jwtUser?.sub ?? jwtUser?.id);
-
     if (Number.isFinite(jwtVal) && jwtVal > 0) return jwtVal;
-
     throw new ForbiddenException('Invalid auth context: missing user id');
   }
 
@@ -114,72 +108,95 @@ export class WalletController {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
 
-    // ===== GATE 1: Identity must be verified =====
-    const identity: any = await this.identityService.getStatus(userId);
-    if (identity?.status !== 'verified') {
-      throw new ForbiddenException(
-        'Identity verification is required before cashouts.',
+    try {
+      // ===== GATE 1: Identity must be verified =====
+      const identity: any = await this.identityService.getStatus(userId);
+      if (identity?.status !== 'verified') {
+        throw new ForbiddenException(
+          'Identity verification is required before cashouts.',
+        );
+      }
+
+      // ===== GATE 2: Bank info must exist =====
+      const bank = await this.bankInfoService.getForUser(userId);
+      if (!bank) {
+        throw new ForbiddenException(
+          'Bank information is required before cashouts.',
+        );
+      }
+
+      const rawAmount = body?.amountCents;
+      const amount = Math.floor(Number(rawAmount));
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new BadRequestException(
+          'Cashout amount must be a positive number of cents.',
+        );
+      }
+
+      const minAmountCents = 500;
+      if (amount < minAmountCents) {
+        throw new BadRequestException(
+          `Minimum cashout is ${minAmountCents} cents ($${(
+            minAmountCents / 100
+          ).toFixed(2)}).`,
+        );
+      }
+
+      const summary = await this.walletService.getSummary(userId);
+      const available = Number(summary.cashoutAvailableCents);
+
+      if (!Number.isFinite(available) || available <= 0) {
+        throw new BadRequestException('No cashout-ready balance available.');
+      }
+
+      if (amount > available) {
+        throw new BadRequestException(
+          `Cashout amount exceeds available cashout balance (${available} cents).`,
+        );
+      }
+
+      const cashout: CashoutRequest = await this.walletService.cashout(
+        userId,
+        amount,
+      );
+
+      return {
+        id: cashout.id,
+        walletId: cashout.walletId,
+        amountCents: Number(cashout.amountCents),
+        status: cashout.status,
+        failureReason: cashout.failureReason,
+        destinationLast4: cashout.destinationLast4 ?? null,
+        createdAt: cashout.createdAt,
+      };
+    } catch (e: any) {
+      // 🔒 M30: FORCE JSON ERROR BODY (NO BEHAVIOR CHANGE)
+      // eslint-disable-next-line no-console
+      console.error('[wallet.cashout] error', e);
+
+      const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+
+      // ✅ M31.1 FIX:
+      // Preserve the original status code on the HTTP transport
+      // while still returning our structured JSON body.
+      const status = Number(e?.status);
+      const httpStatus = Number.isFinite(status) && status > 0 ? status : 400;
+
+      throw new HttpException(
+        {
+          message: 'cashout_failed',
+          detail,
+          name: e?.name ?? null,
+          status: e?.status ?? null,
+        },
+        httpStatus,
       );
     }
-
-    // ===== GATE 2: Bank info must exist =====
-    const bank = await this.bankInfoService.getForUser(userId);
-    if (!bank) {
-      throw new ForbiddenException(
-        'Bank information is required before cashouts.',
-      );
-    }
-
-    const rawAmount = body?.amountCents;
-    const amount = Math.floor(Number(rawAmount));
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw new BadRequestException(
-        'Cashout amount must be a positive number of cents.',
-      );
-    }
-
-    const minAmountCents = 500;
-    if (amount < minAmountCents) {
-      throw new BadRequestException(
-        `Minimum cashout is ${minAmountCents} cents ($${(
-          minAmountCents / 100
-        ).toFixed(2)}).`,
-      );
-    }
-
-    const summary = await this.walletService.getSummary(userId);
-    const available = Number(summary.cashoutAvailableCents);
-
-    if (!Number.isFinite(available) || available <= 0) {
-      throw new BadRequestException('No cashout-ready balance available.');
-    }
-
-    if (amount > available) {
-      throw new BadRequestException(
-        `Cashout amount exceeds available cashout balance (${available} cents).`,
-      );
-    }
-
-    const cashout: CashoutRequest = await this.walletService.cashout(
-      userId,
-      amount,
-    );
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
   }
 
   // --------------------------------------------------
   // M6: UNIFIED CASHOUT HISTORY (canonical)
-  // GET /wallet/cashouts?status=pending|completed|failed
   // --------------------------------------------------
   @Get('cashouts')
   async getCashouts(@Req() req, @Query('status') status?: string) {
@@ -188,35 +205,17 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, status ?? null);
   }
 
-  // --------------------------------------------------
-  // GET /wallet/cashouts/:id
-  // --------------------------------------------------
   @Get('cashouts/:id')
   async getCashoutById(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
-
-    console.log(
-      '[GET /wallet/cashouts/:id]',
-      'jwtUser=',
-      req?.user,
-      'x-user-id=',
-      req?.headers?.['x-user-id'],
-      'resolvedUserId=',
-      this.getUserId(req),
-    );
-
     const userId = this.getUserId(req);
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
     return this.walletService.getCashoutForUserById(userId, cashoutId);
   }
 
-  // --------------------------------------------------
-  // M6: EXPLICIT FAILED ENDPOINT (canonical)
-  // --------------------------------------------------
   @Get('cashouts/failed')
   async getFailedCashouts(@Req() req) {
     this.assertWalletRole(req);
@@ -224,35 +223,17 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, 'failed');
   }
 
-  // --------------------------------------------------
-  // 🔥 ADMIN: COMPLETE CASHOUT
-  // NOTE: still role-gated here; staff blocked.
-  // --------------------------------------------------
   @Post('cashouts/:id/complete')
   async completeCashout(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
-
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
     const cashout = await this.walletService.adminCompleteCashout(cashoutId);
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
+    return cashout;
   }
 
-  // --------------------------------------------------
-  // 🔥 ADMIN: FAIL CASHOUT
-  // --------------------------------------------------
   @Post('cashouts/:id/fail')
   async failCashout(
     @Req() req,
@@ -260,113 +241,52 @@ export class WalletController {
     @Body() body: { failureReason?: string },
   ) {
     this.assertWalletRole(req);
-
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
-    const reason = body.failureReason ?? 'Cashout failed';
-    const cashout = await this.walletService.adminFailCashout(cashoutId, reason);
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
+    return this.walletService.adminFailCashout(
+      cashoutId,
+      body.failureReason ?? 'Cashout failed',
+    );
   }
 
-  // --------------------------------------------------
-  // ✅ ADMIN/DEV: REPAIR FAILED CASHOUT REFUND (FV-10)
-  // --------------------------------------------------
   @Post('cashouts/:id/repair-refund')
   async repairFailedCashoutRefund(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
-
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
-    const cashout = await this.walletService.adminRepairFailedCashoutRefund(
-      cashoutId,
-    );
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
+    return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
   }
 
-  // --------------------------------------------------
-  // OWNER: CANCEL OWN CASHOUT
-  // --------------------------------------------------
   @Post('cashouts/:id/cancel')
   async cancelOwnCashout(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
-    const cashout = await this.walletService.cancelCashout(userId, cashoutId);
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
+    return this.walletService.cancelCashout(userId, cashoutId);
   }
 
-  // --------------------------------------------------
-  // OWNER: RETRY FAILED CASHOUT
-  // --------------------------------------------------
   @Post('cashouts/:id/retry')
   async retryOwnCashout(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     const cashoutId = Number(id);
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-
-    const cashout = await this.walletService.retryCashout(userId, cashoutId);
-
-    return {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: Number(cashout.amountCents),
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4 ?? null,
-      createdAt: cashout.createdAt,
-    };
+    return this.walletService.retryCashout(userId, cashoutId);
   }
 
-  // --------------------------------------------------
-  // DEV TOOL — Add Direct Balance
-  // --------------------------------------------------
   @Post('dev/add-cashout-balance')
   async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     const amount = Number(body?.amountCents);
     if (!Number.isFinite(amount) || amount <= 0) {
       throw new BadRequestException('Invalid amount');
@@ -374,9 +294,20 @@ export class WalletController {
     return this.walletService.devAddCashoutBalance(userId, amount);
   }
 
-  // --------------------------------------------------
-  // OWNER METRICS FOR DASHBOARD
-  // --------------------------------------------------
+  @Post('unlock-spendable')
+  async unlockSpendable(@Req() req, @Body() body: { amountCents: number }) {
+    this.assertWalletRole(req);
+    if (String(req?.user?.role).toLowerCase() !== 'buyer') {
+      throw new ForbiddenException('buyer_only');
+    }
+    const userId = this.getUserId(req);
+    const amount = Number(body?.amountCents);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException('amountCents must be a positive number');
+    }
+    return this.walletService.unlockSpendableBalance(userId, amount);
+  }
+
   @Get('metrics')
   async getMetrics(@Req() req) {
     this.assertWalletRole(req);
@@ -384,38 +315,24 @@ export class WalletController {
     return this.walletService.getCashoutMetrics(userId);
   }
 
-  // --------------------------------------------------
-  // NEXT PAYOUT
-  // --------------------------------------------------
   @Get('next-payout')
   async getNextPayout(@Req() req) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
-    const next = await this.walletService.getNextPayout(userId);
-    return { next: next ?? null };
+    return { next: (await this.walletService.getNextPayout(userId)) ?? null };
   }
 
-  // --------------------------------------------------
-  // TRANSACTIONS
-  // GET /wallet/transactions
-  // --------------------------------------------------
   @Get('transactions')
   async getTransactions(@Req() req) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     return this.walletService.getTransactionsForUser(userId);
   }
 
-  // --------------------------------------------------
-  // BACK-COMPAT / UI ENDPOINTS (canonical, user-scoped)
-  // --------------------------------------------------
   @Get('cashouts/pending')
   async getPendingCashouts(@Req() req) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     return this.walletService.listCashoutsCanonical(userId, 'pending');
   }
 
@@ -423,7 +340,6 @@ export class WalletController {
   async getCompletedCashouts(@Req() req) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
-
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }
