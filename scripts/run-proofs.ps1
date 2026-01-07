@@ -14,7 +14,8 @@ if ($r.StatusCode -ne 200) { throw "FAIL: health not 200" }
 # 1) Proofs (add more here as we finish milestones)
 $proofs = @(
   "FV24-venues-proof.ps1",
-  "M27-profiles-upload-proof.ps1"
+  "M27-profiles-upload-proof.ps1",
+  "m32-proof.ps1"
 )
 
 foreach($p in $proofs){
@@ -28,3 +29,6 @@ foreach($p in $proofs){
 }
 
 "ALL_PROOFS_PASS"
+
+
+
