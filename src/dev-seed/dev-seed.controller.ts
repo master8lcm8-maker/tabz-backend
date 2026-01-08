@@ -6,7 +6,9 @@ import {
   Req,
   UnauthorizedException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
+import { DevEndpointGuard } from '../app/dev-endpoint.guard';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../modules/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,7 +21,7 @@ import { Venue } from '../modules/venues/venue.entity';
 
 // ✅ ADD
 import { StoreItemsService } from '../modules/store-items/store-items.service';
-
+@UseGuards(DevEndpointGuard)
 @Controller('dev-seed')
 export class DevSeedController {
   constructor(
@@ -449,3 +451,4 @@ export class DevSeedController {
     return { ok: true, buyer, owner, owner2, staff };
   }
 }
+
