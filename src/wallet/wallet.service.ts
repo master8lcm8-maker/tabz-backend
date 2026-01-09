@@ -7,7 +7,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, DeepPartial } from 'typeorm';
 
-
 import { Wallet } from './wallet.entity';
 import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
 import { WalletTransaction } from './wallet-transaction.entity';
@@ -18,8 +17,20 @@ export type WalletSummary = {
   id: number;
   userId: number;
   balanceCents: number;
+
+  // 🔒 M35: spendable is what remains after cashoutAvailable is reserved.
+  // The invariant we lock/prove at the API boundary:
+  //    balance = spendable + cashoutAvailable
   spendableBalanceCents: number;
+
   cashoutAvailableCents: number;
+
+  // Informational only: derived from PENDING cashouts (does NOT participate in invariant)
+  pendingHeldCents: number;
+
+  // ✅ M35 lock: server-side invariant assertion (balance = spendable + cashoutAvailable AND spendable non-negative)
+  ok: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 };
@@ -98,12 +109,42 @@ export class WalletService {
 
   async getSummary(userId: number): Promise<WalletSummary> {
     const wallet = await this.getOrCreateWallet(userId);
+
+    // Informational: pending-held is the sum of PENDING cashouts (does NOT participate in invariant)
+    const raw = await this.cashoutRepo
+      .createQueryBuilder('c')
+      .select('COALESCE(SUM(c.amountCents), 0)', 'sum')
+      .where('c.walletId = :walletId', { walletId: wallet.id })
+      .andWhere('c.status = :status', { status: 'PENDING' })
+      .getRawOne();
+
+    const pendingHeldCents = Number(raw?.sum ?? 0);
+
+    const balanceCents = Number(wallet.balanceCents);
+    const cashoutAvailableCents = Number(wallet.cashoutAvailableCents);
+
+    // 🔒 M35 invariant (locked): balance = spendable + cashoutAvailable
+    // Spendable is derived as the remainder after reserving cashoutAvailable.
+    // NOTE: We do NOT trust stored wallet.spendableBalanceCents here because it can drift
+    // if not updated in every flow. The API boundary must remain conserved.
+    const derivedSpendable = balanceCents - cashoutAvailableCents;
+
+    // If derivedSpendable < 0, the wallet is in an impossible state (cashoutAvailable exceeds balance).
+    // We clamp spendable to 0 for display, but ok=false will expose the invariant breach.
+    const spendableBalanceCents = Math.max(0, derivedSpendable);
+
+    const ok =
+      balanceCents === spendableBalanceCents + cashoutAvailableCents &&
+      derivedSpendable >= 0;
+
     return {
       id: wallet.id,
       userId: wallet.userId,
-      balanceCents: Number(wallet.balanceCents),
-      spendableBalanceCents: Number(wallet.spendableBalanceCents),
-      cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+      balanceCents,
+      spendableBalanceCents,
+      cashoutAvailableCents,
+      pendingHeldCents,
+      ok,
       createdAt: wallet.createdAt,
       updatedAt: wallet.updatedAt,
     };
@@ -372,6 +413,14 @@ export class WalletService {
 
       const wallet = await walletRepo.findOne({ where: { userId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
+
+      // ✅ HARD GATE: only 1 PENDING cashout allowed per wallet
+      const pendingCount = await cashoutRepo.count({
+        where: { wallet: { id: wallet.id }, status: 'PENDING' as any } as any,
+      });
+      if (pendingCount > 0) {
+        throw new BadRequestException('pending_cashout_exists');
+      }
 
       if (Number(wallet.cashoutAvailableCents) < amountCents)
         throw new BadRequestException('Insufficient cashout balance');
@@ -893,19 +942,17 @@ export class WalletService {
         Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
-     // ✅ Single-object DeepPartial prevents TS from selecting the array overload
-const retryPartial: DeepPartial<CashoutRequest> = {
-  walletId: wallet.id,
-  amountCents: amount,
-  status: 'PENDING',
-  failureReason: null,
-  destinationLast4: original.destinationLast4 ?? null,
-  retryOfCashoutId: original.id as any,
-};
+      // ✅ Single-object DeepPartial prevents TS from selecting the array overload
+      const retryPartial: DeepPartial<CashoutRequest> = {
+        walletId: wallet.id,
+        amountCents: amount,
+        status: 'PENDING',
+        failureReason: null,
+        destinationLast4: original.destinationLast4 ?? null,
+        retryOfCashoutId: original.id as any,
+      };
 
-const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
-
-
+      const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
 
       await txRepo.save(
         txRepo.create({
