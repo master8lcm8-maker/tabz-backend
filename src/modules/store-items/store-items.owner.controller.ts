@@ -23,37 +23,8 @@ export class StoreItemsOwnerController {
     private readonly walletService: WalletService,
   ) {}
 
-  // --------------------------------------------------------------
-  // BUYER — CREATE ORDER
-  // --------------------------------------------------------------
-  @Post('order')
-  async createOrder(@Req() req: Request, @Body() body: any) {
-    const buyerId = (req as any).user?.sub;
-
-    if (!buyerId || buyerId <= 0) {
-      throw new BadRequestException('Invalid buyer id from auth token.');
-    }
-
-    return this.storeItemsService.createOrderForUser(buyerId, body);
-  }
-
-  // --------------------------------------------------------------
-  // BUYER — MY ORDERS
-  // --------------------------------------------------------------
-  @Get('my-orders')
-  async getMyOrders(@Req() req: Request) {
-    const buyerId = (req as any).user?.sub;
-
-    if (!buyerId || buyerId <= 0) {
-      throw new BadRequestException('Invalid buyer id from auth token.');
-    }
-
-    const value = await this.storeItemsService.findOrdersForBuyer(buyerId);
-    return { value, Count: value.length };
-  }
-
   // ==============================================================
-  // MILESTONE 8 — OWNER ORDERS (LIVE)
+  // OWNER — ORDERS (LIVE)
   // ==============================================================
   @Get('owner/orders')
   async getOwnerOrdersLive(@Req() req: Request) {
@@ -68,7 +39,7 @@ export class StoreItemsOwnerController {
   }
 
   // ==============================================================
-  // MILESTONE 9A — OWNER ORDER DETAIL (LIVE) ✅ NEW
+  // OWNER — ORDER DETAIL (LIVE)
   // ==============================================================
   @Get('owner/orders/:orderId')
   async getOwnerOrderDetail(
@@ -87,10 +58,9 @@ export class StoreItemsOwnerController {
     }
 
     const value = await this.storeItemsService.findOwnerOrderByIdLive(
-  ownerId,
-  orderId,
-);
-
+      ownerId,
+      orderId,
+    );
 
     return { value };
   }
@@ -150,7 +120,7 @@ export class StoreItemsOwnerController {
   }
 
   // --------------------------------------------------------------
-  // 🔥 OWNER DASHBOARD ENDPOINT
+  // OWNER DASHBOARD ENDPOINT
   // --------------------------------------------------------------
   @Get('owner/dashboard')
   async getOwnerDashboard(@Req() req: Request) {

@@ -9,6 +9,9 @@ import { UsersService } from '../users/users.service';
 import { LoginDto } from './dtos/login.dto';
 import { Staff } from '../staff/staff.entity';
 
+// ✅ NEW: derive role from Profiles (not from "try buyer first")
+import { ProfileService } from '../../profile/profile.service';
+
 // Roles we support in TABZ
 export type UserRole = 'buyer' | 'owner' | 'staff';
 
@@ -24,6 +27,9 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+
+    // ✅ profile role resolution
+    private readonly profileService: ProfileService,
 
     // ✅ staff auth must come from Staff table
     @InjectRepository(Staff)
@@ -76,12 +82,17 @@ export class AuthService {
     return this.stripSensitive(user);
   }
 
-  async validateBuyer(email: string, password: string): Promise<any> {
-    return this.validateUser(email, password);
-  }
+  // ✅ Deterministic: role derived from user's profiles
+  private async resolveUserRoleFromProfiles(userId: number): Promise<UserRole> {
+    const uid = Number(userId);
+    if (!Number.isFinite(uid) || uid <= 0) return 'buyer';
 
-  async validateOwner(email: string, password: string): Promise<any> {
-    return this.validateUser(email, password);
+    const profiles = await this.profileService.listForUser(uid);
+    const hasOwner = (profiles || []).some(
+      (p: any) => String(p?.type || '').toLowerCase() === 'owner',
+    );
+
+    return hasOwner ? 'owner' : 'buyer';
   }
 
   // -------------------------
@@ -100,13 +111,11 @@ export class AuthService {
 
     // ✅ CRITICAL FIX:
     // Staff tokens must use the USERS table id as JWT "sub"
-    // so /auth/me + profile lookups resolve correctly.
     const user = await this.usersService.findByEmail?.(email);
     if (!user?.id) {
       throw new UnauthorizedException('Staff user missing Users row');
     }
 
-    // return "user-like" object for signing
     return {
       id: user.id, // ✅ MUST be Users.id (NOT staff.id)
       email: staff.email,
@@ -143,38 +152,23 @@ export class AuthService {
 
   // ----------- PUBLIC API ------------
 
+  // ✅ FIXED: login() no longer guesses buyer/owner by trying buyer first.
+  // It validates credentials, then derives role from Profiles.
   async login(dto: LoginDto): Promise<{ access_token: string }> {
-    const user = await this.validateLocal(dto.email, dto.password);
-    const role: UserRole =
-      (user as any)._authType === 'owner' ? 'owner' : 'buyer';
-    const { _authType, ...rest } = user as any;
-    return this.signTokenFromUser(rest, role);
+    const user = await this.validateUser(dto.email, dto.password);
+    const role = await this.resolveUserRoleFromProfiles(Number(user.id));
+    return this.signTokenFromUser(user, role);
   }
 
-  async validateLocal(email: string, password: string): Promise<any> {
-    // Try buyer first
-    try {
-      const buyer = await this.validateBuyer(email, password);
-      return { ...buyer, _authType: 'buyer' };
-    } catch {}
-
-    // Then owner
-    try {
-      const owner = await this.validateOwner(email, password);
-      return { ...owner, _authType: 'owner' };
-    } catch {}
-
-    throw new UnauthorizedException('Invalid credentials');
-  }
-
+  // Keep these explicit endpoints as-is (deterministic by endpoint)
   async loginBuyer(dto: LoginDto): Promise<{ access_token: string }> {
-    const buyer = await this.validateBuyer(dto.email, dto.password);
-    return this.signTokenFromUser(buyer, 'buyer');
+    const user = await this.validateUser(dto.email, dto.password);
+    return this.signTokenFromUser(user, 'buyer');
   }
 
   async loginOwner(dto: LoginDto): Promise<{ access_token: string }> {
-    const owner = await this.validateOwner(dto.email, dto.password);
-    return this.signTokenFromUser(owner, 'owner');
+    const user = await this.validateUser(dto.email, dto.password);
+    return this.signTokenFromUser(user, 'owner');
   }
 
   // ✅ staff login uses Staff table, but JWT sub = Users.id
