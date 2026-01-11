@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+﻿import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateCreditsLedger3047 implements MigrationInterface {
+export class CreateCreditsLedger1768109000000 implements MigrationInterface {
   name = 'CreateCreditsLedger3047';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -101,3 +101,4 @@ export class CreateCreditsLedger3047 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS "credits_account"`);
   }
 }
+
