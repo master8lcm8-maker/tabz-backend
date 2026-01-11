@@ -1,4 +1,4 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -15,13 +15,13 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// ✅ ADD
+// âœ… ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// ✅ ADD
+// âœ… ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// ✅ ADD (HEALTH)
+// âœ… ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
 @Module({
@@ -34,12 +34,37 @@ import { HealthModule } from '../health/health.module';
     }),
 
     // LOCAL DEV: SQLITE ONLY
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'tabz-dev.sqlite',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot((() => {
+      const env = String(process.env.NODE_ENV || '').toLowerCase();
+      const isProd = env === 'production';
+      const dbUrl = process.env.DATABASE_URL;
+
+      if (isProd) {
+        if (!dbUrl) {
+          // Hard fail in production if DATABASE_URL is missing
+          throw new Error('DATABASE_URL is required in production');
+        }
+
+        return {
+          type: 'postgres',
+          url: dbUrl,
+          autoLoadEntities: true,
+          synchronize: false,
+          // Most managed Postgres providers require SSL
+          ssl: String(process.env.DB_SSL || 'true').toLowerCase() === 'true'
+            ? { rejectUnauthorized: false }
+            : false,
+        } as any;
+      }
+
+      // DEV default: sqlite
+      return {
+        type: 'sqlite',
+        database: process.env.SQLITE_PATH || 'tabz-dev.sqlite',
+        autoLoadEntities: true,
+        synchronize: true,
+      } as any;
+    })()),
 
     // Core modules
     UsersModule,
@@ -49,7 +74,7 @@ import { HealthModule } from '../health/health.module';
     ProfileModule,
     CreditsModule,
 
-    // ✅ FV-17 — venues endpoints
+    // âœ… FV-17 â€” venues endpoints
     VenuesModule,
 
     // Identity
@@ -63,3 +88,4 @@ import { HealthModule } from '../health/health.module';
   ],
 })
 export class AppModule {}
+
