@@ -394,6 +394,39 @@ export class WalletService {
   }
 
   // ==================================================
+  // DEV/REPAIR: Unlock spendable by moving from cashoutAvailable -> spendable
+  // Invariant preserved: balance stays the same
+  // ==================================================
+  async unlockSpendableBalance(userId: number, amountCents: number) {
+    if (amountCents <= 0) {
+      throw new BadRequestException('Amount must be positive');
+    }
+
+    let wallet = await this.getOrCreateWallet(userId);
+
+    if (Number(wallet.cashoutAvailableCents) < amountCents) {
+      throw new BadRequestException('Insufficient cashout balance');
+    }
+
+    wallet.cashoutAvailableCents -= amountCents;
+    wallet.spendableBalanceCents += amountCents;
+
+    wallet = await this.walletRepo.save(wallet);
+
+    await this.txRepo.save(
+      this.txRepo.create({
+        walletId: wallet.id,
+        type: 'unlock_spendable',
+        amountCents,
+        metadata: { via: 'unlock_spendable' },
+      }),
+    );
+
+    this.emitWalletUpdated(wallet);
+    return wallet;
+  }
+
+  // ==================================================
   // CASHOUT FLOW
   // ==================================================
   async cashout(userId: number, amountCents: number): Promise<CashoutRequest> {

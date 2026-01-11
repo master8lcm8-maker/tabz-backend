@@ -1,12 +1,12 @@
-﻿// src/app/app.module.ts
+// src/app/app.module.ts
 import { Module } from '@nestjs/common';
-
 
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { CreditsModule } from '../modules/credits/credits.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
 
@@ -15,13 +15,13 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// âœ… ADD
+// ✅ ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// âœ… ADD
+// ✅ ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// âœ… ADD (HEALTH)
+// ✅ ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
 @Module({
@@ -47,8 +47,9 @@ import { HealthModule } from '../health/health.module';
     WalletModule,
     StoreItemsModule,
     ProfileModule,
+    CreditsModule,
 
-    // âœ… FV-17 â€” venues endpoints
+    // ✅ FV-17 — venues endpoints
     VenuesModule,
 
     // Identity
@@ -62,7 +63,3 @@ import { HealthModule } from '../health/health.module';
   ],
 })
 export class AppModule {}
-
-
-
-

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
@@ -16,7 +16,7 @@ export class Staff {
   @Column()
   venueId: number;
 
-  @ManyToOne(() => Venue, (venue) => venue.staff, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Venue, { onDelete: 'CASCADE' })
   venue: Venue;
 
   @Column()

@@ -1,4 +1,4 @@
-// src/modules/venues/venues.service.ts
+﻿// src/modules/venues/venues.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -19,7 +19,7 @@ export class VenuesService {
   ) {}
 
   // ----------------------------
-  // FV-20.1.A / FV-20.2 — PUBLIC DIRECTORY LIST
+  // FV-20.1.A / FV-20.2 â€” PUBLIC DIRECTORY LIST
   // ----------------------------
   async publicList() {
     const venues = await this.venueRepo
@@ -44,7 +44,7 @@ export class VenuesService {
   }
 
   // ----------------------------
-  // FV-24 — PUBLIC VENUE PAGE WITH OWNER-PAGE PARITY
+  // FV-24 â€” PUBLIC VENUE PAGE WITH OWNER-PAGE PARITY
   // ----------------------------
   async publicBySlug(slugRaw: string) {
     const slug = String(slugRaw || '').trim();
@@ -98,7 +98,9 @@ export class VenuesService {
         city: venue.city,
         state: venue.state,
         country: venue.country,
-      },
+        avatarUrl: venue.avatarUrl,
+        coverUrl: venue.coverUrl,
+},
       ownerProfile: {
         id: ownerProfile.id,
         type: ownerProfile.type,
@@ -129,7 +131,7 @@ export class VenuesService {
       throw new BadRequestException('name_and_address_are_required');
     }
 
-    // ✅ MUST: determine ownerProfileId (public venues depend on it)
+    // âœ… MUST: determine ownerProfileId (public venues depend on it)
     const profiles = await this.profileService.listForUser(ownerId);
     const ownerProfile = profiles.find((p: any) => {
       const t = String(p?.type || '').toLowerCase();
@@ -140,7 +142,7 @@ export class VenuesService {
       throw new BadRequestException('owner_profile_missing');
     }
 
-    // ✅ MUST: generate a slug so /venues/:slug/public can work
+    // âœ… MUST: generate a slug so /venues/:slug/public can work
     const baseSlug = this.slugify(name);
     if (!baseSlug) throw new BadRequestException('invalid_venue_name');
 
@@ -172,6 +174,37 @@ export class VenuesService {
     return this.venueRepo.find({
       order: { createdAt: 'DESC' },
     });
+  }
+  // ----------------------------
+  // MEDIA UPDATE (avatar/cover)
+  // Used by VenuesController upload endpoints
+  // ----------------------------
+  async updateMedia(
+    venueId: number,
+    patch: { avatarUrl?: string; coverUrl?: string },
+  ): Promise<Venue> {
+    const id = Number(venueId);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new BadRequestException('invalid_venue_id');
+    }
+
+    const venue = await this.venueRepo.findOne({ where: { id } });
+    if (!venue) throw new NotFoundException('venue_not_found');
+
+    const nextAvatar = patch?.avatarUrl;
+    const nextCover = patch?.coverUrl;
+
+    const avatarProvided = typeof nextAvatar === 'string';
+    const coverProvided = typeof nextCover === 'string';
+
+    if (!avatarProvided && !coverProvided) {
+      throw new BadRequestException('no_media_fields');
+    }
+
+    if (avatarProvided) (venue as any).avatarUrl = nextAvatar;
+    if (coverProvided) (venue as any).coverUrl = nextCover;
+
+    return this.venueRepo.save(venue);
   }
 
   // ----------------------------
@@ -211,3 +244,6 @@ export class VenuesService {
     return `${base.slice(0, Math.max(1, maxBaseLen2))}${suffix2}`;
   }
 }
+
+
+

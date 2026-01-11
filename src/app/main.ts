@@ -1,13 +1,20 @@
-﻿import { NestFactory } from '@nestjs/core';
+// src/app/main.ts
 
+// ✅ FIX: ensure globalThis.crypto exists (needed by @nestjs/schedule on some Node runtimes)
+import { webcrypto } from 'crypto';
+if (!(globalThis as any).crypto) {
+  (globalThis as any).crypto = webcrypto as any;
+}
+
+import { NestFactory } from '@nestjs/core';
 import { HttpStatusBodySyncFilter } from './http-status-body-sync.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   app.useGlobalFilters(new HttpStatusBodySyncFilter());
-app.getHttpAdapter().getInstance().set('etag', false);
+  app.getHttpAdapter().getInstance().set('etag', false);
 
   // Enable CORS for web (Expo web at localhost:8081/8082/8083)
   app.enableCors({
@@ -30,13 +37,11 @@ app.getHttpAdapter().getInstance().set('etag', false);
 
   const port = 3000;
 
-  // ðŸ”’ Explicit bind to all interfaces (fixes Windows ambiguity)
+  // 🔒 Explicit bind to all interfaces (fixes Windows ambiguity)
   const server = await app.listen(port, '0.0.0.0');
 
-  // ðŸ” Log the real bound address (source of truth)
+  // 🔍 Log the real bound address (source of truth)
   const addr = server.address();
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
-
-

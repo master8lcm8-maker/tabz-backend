@@ -1,4 +1,4 @@
-// src/wallet/venue-wallet-transaction.entity.ts
+﻿// src/wallet/venue-wallet-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -17,6 +17,7 @@ export type VenueWalletTransactionType =
   | 'transfer_out'
   | 'cashout';
 
+
 @Entity('venue_wallet_transactions')
 export class VenueWalletTransaction {
   @PrimaryGeneratedColumn()
@@ -25,7 +26,7 @@ export class VenueWalletTransaction {
   @Column()
   venueWalletId: number;
 
-  // ✅ MUST declare inverse side because VenueWallet has OneToMany(transactions)
+  // âœ… MUST declare inverse side because VenueWallet has OneToMany(transactions)
   @ManyToOne(() => VenueWallet, (vw) => vw.transactions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'venueWalletId' })
   venueWallet: VenueWallet;

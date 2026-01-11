@@ -707,12 +707,6 @@ export class StoreItemsService {
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
 order.status = next as any;
     const saved = await this.storeItemOrderRepo.save(order);
 
@@ -740,12 +734,6 @@ order.status = next as any;
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
 if (String(order.status).toLowerCase() === 'completed') {
       throw new BadRequestException('Cannot cancel a completed order.');
     }
@@ -912,12 +900,6 @@ if (String(order.status).toLowerCase() === 'completed') {
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
 if (Number(order.venueId) !== Number(staffVenueId)) {
       throw new BadRequestException('Order not found for this venue');
     }
@@ -941,12 +923,6 @@ if (Number(order.venueId) !== Number(staffVenueId)) {
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
 if (Number(order.venueId) !== Number(staffVenueId)) {
       throw new BadRequestException('Order not found for this venue');
     }
@@ -963,4 +939,5 @@ if (Number(order.venueId) !== Number(staffVenueId)) {
     return saved;
   }
 }
+
 

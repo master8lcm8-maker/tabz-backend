@@ -1,4 +1,4 @@
-// src/wallet/wallet-transaction.entity.ts
+﻿// src/wallet/wallet-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -19,7 +19,8 @@ export type WalletTransactionType =
   | 'payout_credit'
   | 'transfer_in'
   | 'transfer_out'
-  | 'cashout';
+  | 'cashout'
+  | 'unlock_spendable';
 
 @Entity('wallet_transactions')
 export class WalletTransaction {
