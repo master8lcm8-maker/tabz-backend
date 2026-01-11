@@ -1,11 +1,14 @@
-﻿{
+{
     "name":  "tabz-backend",
     "version":  "1.0.0",
     "main":  "dist/main.js",
     "scripts":  {
                     "build":  "tsc -p tsconfig.build.json",
+                    "db:run":  "typeorm-ts-node-commonjs -d src/data-source.cli.ts migration:run",
                     "start":  "node dist/main.js",
-                    "start:dev":  "ts-node-dev --respawn --transpile-only src/app/main.ts"
+                    "start:dev":  "ts-node-dev --respawn --transpile-only src/app/main.ts",
+                    "db:revert":  "typeorm-ts-node-commonjs -d src/data-source.cli.ts migration:revert",
+                    "db:show":  "typeorm-ts-node-commonjs -d src/data-source.cli.ts migration:show"
                 },
     "dependencies":  {
                          "@aws-sdk/client-s3":  "^3.962.0",
