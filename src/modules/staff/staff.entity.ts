@@ -1,22 +1,25 @@
-﻿import {
+﻿// src/modules/staff/staff.entity.ts
+import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { Venue } from '../venues/venue.entity';
 
-@Entity()
+@Entity('staff')
 export class Staff {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   venueId: number;
-
-  @ManyToOne(() => Venue, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Venue, (v) => v.staffMembers, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'venueId' })
   venue: Venue;
 
   @Column()
@@ -34,3 +37,5 @@ export class Staff {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+
