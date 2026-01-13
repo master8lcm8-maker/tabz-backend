@@ -43,7 +43,10 @@ import { HealthModule } from '../health/health.module';
         if (!dbUrl) {
           // Hard fail in production if DATABASE_URL is missing
           const sslRaw = (process.env.DB_SSL || '').toLowerCase();
-const sslMode = (sslRaw -eq 'true' -or sslRaw -eq '1' -or sslRaw -eq 'require') ? '?sslmode=require' : '';
+const sslMode =
+  (sslRaw === 'true' || sslRaw === '1' || sslRaw === 'require')
+    ? '?sslmode=require'
+    : '';
 
 if (!process.env.DATABASE_URL) {
   const u = process.env.DB_USERNAME;
@@ -54,14 +57,11 @@ if (!process.env.DATABASE_URL) {
 
   if (u && p && h && port && db) {
     process.env.DATABASE_URL =
-      postgresql:// +
-      ${encodeURIComponent(u)}:@ +
-      ${h}:/;
+      `postgresql://${encodeURIComponent(u)}:${encodeURIComponent(p)}@${h}:${port}/${db}${sslMode}`;
   } else {
     throw new Error('DATABASE_URL or DB_HOST/DB_PORT/DB_USERNAME/DB_PASSWORD/DB_NAME is required in production');
   }
 }
-        }
 
         return {
           type: 'postgres',
@@ -106,5 +106,6 @@ if (!process.env.DATABASE_URL) {
   ],
 })
 export class AppModule {}
+
 
 
