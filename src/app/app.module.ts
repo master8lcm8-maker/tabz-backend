@@ -32,7 +32,6 @@ import { HealthModule } from '../health/health.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     // LOCAL DEV: SQLITE ONLY
     TypeOrmModule.forRoot((() => {
       const env = String(process.env.NODE_ENV || '').toLowerCase();
@@ -63,6 +62,7 @@ if (!process.env.DATABASE_URL) {
   }
 }
 
+        }
         return {
           type: 'postgres',
           url: dbUrl,
@@ -83,7 +83,6 @@ if (!process.env.DATABASE_URL) {
         synchronize: true,
       } as any;
     })()),
-
     // Core modules
     UsersModule,
     AuthModule,
@@ -106,6 +105,14 @@ if (!process.env.DATABASE_URL) {
   ],
 })
 export class AppModule {}
+
+
+
+
+
+
+
+
 
 
 
