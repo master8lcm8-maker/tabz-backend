@@ -42,7 +42,25 @@ import { HealthModule } from '../health/health.module';
       if (isProd) {
         if (!dbUrl) {
           // Hard fail in production if DATABASE_URL is missing
-          throw new Error('DATABASE_URL is required in production');
+          const sslRaw = (process.env.DB_SSL || '').toLowerCase();
+const sslMode = (sslRaw -eq 'true' -or sslRaw -eq '1' -or sslRaw -eq 'require') ? '?sslmode=require' : '';
+
+if (!process.env.DATABASE_URL) {
+  const u = process.env.DB_USERNAME;
+  const p = process.env.DB_PASSWORD;
+  const h = process.env.DB_HOST;
+  const port = process.env.DB_PORT;
+  const db = process.env.DB_NAME;
+
+  if (u && p && h && port && db) {
+    process.env.DATABASE_URL =
+      postgresql:// +
+      ${encodeURIComponent(u)}:@ +
+      ${h}:/;
+  } else {
+    throw new Error('DATABASE_URL or DB_HOST/DB_PORT/DB_USERNAME/DB_PASSWORD/DB_NAME is required in production');
+  }
+}
         }
 
         return {
@@ -88,4 +106,5 @@ import { HealthModule } from '../health/health.module';
   ],
 })
 export class AppModule {}
+
 
