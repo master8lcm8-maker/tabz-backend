@@ -67,31 +67,6 @@ export class AppController {
 
     return { dbinfo: who[0], groups: r };
   }
-  // LOCKED DEBUG (prod-only + key required)
-  @Get('__debug/relations')
-  async __debugRelations(@Headers('x-debug-key') key?: string) {
-    if (String(process.env.NODE_ENV || '').toLowerCase() !== 'production') {
-      throw new ForbiddenException('debug disabled');
-    }
-    const expected = String(process.env.DEBUG_KEY || '');
-    if (!expected || key !== expected) {
-      throw new ForbiddenException('forbidden');
-    }
-
-    const who = await this.dataSource.query(
-      "select current_database() as db, current_user as user, current_schema() as schema"
-    );
-
-    const r = await this.dataSource.query(
-      "select n.nspname as schema, c.relkind, count(*)::int as count " +
-      "from pg_class c join pg_namespace n on n.oid = c.relnamespace " +
-      "where n.nspname not like 'pg_%' and n.nspname <> 'information_schema' " +
-      "group by n.nspname, c.relkind " +
-      "order by n.nspname, c.relkind"
-    );
-
-    return { dbinfo: who[0], groups: r };
-  }
 
   // LOCKED DEBUG (prod-only + key required)
   @Get('__debug/tables')
@@ -127,6 +102,11 @@ export class AppController {
     });
   }
 }
+
+
+
+
+
 
 
 
