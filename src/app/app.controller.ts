@@ -26,6 +26,22 @@ export class AppController {
   getHealth() {
     return this.appService.getHealth();
   }
+  // LOCKED DEBUG (prod-only + key required)
+  @Get('__debug/dbs')
+  async __debugDbs(@Headers('x-debug-key') key?: string) {
+    if (String(process.env.NODE_ENV || '').toLowerCase() !== 'production') {
+      throw new ForbiddenException('debug disabled');
+    }
+    const expected = String(process.env.DEBUG_KEY || '');
+    if (!expected || key !== expected) {
+      throw new ForbiddenException('forbidden');
+    }
+
+    const r = await this.dataSource.query(
+      "select datname from pg_database where datistemplate=false order by datname"
+    );
+    return { db: (await this.dataSource.query('select current_database() as db'))[0].db, databases: r };
+  }
 
   // LOCKED DEBUG (prod-only + key required)
   @Get('__debug/tables')
@@ -61,4 +77,5 @@ export class AppController {
     });
   }
 }
+
 
