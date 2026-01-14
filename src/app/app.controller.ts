@@ -1,9 +1,15 @@
-﻿import { BadRequestException, Controller, Get } from '@nestjs/common';
+﻿import { BadRequestException, Controller, ForbiddenException, Get, Headers } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    @InjectDataSource() private readonly dataSource: DataSource,
+  ) {}
 
   // Friendly root route so the domain doesn't look "broken"
   @Get('/')
@@ -19,6 +25,24 @@ export class AppController {
   @Get('health')
   getHealth() {
     return this.appService.getHealth();
+  }
+
+  // LOCKED DEBUG (prod-only + key required)
+  @Get('__debug/tables')
+  async __debugTables(@Headers('x-debug-key') key?: string) {
+    if (String(process.env.NODE_ENV || '').toLowerCase() !== 'production') {
+      throw new ForbiddenException('debug disabled');
+    }
+    const expected = String(process.env.DEBUG_KEY || '');
+    if (!expected || key !== expected) {
+      throw new ForbiddenException('forbidden');
+    }
+
+    const r = await this.dataSource.query(
+      "select table_schema, table_name from information_schema.tables where table_type='BASE TABLE' and table_schema not in ('pg_catalog','information_schema') order by table_schema, table_name"
+    );
+
+    return { count: r.length, tables: r };
   }
 
   // --------------------------------------------------
