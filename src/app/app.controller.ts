@@ -42,7 +42,10 @@ export class AppController {
       "select table_schema, table_name from information_schema.tables where table_type='BASE TABLE' and table_schema not in ('pg_catalog','information_schema') order by table_schema, table_name"
     );
 
-    return { count: r.length, tables: r };
+        const who = await this.dataSource.query(
+      "select current_database() as db, current_user as user, current_schema() as schema"
+    );
+    return { dbinfo: who[0], count: r.length, tables: r };
   }
 
   // --------------------------------------------------
@@ -58,3 +61,4 @@ export class AppController {
     });
   }
 }
+
