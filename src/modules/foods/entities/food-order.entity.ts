@@ -89,14 +89,14 @@ export class FoodOrder {
    * When the food order was redeemed.
    * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   redeemedAt?: Date | null;
 
   /**
    * When the food order expires.
    * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   expiresAt?: Date | null;
 
   /**

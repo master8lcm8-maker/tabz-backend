@@ -44,7 +44,7 @@ export class CreditsTransfer {
   @Column({ type: 'text', nullable: true })
   message: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   expiresAt: Date | null;
 
   @Column({ type: 'simple-json', nullable: true })

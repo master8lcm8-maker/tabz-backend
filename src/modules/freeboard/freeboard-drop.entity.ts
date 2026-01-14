@@ -51,16 +51,16 @@ export class FreeboardDrop {
   claimCode: string | null;
 
   // ⚠ FIXED FOR SQLITE — was timestamptz
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   expiresAt: Date | null;
 
   // ⚠ FIXED FOR SQLITE — was timestamptz
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   claimedAt: Date | null;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn()
   updatedAt: Date;
 }

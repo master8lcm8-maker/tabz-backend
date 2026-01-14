@@ -66,6 +66,6 @@ export class DrinkOrder {
 
   // When the drink was actually redeemed by staff
   // Use 'datetime' so it's supported by SQLite.
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   redeemedAt: Date | null;
 }

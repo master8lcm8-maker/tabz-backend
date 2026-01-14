@@ -1,4 +1,4 @@
-﻿import {
+import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
@@ -34,7 +34,7 @@ export class CreditsTransfer {
   @Column({ type: 'integer' })
   amountCents: number;
 
-  // ✅ REQUIRED: persists running total funded so far
+  // ? REQUIRED: persists running total funded so far
   @Column({ type: 'integer', default: 0 })
   fundedCents: number;
 
@@ -44,7 +44,7 @@ export class CreditsTransfer {
   @Column({ type: 'text', nullable: true })
   message: string | null;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ nullable: true })
   expiresAt: Date | null;
 
   @Column({ type: 'simple-json', nullable: true })
