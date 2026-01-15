@@ -31,7 +31,7 @@ async function bootstrap() {
       'http://10.0.0.239:8081'
     ]);
 
-    return allow.has(origin) ? cb(null, true) : cb(new Error('CORS blocked: ' + origin), false);
+    return allow.has(origin) ? cb(null, true) : cb(null, false);
   },
   credentials: true,
   methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
