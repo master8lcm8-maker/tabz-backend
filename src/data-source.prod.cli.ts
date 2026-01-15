@@ -1,5 +1,14 @@
 ﻿import "reflect-metadata";
 import { DataSource } from "typeorm";
+console.log("TABZ_DB_DEBUG", {
+  DATABASE_URL: process.env.DATABASE_URL,
+  TYPEORM_URL: process.env.TYPEORM_URL,
+  DB_HOST: process.env.DB_HOST,
+  DB_PORT: process.env.DB_PORT,
+  DB_USERNAME: process.env.DB_USERNAME,
+  DB_NAME: process.env.DB_NAME,
+});
+
 
 // Postgres CLI DataSource for PROD migrations
 // Uses DATABASE_URL (preferred) or individual DB_* vars.
@@ -31,3 +40,4 @@ export default new DataSource(
         ssl: { rejectUnauthorized: false },
       }
 );
+
