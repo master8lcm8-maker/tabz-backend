@@ -24,7 +24,7 @@ export default new DataSource(
         migrations: ["dist/migrations/*.js"],
         synchronize: false,
         logging: false,
-        ssl: ((process.env.TABZ_PG_SSL==="1" -or process.env.TABZ_PG_SSL==="true") ? { rejectUnauthorized: false } : false),
+        ssl: { rejectUnauthorized: false },
       }
     : {
         type: "postgres",
@@ -37,8 +37,7 @@ export default new DataSource(
         migrations: ["dist/migrations/*.js"],
         synchronize: false,
         logging: false,
-        ssl: ((process.env.TABZ_PG_SSL==="1" -or process.env.TABZ_PG_SSL==="true") ? { rejectUnauthorized: false } : false),
+        ssl: { rejectUnauthorized: false },
       }
 );
-
 
