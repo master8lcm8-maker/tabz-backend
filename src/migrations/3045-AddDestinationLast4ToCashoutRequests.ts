@@ -1,4 +1,4 @@
-﻿import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddDestinationLast4ToCashoutRequests1733290000000 implements MigrationInterface {
   name = "AddDestinationLast4ToCashoutRequests1733290000000";

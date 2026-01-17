@@ -1,4 +1,4 @@
-﻿import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddOwnerProfileIdToVenues1733390000000 implements MigrationInterface {
   name = "AddOwnerProfileIdToVenues1733390000000";

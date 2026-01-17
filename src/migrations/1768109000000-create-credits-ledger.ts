@@ -1,4 +1,4 @@
-﻿import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateCreditsLedger1768109000000 implements MigrationInterface {
   name = "CreateCreditsLedger1768109000000";
