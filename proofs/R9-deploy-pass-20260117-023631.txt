@@ -1,0 +1,9 @@
+﻿R9 DEPLOY PROOF (20260117-023631)
+
+https://tabz-backend-bxxbf.ondigitalocean.app    a094560a-ba9e-48a5-8a79-2a3b6aadd2a4
+
+HEALTH:
+{"status":"ok","service":"tabz-backend","timestamp":"2026-01-17T07:36:32.239Z"}
+
+LOG FILTER CHECK:
+PASS: no migration/db error lines in last 250 run logs.
