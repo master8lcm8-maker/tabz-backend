@@ -24,7 +24,7 @@ export default new DataSource(
         migrations: ["dist/migrations/*.js"],
         synchronize: false,
         logging: false,
-        ssl: ((process.env.TABZ_PG_SSL || "").toLowerCase() === "1" || (process.env.TABZ_PG_SSL || "").toLowerCase() === "true") ? { rejectUnauthorized: false } : false,
+        ssl: (((process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "1" || (process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "true" || (process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "require")) ? { rejectUnauthorized: false } : false,
       }
     : {
         type: "postgres",
@@ -37,9 +37,10 @@ export default new DataSource(
         migrations: ["dist/migrations/*.js"],
         synchronize: false,
         logging: false,
-        ssl: ((process.env.TABZ_PG_SSL || "").toLowerCase() === "1" || (process.env.TABZ_PG_SSL || "").toLowerCase() === "true") ? { rejectUnauthorized: false } : false,
+        ssl: (((process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "1" || (process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "true" || (process.env.TABZ_PG_SSL || process.env.DB_SSL || process.env.PGSSLMODE || "").toLowerCase() === "require")) ? { rejectUnauthorized: false } : false,
       }
 );
+
 
 
 
