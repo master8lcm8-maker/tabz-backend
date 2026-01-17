@@ -1,0 +1,636 @@
+﻿[
+  {
+    "id": "26cfd6bb-765d-488d-ba33-7709188bb032",
+    "owner_uuid": "7f3d326c-f45a-41ae-a686-3b8176342312",
+    "spec": {
+      "name": "tabz-backend",
+      "services": [
+        {
+          "name": "tabz-backend",
+          "github": {
+            "repo": "master8lcm8-maker/tabz-backend",
+            "branch": "m37-from-m36-final",
+            "deploy_on_push": true
+          },
+          "build_command": "npm run build",
+          "run_command": "npm run db:run:prod\nnpm run start\n",
+          "source_dir": "/",
+          "environment_slug": "node-js",
+          "envs": [
+            {
+              "key": "NODE_TLS_REJECT_UNAUTHORIZED",
+              "value": "0",
+              "scope": "RUN_AND_BUILD_TIME"
+            }
+          ],
+          "instance_size_slug": "apps-s-1vcpu-1gb",
+          "instance_count": 2,
+          "http_port": 3000
+        }
+      ],
+      "domains": [
+        {
+          "domain": "8tabz.com",
+          "type": "PRIMARY",
+          "zone": "8tabz.com"
+        },
+        {
+          "domain": "www.8tabz.com",
+          "type": "ALIAS",
+          "zone": "8tabz.com"
+        }
+      ],
+      "region": "nyc",
+      "envs": [
+        {
+          "key": "DEBUG_KEY",
+          "value": "tabz-debug-1",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "DB_HOST",
+          "value": "tabz-prod-db-do-user-29585639-0.k.db.ondigitalocean.com",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "DB_PORT",
+          "value": "25060",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "DB_USERNAME",
+          "value": "doadmin",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "DB_PASSWORD",
+          "value": "EV[1:uzEM6s5SCjkuEhe5cGR8V9fa0C76ZNLy:NvEo62nKb2ZgHHIlYd0LInqOXID8TxFwIiG0ae+u7R1z/ZErwVe0wg==]",
+          "scope": "RUN_AND_BUILD_TIME",
+          "type": "SECRET"
+        },
+        {
+          "key": "DB_NAME",
+          "value": "defaultdb",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "DB_SSL",
+          "value": "true",
+          "scope": "RUN_AND_BUILD_TIME"
+        }
+      ],
+      "alerts": [
+        {
+          "rule": "DEPLOYMENT_FAILED"
+        },
+        {
+          "rule": "DOMAIN_FAILED"
+        }
+      ],
+      "ingress": {
+        "rules": [
+          {
+            "match": {
+              "path": {
+                "prefix": "/"
+              }
+            },
+            "component": {
+              "name": "tabz-backend"
+            }
+          }
+        ]
+      },
+      "features": [
+        "buildpack-stack=ubuntu-22"
+      ]
+    },
+    "last_deployment_active_at": "2026-01-17T07:02:21Z",
+    "default_ingress": "https://tabz-backend-bxxbf.ondigitalocean.app",
+    "created_at": "2025-11-24T22:16:40Z",
+    "updated_at": "2026-01-17T07:02:35Z",
+    "active_deployment": {
+      "id": "dea7a1e0-93b7-4042-801e-256020444fef",
+      "spec": {
+        "name": "tabz-backend",
+        "services": [
+          {
+            "name": "tabz-backend",
+            "github": {
+              "repo": "master8lcm8-maker/tabz-backend",
+              "branch": "m37-from-m36-final",
+              "deploy_on_push": true
+            },
+            "build_command": "npm run build",
+            "run_command": "npm run db:run:prod\nnpm run start\n",
+            "source_dir": "/",
+            "environment_slug": "node-js",
+            "envs": [
+              {
+                "key": "NODE_TLS_REJECT_UNAUTHORIZED",
+                "value": "0",
+                "scope": "RUN_AND_BUILD_TIME"
+              }
+            ],
+            "instance_size_slug": "apps-s-1vcpu-1gb",
+            "instance_count": 2,
+            "http_port": 3000
+          }
+        ],
+        "domains": [
+          {
+            "domain": "8tabz.com",
+            "type": "PRIMARY",
+            "zone": "8tabz.com"
+          },
+          {
+            "domain": "www.8tabz.com",
+            "type": "ALIAS",
+            "zone": "8tabz.com"
+          }
+        ],
+        "region": "nyc",
+        "envs": [
+          {
+            "key": "DEBUG_KEY",
+            "value": "tabz-debug-1",
+            "scope": "RUN_AND_BUILD_TIME"
+          },
+          {
+            "key": "DB_HOST",
+            "value": "tabz-prod-db-do-user-29585639-0.k.db.ondigitalocean.com",
+            "scope": "RUN_AND_BUILD_TIME"
+          },
+          {
+            "key": "DB_PORT",
+            "value": "25060",
+            "scope": "RUN_AND_BUILD_TIME"
+          },
+          {
+            "key": "DB_USERNAME",
+            "value": "doadmin",
+            "scope": "RUN_AND_BUILD_TIME"
+          },
+          {
+            "key": "DB_PASSWORD",
+            "value": "EV[1:uzEM6s5SCjkuEhe5cGR8V9fa0C76ZNLy:NvEo62nKb2ZgHHIlYd0LInqOXID8TxFwIiG0ae+u7R1z/ZErwVe0wg==]",
+            "scope": "RUN_AND_BUILD_TIME",
+            "type": "SECRET"
+          },
+          {
+            "key": "DB_NAME",
+            "value": "defaultdb",
+            "scope": "RUN_AND_BUILD_TIME"
+          },
+          {
+            "key": "DB_SSL",
+            "value": "true",
+            "scope": "RUN_AND_BUILD_TIME"
+          }
+        ],
+        "alerts": [
+          {
+            "rule": "DEPLOYMENT_FAILED"
+          },
+          {
+            "rule": "DOMAIN_FAILED"
+          }
+        ],
+        "ingress": {
+          "rules": [
+            {
+              "match": {
+                "path": {
+                  "prefix": "/"
+                }
+              },
+              "component": {
+                "name": "tabz-backend"
+              }
+            }
+          ]
+        },
+        "features": [
+          "buildpack-stack=ubuntu-22"
+        ]
+      },
+      "services": [
+        {
+          "name": "tabz-backend",
+          "source_commit_hash": "7001478cb434c76316b31a3ceff77cf96070d27f",
+          "buildpacks": [
+            {
+              "id": "heroku/nodejs",
+              "version": "0.319.5",
+              "latest": true,
+              "name": "Node.js",
+              "description": [
+                "Install dependencies using NPM, PNPM or Yarn"
+              ],
+              "docs_link": "https://docs.digitalocean.com/products/app-platform/languages-frameworks/nodejs/"
+            },
+            {
+              "id": "digitalocean/procfile",
+              "version": "0.1.0",
+              "latest": true,
+              "name": "Procfile",
+              "description": [
+                "Configure default run commands from the Procfile if one exists"
+              ]
+            },
+            {
+              "id": "digitalocean/custom",
+              "version": "0.2.0",
+              "latest": true,
+              "name": "Custom Build Command",
+              "description": [
+                "Run the provided custom build command"
+              ],
+              "docs_link": "https://docs.digitalocean.com/products/app-platform/how-to/build-run-commands/"
+            }
+          ]
+        }
+      ],
+      "phase_last_updated_at": "2026-01-17T07:02:21Z",
+      "created_at": "2026-01-17T06:59:31Z",
+      "updated_at": "2026-01-17T07:02:21Z",
+      "cause": "commit 7001478 pushed to github.com/master8lcm8-maker/tabz-backend/tree/m37-from-m36-final",
+      "progress": {
+        "success_steps": 6,
+        "total_steps": 6,
+        "steps": [
+          {
+            "name": "build",
+            "status": "SUCCESS",
+            "steps": [
+              {
+                "name": "initialize",
+                "status": "SUCCESS",
+                "started_at": "2026-01-17T06:59:35.7086942Z",
+                "ended_at": "2026-01-17T06:59:37.371146607Z"
+              },
+              {
+                "name": "components",
+                "status": "SUCCESS",
+                "steps": [
+                  {
+                    "name": "tabz-backend",
+                    "status": "SUCCESS",
+                    "started_at": "0001-01-01T00:00:00Z",
+                    "ended_at": "0001-01-01T00:00:00Z",
+                    "component_name": "tabz-backend",
+                    "message_base": "Building service"
+                  }
+                ],
+                "started_at": "2026-01-17T06:59:37.37118081Z",
+                "ended_at": "2026-01-17T07:00:38.404128687Z"
+              }
+            ],
+            "started_at": "2026-01-17T06:59:35.708630523Z",
+            "ended_at": "2026-01-17T07:00:38.869520826Z"
+          },
+          {
+            "name": "deploy",
+            "status": "SUCCESS",
+            "steps": [
+              {
+                "name": "initialize",
+                "status": "SUCCESS",
+                "started_at": "2026-01-17T07:00:42.783240754Z",
+                "ended_at": "2026-01-17T07:00:44.047413775Z"
+              },
+              {
+                "name": "components",
+                "status": "SUCCESS",
+                "steps": [
+                  {
+                    "name": "tabz-backend",
+                    "status": "SUCCESS",
+                    "steps": [
+                      {
+                        "name": "deploy",
+                        "status": "SUCCESS",
+                        "started_at": "0001-01-01T00:00:00Z",
+                        "ended_at": "0001-01-01T00:00:00Z",
+                        "component_name": "tabz-backend",
+                        "message_base": "Deploying service"
+                      },
+                      {
+                        "name": "wait",
+                        "status": "SUCCESS",
+                        "started_at": "0001-01-01T00:00:00Z",
+                        "ended_at": "0001-01-01T00:00:00Z",
+                        "component_name": "tabz-backend",
+                        "message_base": "Waiting for service"
+                      }
+                    ],
+                    "started_at": "0001-01-01T00:00:00Z",
+                    "ended_at": "0001-01-01T00:00:00Z",
+                    "component_name": "tabz-backend"
+                  }
+                ],
+                "started_at": "2026-01-17T07:00:44.047448339Z",
+                "ended_at": "2026-01-17T07:02:20.082705023Z"
+              },
+              {
+                "name": "finalize",
+                "status": "SUCCESS",
+                "started_at": "2026-01-17T07:02:20.397452533Z",
+                "ended_at": "2026-01-17T07:02:20.719239727Z"
+              }
+            ],
+            "started_at": "2026-01-17T07:00:42.783222981Z",
+            "ended_at": "2026-01-17T07:02:20.719304597Z"
+          }
+        ]
+      },
+      "phase": "ACTIVE",
+      "tier_slug": "professional",
+      "previous_deployment_id": "c90775bf-4a92-4bfe-ab31-367687b064d2",
+      "cause_details": {
+        "git_push": {
+          "github": {
+            "repo": "master8lcm8-maker/tabz-backend",
+            "branch": "m37-from-m36-final"
+          },
+          "username": "master8lcm8-maker",
+          "commit_sha": "7001478cb434c76316b31a3ceff77cf96070d27f",
+          "commit_message": "R9: baseline migration to create core tables (users/profiles/venues/cashout_requests)"
+        },
+        "type": "DEPLOY_ON_PUSH"
+      },
+      "timing": {
+        "pending": "4.708694200s",
+        "build_total": "63.160826626s",
+        "build_billable": "24.719342065s",
+        "components": [
+          {
+            "name": "tabz-backend",
+            "build_billable": "24.719342065s"
+          }
+        ]
+      }
+    },
+    "last_deployment_created_at": "2026-01-17T06:59:31Z",
+    "live_url": "https://8tabz.com",
+    "region": {
+      "slug": "nyc",
+      "label": "New York",
+      "flag": "usa",
+      "continent": "North America",
+      "data_centers": [
+        "nyc1",
+        "nyc3"
+      ]
+    },
+    "tier_slug": "professional",
+    "live_url_base": "https://8tabz.com",
+    "live_domain": "8tabz.com",
+    "domains": [
+      {
+        "id": "665f1bcf-0a14-4897-be14-b61e14b26501",
+        "spec": {
+          "domain": "8tabz.com",
+          "type": "PRIMARY",
+          "zone": "8tabz.com"
+        },
+        "phase": "ACTIVE",
+        "progress": {
+          "steps": [
+            {
+              "name": "default-ingress-ready",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.19428851Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-zone",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.194335276Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-ns-records",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.293774266Z",
+              "ended_at": "2026-01-14T03:02:24.730312855Z"
+            },
+            {
+              "name": "verify-nameservers",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.311382348Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.345596843Z",
+              "ended_at": "2026-01-14T03:02:24.767864328Z"
+            },
+            {
+              "name": "ensure-alias-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.345653478Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-wildcard-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.352749176Z",
+              "ended_at": "2026-01-14T03:03:23.585558725Z"
+            },
+            {
+              "name": "verify-cname",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.352802645Z",
+              "ended_at": "2026-01-14T03:03:23.5856262Z"
+            },
+            {
+              "name": "ensure-ssl-txt-record-saved",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.352843941Z",
+              "ended_at": "2026-01-14T03:03:23.631526795Z"
+            },
+            {
+              "name": "ensure-ssl-txt-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.352881981Z",
+              "ended_at": "2026-01-14T03:03:23.631598088Z"
+            },
+            {
+              "name": "ensure-renewal-email",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.352915052Z",
+              "ended_at": "2026-01-14T03:03:23.631639265Z"
+            },
+            {
+              "name": "ensure-CA-authorization",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.35296225Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-certificate",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.366875302Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "create-deployment",
+              "status": "SUCCESS",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "2026-01-14T03:05:43.906542878Z"
+            },
+            {
+              "name": "configuration-alert",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T22:53:34.728908636Z",
+              "ended_at": "2026-01-14T03:03:24.376985544Z"
+            }
+          ]
+        },
+        "validation": {},
+        "certificate_expires_at": "2026-04-14T03:03:24Z"
+      },
+      {
+        "id": "23ce26ab-32a3-44c4-a48b-abe1c46f6999",
+        "spec": {
+          "domain": "www.8tabz.com",
+          "type": "ALIAS",
+          "zone": "8tabz.com"
+        },
+        "phase": "ACTIVE",
+        "progress": {
+          "steps": [
+            {
+              "name": "default-ingress-ready",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.44624926Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-zone",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.446292831Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-ns-records",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.535902982Z",
+              "ended_at": "2026-01-14T03:03:24.436613761Z"
+            },
+            {
+              "name": "verify-nameservers",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.553853989Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.613205121Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-alias-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.630311375Z",
+              "ended_at": "2026-01-14T03:03:24.495255003Z"
+            },
+            {
+              "name": "ensure-wildcard-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.63035722Z",
+              "ended_at": "2026-01-14T03:03:24.495316157Z"
+            },
+            {
+              "name": "verify-cname",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.630404287Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-ssl-txt-record-saved",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.745956669Z",
+              "ended_at": "2026-01-14T03:03:24.571881121Z"
+            },
+            {
+              "name": "ensure-ssl-txt-record",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.74599553Z",
+              "ended_at": "2026-01-14T03:03:24.571962672Z"
+            },
+            {
+              "name": "ensure-renewal-email",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.746026007Z",
+              "ended_at": "2026-01-14T03:03:24.572001895Z"
+            },
+            {
+              "name": "ensure-CA-authorization",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.74607623Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "ensure-certificate",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:42.775730572Z",
+              "ended_at": "0001-01-01T00:00:00Z"
+            },
+            {
+              "name": "create-deployment",
+              "status": "SUCCESS",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "2026-01-14T03:05:14.241421856Z"
+            },
+            {
+              "name": "configuration-alert",
+              "status": "SUCCESS",
+              "started_at": "2026-01-16T21:57:43.169247506Z",
+              "ended_at": "2026-01-14T03:03:27.282980201Z"
+            }
+          ]
+        },
+        "validation": {},
+        "certificate_expires_at": "2026-04-14T03:03:27Z"
+      }
+    ],
+    "build_config": {
+      "cnb_versioning": {
+        "buildpacks": [
+          {
+            "id": "digitalocean/custom",
+            "latest": true,
+            "name": "Custom Build Command",
+            "description": [
+              "Run the provided custom build command"
+            ],
+            "docs_link": "https://docs.digitalocean.com/products/app-platform/how-to/build-run-commands/"
+          },
+          {
+            "id": "digitalocean/procfile",
+            "latest": true,
+            "name": "Procfile",
+            "description": [
+              "Configure default run commands from the Procfile if one exists"
+            ]
+          },
+          {
+            "id": "heroku/nodejs",
+            "latest": true,
+            "name": "Node.js",
+            "description": [
+              "Install dependencies using NPM, PNPM or Yarn"
+            ],
+            "docs_link": "https://docs.digitalocean.com/products/app-platform/languages-frameworks/nodejs/"
+          }
+        ],
+        "stack_id": "heroku-22"
+      }
+    },
+    "project_id": "9ad8eec6-6c75-4502-acaf-e0e20d4c2545"
+  }
+]
