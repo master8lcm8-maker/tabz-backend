@@ -1,2 +1,9 @@
-*.json text eol=lf
+# Normalize line endings in repo (avoid CRLF churn)
+* text=auto
 
+# Force LF for source files
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
