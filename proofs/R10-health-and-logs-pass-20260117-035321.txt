@@ -1,0 +1,9 @@
+﻿R10 PROOF - ACTIVE SERVING + LOGS CLEAN (20260117-035321)
+
+https://tabz-backend-bxxbf.ondigitalocean.app    6f0eb6a1-04db-48dc-8c02-cc031f7d0c35    
+
+HEALTH:
+{"status":"ok","service":"tabz-backend","timestamp":"2026-01-17T08:53:21.488Z"}
+
+LOG FILTER CHECK:
+PASS: no migration/db error lines in last 250 run logs.
