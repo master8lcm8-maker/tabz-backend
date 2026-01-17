@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+﻿import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
 export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'owner_bank_info',
+        name: 'owner_bank_infos',
         columns: [
           { name: 'id', type: 'int', isPrimary: true, isGenerated: true, generationStrategy: 'increment' },
 
@@ -35,6 +35,7 @@ export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('owner_bank_info');
+    await queryRunner.dropTable('owner_bank_infos');
   }
 }
+
