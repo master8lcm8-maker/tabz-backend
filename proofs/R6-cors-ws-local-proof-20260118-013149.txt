@@ -1,0 +1,7 @@
+﻿R6 CORS PROOF (LOCAL) - WEBSOCKET (20260118-013149)
+
+WS GOOD (Origin localhost:19006) - expect Access-Control-Allow-Origin
+HTTP/1.1 200 OK Access-Control-Allow-Origin: http://localhost:19006 Vary: Origin Access-Control-Allow-Credentials: true Content-Type: text/plain; charset=UTF-8 Content-Length: 118 cache-control: no-store Date: Sun, 18 Jan 2026 06:31:50 GMT Connection: keep-alive Keep-Alive: timeout=5  0{"sid":"p4ejoxg_L_WKLT5kAAAC","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":20000,"maxPayload":1000000}
+
+WS EVIL (Origin evil.com) - expect NO Access-Control-Allow-Origin header
+HTTP/1.1 200 OK Content-Type: text/plain; charset=UTF-8 Content-Length: 118 cache-control: no-store Date: Sun, 18 Jan 2026 06:31:50 GMT Connection: keep-alive Keep-Alive: timeout=5  0{"sid":"a8FAu7g3lHJnD4-LAAAD","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":20000,"maxPayload":1000000}
