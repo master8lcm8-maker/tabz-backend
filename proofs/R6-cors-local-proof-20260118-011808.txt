@@ -1,0 +1,13 @@
+﻿R6 CORS PROOF (LOCAL) (20260118-011808)
+
+GOOD GET (Origin localhost:19006)
+HTTP/1.1 200 OK X-Powered-By: Express Access-Control-Allow-Origin: http://localhost:19006 Vary: Origin Access-Control-Allow-Credentials: true Content-Type: application/json; charset=utf-8 Content-Length: 79 Date: Sun, 18 Jan 2026 06:18:08 GMT Connection: keep-alive Keep-Alive: timeout=5  {"status":"ok","service":"tabz-backend","timestamp":"2026-01-18T06:18:08.629Z"}
+
+EVIL GET (Origin evil.com) - expect NO Access-Control-Allow-Origin header
+HTTP/1.1 200 OK X-Powered-By: Express Content-Type: application/json; charset=utf-8 Content-Length: 79 Date: Sun, 18 Jan 2026 06:18:08 GMT Connection: keep-alive Keep-Alive: timeout=5  {"status":"ok","service":"tabz-backend","timestamp":"2026-01-18T06:18:08.879Z"}
+
+GOOD OPTIONS (Origin localhost:19006)
+HTTP/1.1 204 No Content X-Powered-By: Express Access-Control-Allow-Origin: http://localhost:19006 Vary: Origin Access-Control-Allow-Credentials: true Access-Control-Allow-Methods: GET,POST,PATCH,DELETE,OPTIONS Access-Control-Allow-Headers: Content-Type,Authorization,x-user-id,Cache-Control,Pragma,If-None-Match,x-dev-seed-secret Content-Length: 0 Date: Sun, 18 Jan 2026 06:18:09 GMT Connection: keep-alive Keep-Alive: timeout=5 
+
+EVIL OPTIONS (Origin evil.com) - expect no CORS headers, likely 404
+HTTP/1.1 404 Not Found X-Powered-By: Express Content-Type: application/json; charset=utf-8 Content-Length: 73 Date: Sun, 18 Jan 2026 06:18:09 GMT Connection: keep-alive Keep-Alive: timeout=5  {"message":"Cannot OPTIONS /health","error":"Not Found","statusCode":404}
