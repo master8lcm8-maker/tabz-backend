@@ -31,3 +31,7 @@ ledger-*.js
 tmp-*.js
 wallet-row.js
 _quarantine/
+
+# local secrets
+_prod_db_url.txt
+
