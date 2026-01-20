@@ -1,6 +1,7 @@
 ﻿import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Post,
   Req,
@@ -30,13 +31,7 @@ export class DrinksController {
   async createOrder(@Req() req: Request, @Body() body: any) {
     const userId = getUserIdFromRequest(req);
 
-    const {
-      venueId,
-      drinkName,
-      priceCents,
-      note,
-      platformFeePercent,
-    } = body;
+    const { venueId, drinkName, priceCents, note, platformFeePercent } = body;
 
     return this.drinksService.createOrder({
       senderId: userId,
@@ -65,11 +60,17 @@ export class DrinksController {
   }
 
   // STAFF: redeem a drink by code (QR)
+  // SECURITY: only STAFF can redeem (buyers/owners must be blocked)
   @UseGuards(JwtAuthGuard)
   @Post('redeem')
-  async redeem(@Body('code') code: string) {
+  async redeem(@Req() req: Request, @Body('code') code: string) {
+    const user: any = (req as any).user || {};
+    const role = String(user.role || '').toLowerCase();
+
+    if (role !== 'staff') {
+      throw new ForbiddenException('forbidden');
+    }
+
     return this.drinksService.redeemOrderByCode(code);
   }
 }
-
-
