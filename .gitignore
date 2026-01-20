@@ -35,3 +35,10 @@ _quarantine/
 # local secrets
 _prod_db_url.txt
 
+# --- LOCAL PROOF / CURL ARTIFACTS (do not commit) ---
+TABZ-R9-PROD-PROOF-20260119-043615.log
+_do_spec.yaml
+body.json
+buyer-login.json
+login.json
+order.json
