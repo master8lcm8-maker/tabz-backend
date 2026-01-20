@@ -1,16 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+﻿import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import {
-  DrinkOrder,
-  DrinkOrderStatus,
-} from './entities/drink-order.entity';
-import { Venue } from '../venues/venue.entity';
 import { randomBytes } from 'crypto';
+
+import { DrinkOrder, DrinkOrderStatus } from './entities/drink-order.entity';
+import { Venue } from '../venues/venue.entity';
 import { WalletService } from '../../wallet/wallet.service';
 
 const DRINK_PLATFORM_FEE_PERCENT = 20; // TABZ fee on drinks
@@ -29,27 +23,25 @@ export class DrinksService {
    * USER SIDE — SEND A DRINK
    */
   async createOrder(params: {
-    senderId: number;
-    venueId: number;
-    drinkName: string;
-    amountCents: number;
-    currency?: string;
-    message?: string;
-    recipientId?: number;
-    platformFeePercent?: number;
-  }): Promise<DrinkOrder> {
+  senderId: number;
+  venueId: number;
+  drinkName: string;
+  priceCents: number;
+  customerName?: string;
+  note?: string | null;
+  platformFeePercent?: number;
+}): Promise<DrinkOrder> {
     const {
-      senderId,
-      venueId,
-      drinkName,
-      amountCents,
-      currency = 'USD',
-      message,
-      recipientId,
-      platformFeePercent,
-    } = params;
+  senderId,
+  venueId,
+  drinkName,
+  priceCents,
+  customerName = 'Customer',
+  note,
+  platformFeePercent,
+} = params;
 
-    if (!amountCents || amountCents <= 0) {
+    if (!priceCents || priceCents <= 0) {
       throw new BadRequestException('Amount must be positive.');
     }
 
@@ -65,25 +57,25 @@ export class DrinksService {
 
     // Charge the sender wallet and credit venue owner
     await this.walletService.spendWithPayout(
-      senderId,
-      venue.ownerId ?? null,
-      amountCents,
+  senderId,                 // buyerId
+  venue.ownerId ?? null,    // payoutUserId
+  priceCents,
       feePercent,
     );
 
     const redemptionCode = randomBytes(16).toString('hex');
 
     const order = this.drinkRepo.create({
-      senderId,
-      recipientId: recipientId ?? null,
-      venue,
-      drinkName,
-      amountCents,
-      currency,
-      message,
-      status: DrinkOrderStatus.PENDING,
-      redemptionCode,
-    });
+  buyerId: senderId,
+  venue,
+  venueId,
+  customerName,
+  drinkName,
+  priceCents,
+  note: note ?? null,
+  status: DrinkOrderStatus.PENDING,
+  redemptionCode,
+});
 
     return this.drinkRepo.save(order);
   }
@@ -93,7 +85,7 @@ export class DrinksService {
    */
   async getOrdersForUser(userId: number): Promise<DrinkOrder[]> {
     return this.drinkRepo.find({
-      where: { senderId: userId },
+      where: { buyerId: userId },
       relations: ['venue'],
       order: { createdAt: 'DESC' },
     });
@@ -104,17 +96,12 @@ export class DrinksService {
    */
   async getOrdersForVenueOwner(ownerId: number): Promise<DrinkOrder[]> {
     const venues = await this.venueRepo.find({ where: { ownerId } });
-
-    if (!venues.length) {
-      return [];
-    }
+    if (!venues.length) return [];
 
     const venueIds = venues.map((v) => v.id);
 
     return this.drinkRepo.find({
-      where: {
-        venue: { id: In(venueIds) },
-      },
+      where: { venue: { id: In(venueIds) } },
       relations: ['venue'],
       order: { createdAt: 'DESC' },
     });
@@ -156,3 +143,4 @@ export class DrinksService {
     return this.redeemOrderByCode(redemptionCode);
   }
 }
+

@@ -1,4 +1,4 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -18,7 +18,7 @@ import { DevSeedModule } from '../dev-seed/dev-seed.module';
 import { VenuesModule } from '../modules/venues/venues.module';
 import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
-
+import { DrinksModule } from '../modules/drinks/drinks.module';
 @Module({
   providers: [AppService],
   controllers: [AppController],
@@ -101,7 +101,9 @@ import { HealthModule } from '../health/health.module';
     VenuesModule,
     IdentityModule,
     HealthModule,
+    DrinksModule,
     DevSeedModule,
   ],
 })
 export class AppModule {}
+
