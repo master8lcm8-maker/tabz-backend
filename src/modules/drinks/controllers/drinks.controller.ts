@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
@@ -33,10 +33,8 @@ export class DrinksController {
     const {
       venueId,
       drinkName,
-      amountCents,
-      currency,
-      message,
-      recipientId,
+      priceCents,
+      note,
       platformFeePercent,
     } = body;
 
@@ -44,10 +42,8 @@ export class DrinksController {
       senderId: userId,
       venueId,
       drinkName,
-      amountCents,
-      currency,
-      message,
-      recipientId,
+      priceCents,
+      note,
       platformFeePercent,
     });
   }
@@ -75,3 +71,5 @@ export class DrinksController {
     return this.drinksService.redeemOrderByCode(code);
   }
 }
+
+
