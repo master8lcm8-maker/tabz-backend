@@ -1,4 +1,4 @@
-﻿import {
+import {
   CanActivate,
   ExecutionContext,
   Injectable,
@@ -10,12 +10,7 @@ export class DevEndpointGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
 
-    // Hard disable in production
-    const env = String(process.env.NODE_ENV || '').toLowerCase();
-    if (env === 'production') {
-      throw new UnauthorizedException('dev_endpoint_disabled');
-    }
-
+    // Gate dev endpoints by secret (works in any env)
     const headerSecret = String(req?.headers?.['x-dev-seed-secret'] || '').trim();
     const envSecret = String(process.env.DEV_SEED_SECRET || '').trim();
 
