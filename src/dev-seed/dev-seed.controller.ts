@@ -21,6 +21,7 @@ import { Venue } from '../modules/venues/venue.entity';
 
 // ✅ ADD
 import { StoreItemsService } from '../modules/store-items/store-items.service';
+
 @UseGuards(DevEndpointGuard)
 @Controller('dev-seed')
 export class DevSeedController {
@@ -44,17 +45,20 @@ export class DevSeedController {
   // 🔒 Dev-seed access gate (minimal + explicit)
   // ------------------------------------------------------------
   private assertDevSeedAllowed(req: any) {
-    if (String(process.env.NODE_ENV || '').toLowerCase() === 'production') {
-      throw new UnauthorizedException('dev_seed_disabled');
-    }
+    const secret = String(process.env.DEV_SEED_SECRET || '').trim();
 
-    const secret = String(process.env.DEV_SEED_SECRET || '');
+    // R5 instrumentation (safe): presence + length only (never log the value)
+    console.log('[DEV_SEED]', {
+      present: !!secret,
+      len: secret ? secret.length : 0,
+    });
+
     if (!secret) {
       throw new UnauthorizedException('dev_seed_secret_missing');
     }
 
-    const provided = String(req?.headers?.['x-dev-seed-secret'] || '');
-    if (provided !== secret) {
+    const provided = String(req?.headers?.['x-dev-seed-secret'] || '').trim();
+    if (!provided || provided !== secret) {
       throw new UnauthorizedException('dev_seed_forbidden');
     }
   }
@@ -451,4 +455,3 @@ export class DevSeedController {
     return { ok: true, buyer, owner, owner2, staff };
   }
 }
-
