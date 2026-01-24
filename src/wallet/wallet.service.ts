@@ -114,7 +114,7 @@ export class WalletService {
     const raw = await this.cashoutRepo
       .createQueryBuilder('c')
       .select('COALESCE(SUM(c.amountCents), 0)', 'sum')
-      .where('c.walletId = :walletId', { walletId: wallet.id })
+      .where('c."walletId" = :walletId', { walletId: wallet.id })
       .andWhere('c.status = :status', { status: 'PENDING' })
       .getRawOne();
 
