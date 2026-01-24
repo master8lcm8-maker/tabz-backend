@@ -42,3 +42,7 @@ body.json
 buyer-login.json
 login.json
 order.json
+
+truth-run-prod.ps1
+truth-run-prod-*.log
+do-runlogs-*.log
