@@ -111,10 +111,12 @@ export class WalletService {
     const wallet = await this.getOrCreateWallet(userId);
 
     // Informational: pending-held is the sum of PENDING cashouts (does NOT participate in invariant)
+    // ✅ FIX: do NOT reference raw FK column name; join relation so TypeORM resolves correct physical column (walletid vs "walletId")
     const raw = await this.cashoutRepo
       .createQueryBuilder('c')
+      .innerJoin('c.wallet', 'w')
       .select('COALESCE(SUM(c.amountCents), 0)', 'sum')
-      .where('c."walletId" = :walletId', { walletId: wallet.id })
+      .where('w.id = :walletId', { walletId: wallet.id })
       .andWhere('c.status = :status', { status: 'PENDING' })
       .getRawOne();
 
