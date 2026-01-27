@@ -550,6 +550,18 @@ export class WalletService {
     return 'ALL';
   }
 
+  // ✅ HARDEN: prevent RangeError ("Invalid time value") from legacy/invalid createdAt values
+  private safeIsoDate(value: any): string {
+    try {
+      if (!value) return new Date().toISOString();
+      const d = value instanceof Date ? value : new Date(value);
+      if (!Number.isFinite(d.getTime())) return new Date().toISOString();
+      return d.toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  }
+
   private toCashoutDto(c: CashoutRequest): CashoutDto {
     const status =
       (String(c?.status || '').toUpperCase() as CashoutStatusCanonical) ||
@@ -564,9 +576,10 @@ export class WalletService {
       amountCents: Number(c.amountCents ?? 0),
       failureReason: c.failureReason ?? null,
       destinationLast4: (c as any).destinationLast4 ?? null,
-      createdAt: c.createdAt
-        ? new Date(c.createdAt).toISOString()
-        : new Date().toISOString(),
+
+      // ✅ FIX: never throw here (map() must not 500 the endpoint)
+      createdAt: this.safeIsoDate((c as any).createdAt),
+
       retryOfCashoutId: (c as any).retryOfCashoutId ?? null, //
     };
   }
