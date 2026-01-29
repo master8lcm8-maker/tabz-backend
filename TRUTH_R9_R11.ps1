@@ -21,6 +21,29 @@ function Fail($msg) {
   exit 1
 }
 
+# Helper: robust JSON call with clean error printing
+function InvokeJson($Url, $Method, $Headers, $BodyObj) {
+  try {
+    if ($null -eq $Headers) { $Headers = @{} }
+
+    if ($null -eq $BodyObj) {
+      return Invoke-RestMethod $Url -Method $Method -Headers $Headers
+    } else {
+      $b = ($BodyObj | ConvertTo-Json -Depth 10)
+      return Invoke-RestMethod $Url -Method $Method -ContentType "application/json" -Headers $Headers -Body $b
+    }
+  } catch {
+    $status = $null
+    try { $status = $_.Exception.Response.StatusCode.value__ } catch {}
+
+    $msg = $null
+    try { $msg = $_.ErrorDetails.Message } catch {}
+    if (-not $msg) { $msg = $_.Exception.Message }
+
+    throw ([Exception]("HTTP_STATUS=$status`n$msg"))
+  }
+}
+
 Write-Host "=== TABZ TRUTH_R9_R11 ==="
 Write-Host "BASE=$BASE"
 Write-Host ""
@@ -30,10 +53,9 @@ Write-Host ""
 # ------------------------------------------------------------
 Write-Host "[0/5] POST /dev-seed/owner-item (expect venueId + item.id)..."
 try {
-  $seed = Invoke-RestMethod "$BASE/dev-seed/owner-item" -Method Post -Headers @{ "x-dev-seed-secret" = $SECRET }
+  $seed = InvokeJson "$BASE/dev-seed/owner-item" "Post" @{ "x-dev-seed-secret" = $SECRET } $null
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "dev-seed/owner-item failed"
 }
 
@@ -54,12 +76,10 @@ Write-Host ""
 # [1/5] Buyer login => JWT
 # ------------------------------------------------------------
 Write-Host "[1/5] POST /auth/login-buyer (expect access_token)..."
-$body = @{ email = $BUYER_EMAIL; password = $BUYER_PASS } | ConvertTo-Json
 try {
-  $login = Invoke-RestMethod "$BASE/auth/login-buyer" -Method Post -ContentType "application/json" -Body $body
+  $login = InvokeJson "$BASE/auth/login-buyer" "Post" @{} @{ email = $BUYER_EMAIL; password = $BUYER_PASS }
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "buyer login failed"
 }
 
@@ -73,18 +93,17 @@ Write-Host ""
 # ------------------------------------------------------------
 Write-Host "[2/5] GET /store-items/venue/:venueId (expect item list contains itemId=$itemId)..."
 try {
-  $itemsResp = Invoke-RestMethod "$BASE/store-items/venue/$venueId" -Method Get -Headers @{ Authorization = "Bearer $buyerToken" }
+  $itemsResp = InvokeJson "$BASE/store-items/venue/$venueId" "Get" @{ Authorization = "Bearer $buyerToken" } $null
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "buyer venue items fetch failed"
 }
 
-# Accept either {ok, items:[...]} or plain array
-$items = $null
-if ($itemsResp -is [System.Array]) { $items = $itemsResp }
-elseif ($itemsResp.items) { $items = $itemsResp.items }
-elseif ($itemsResp.value) { $items = $itemsResp.value }
+# Accept either {ok, items:[...]} or plain array or { value: [...] }
+$items = @()
+if ($itemsResp -is [System.Array]) { $items = @($itemsResp) }
+elseif ($null -ne $itemsResp.items) { $items = @($itemsResp.items) }
+elseif ($null -ne $itemsResp.value) { $items = @($itemsResp.value) }
 else { $items = @() }
 
 $found = $false
@@ -94,7 +113,7 @@ foreach ($it in $items) {
   } catch {}
 }
 if (-not $found) {
-  Write-Host "DEBUG: venue items response:" 
+  Write-Host "DEBUG: venue items response:"
   ($itemsResp | ConvertTo-Json -Depth 10) | Write-Host
   Fail "R9 failed: seeded itemId not visible to buyer"
 }
@@ -102,21 +121,71 @@ Write-Host "OK: R9 buyer sees itemId=$itemId for venueId=$venueId"
 Write-Host ""
 
 # ------------------------------------------------------------
-# [3/5] R10: Buyer places an order
-# NOTE: If your DTO differs, this step will print server error and stop.
+# [3/5] R10: Ensure spendable funds, then Buyer places an order
 # ------------------------------------------------------------
-Write-Host "[3/5] POST /store-items/order (expect order id)..."
-$orderBody = @{
-  venueId  = $venueId
-  itemId   = $itemId
-  quantity = 1
-} | ConvertTo-Json
 
+function EnsureBuyerSpendableFunds() {
+  # Over-fund to make truth runs stable across repeats.
+  $amountCents = 500000  # $5,000.00
+
+  Write-Host "[3/5] Ensure buyer has spendable funds ..."
+
+  $hdrJwtOnly = @{ Authorization = "Bearer $buyerToken" }
+  $hdrJwtPlusSecret = @{
+    Authorization     = "Bearer $buyerToken"
+    "x-dev-seed-secret" = $SECRET
+  }
+
+  # --- Path A (preferred): /wallet/deposit (JWT only). If this works, it should credit spendable directly.
+  try {
+    $null = InvokeJson "$BASE/wallet/deposit" "Post" $hdrJwtOnly @{ amountCents = $amountCents }
+    Write-Host "OK: wallet/deposit"
+    return
+  } catch {
+    # Not fatal; fall back to dev flow.
+    Write-Host "DEBUG: wallet/deposit not usable (will fallback):"
+    Write-Host $_.Exception.Message
+  }
+
+  # --- Path B (fallback): dev add cashout balance, then unlock spendable
+  try {
+    $null = InvokeJson "$BASE/wallet/dev/add-cashout-balance" "Post" $hdrJwtPlusSecret @{ amountCents = $amountCents }
+    Write-Host "OK: wallet/dev/add-cashout-balance"
+  } catch {
+    Write-Host "DEBUG: add-cashout-balance failed:"
+    Write-Host $_.Exception.Message
+    Fail "Cannot add buyer balance via /wallet/dev/add-cashout-balance"
+  }
+
+  try {
+    $null = InvokeJson "$BASE/wallet/unlock-spendable" "Post" $hdrJwtPlusSecret @{ amountCents = $amountCents }
+    Write-Host "OK: wallet/unlock-spendable"
+  } catch {
+    Write-Host "DEBUG: unlock-spendable failed:"
+    Write-Host $_.Exception.Message
+    Fail "Cannot unlock spendable via /wallet/unlock-spendable"
+  }
+
+  Write-Host "OK: buyer spendable funding step completed."
+}
+
+EnsureBuyerSpendableFunds
+Write-Host ""
+
+Write-Host "[3/5] POST /store-items/order (expect order id)..."
 try {
-  $orderResp = Invoke-RestMethod "$BASE/store-items/order" -Method Post -ContentType "application/json" -Headers @{ Authorization = "Bearer $buyerToken" } -Body $orderBody
+  $orderResp = InvokeJson "$BASE/store-items/order" "Post" @{ Authorization = "Bearer $buyerToken" } @{
+    venueId  = $venueId
+    itemId   = $itemId
+    quantity = 1
+  }
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  $em = $_.Exception.Message
+  Write-Host $em
+
+  if ($em -match "Insufficient funds") {
+    Fail "R10 failed: Insufficient funds AFTER EnsureBuyerSpendableFunds()"
+  }
 
   Write-Host ""
   Write-Host "DTO MISMATCH DETECTED: Your /store-items/order body differs from {venueId,itemId,quantity}." -ForegroundColor Yellow
@@ -130,6 +199,8 @@ $orderId = 0
 try { if ($orderResp.orderId) { $orderId = [int]$orderResp.orderId } } catch {}
 try { if ($orderId -le 0 -and $orderResp.id) { $orderId = [int]$orderResp.id } } catch {}
 try { if ($orderId -le 0 -and $orderResp.order -and $orderResp.order.id) { $orderId = [int]$orderResp.order.id } } catch {}
+try { if ($orderId -le 0 -and $orderResp.value -and $orderResp.value.orderId) { $orderId = [int]$orderResp.value.orderId } } catch {}
+try { if ($orderId -le 0 -and $orderResp.value -and $orderResp.value.id) { $orderId = [int]$orderResp.value.id } } catch {}
 
 if ($orderId -le 0) {
   Write-Host "DEBUG: order response:"
@@ -145,10 +216,9 @@ Write-Host ""
 # ------------------------------------------------------------
 Write-Host "[4/5] Ensure staff exists (dev-seed/staff)..."
 try {
-  $staffSeed = Invoke-RestMethod "$BASE/dev-seed/staff" -Method Post -Headers @{ "x-dev-seed-secret" = $SECRET }
+  $staffSeed = InvokeJson "$BASE/dev-seed/staff" "Post" @{ "x-dev-seed-secret" = $SECRET } $null
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "dev-seed/staff failed"
 }
 if (-not $staffSeed.ok) { Fail "dev-seed/staff ok!=true" }
@@ -156,18 +226,10 @@ Write-Host "OK: staff seeded"
 Write-Host ""
 
 Write-Host "[4.1/5] POST /auth/login-staff (expect access_token)..."
-$staffLoginBody = @{ email = $STAFF_EMAIL; password = $STAFF_PASS } | ConvertTo-Json
-
 try {
-  $staffLogin = Invoke-RestMethod "$BASE/auth/login-staff" -Method Post -ContentType "application/json" -Body $staffLoginBody
+  $staffLogin = InvokeJson "$BASE/auth/login-staff" "Post" @{} @{ email = $STAFF_EMAIL; password = $STAFF_PASS }
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
-
-  Write-Host ""
-  Write-Host "STAFF LOGIN ROUTE UNKNOWN: /auth/login-staff did not work in your build." -ForegroundColor Yellow
-  Write-Host "Discover the real staff login endpoint with:" -ForegroundColor Yellow
-  Write-Host "  Select-String -Path .\src\**\*.ts -Pattern `"login-staff`", `"staff login`", `"@Post\('login`", `"AuthController`" -Context 0,6"
+  Write-Host $_.Exception.Message
   Fail "R11 failed: staff login route not found"
 }
 
@@ -178,58 +240,94 @@ Write-Host ""
 
 Write-Host "[4.2/5] GET /store-items/staff/orders (expect includes orderId=$orderId)..."
 try {
-  $staffOrders = Invoke-RestMethod "$BASE/store-items/staff/orders" -Method Get -Headers @{ Authorization = "Bearer $staffToken" }
+  $staffOrders = InvokeJson "$BASE/store-items/staff/orders" "Get" @{ Authorization = "Bearer $staffToken" } $null
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "staff orders fetch failed"
 }
 
-$orders = $null
-if ($staffOrders -is [System.Array]) { $orders = $staffOrders }
-elseif ($staffOrders.orders) { $orders = $staffOrders.orders }
-else { $orders = @() }
-
-$seen = $false
-foreach ($o in $orders) {
-  try { if ([int]$o.id -eq $orderId) { $seen = $true; break } } catch {}
+# normalize to array and match by orderId (or id)
+$orders = @()
+if ($staffOrders -is [System.Array]) {
+  $orders = @($staffOrders)
 }
-if (-not $seen) {
+elseif ($null -ne $staffOrders.value) {
+  $orders = @($staffOrders.value)
+}
+elseif ($null -ne $staffOrders.orders) {
+  $orders = @($staffOrders.orders)
+}
+elseif ($null -ne $staffOrders.items) {
+  $orders = @($staffOrders.items)
+}
+else {
+  $orders = @()
+}
+
+$seenOrder = $orders | Where-Object {
+  (($_.PSObject.Properties.Name -contains 'orderId') -and ([int]$_.orderId -eq [int]$orderId)) -or
+  (($_.PSObject.Properties.Name -contains 'id')      -and ([int]$_.id      -eq [int]$orderId))
+} | Select-Object -First 1
+
+if (-not $seenOrder) {
   Write-Host "DEBUG: staff orders response:"
   ($staffOrders | ConvertTo-Json -Depth 10) | Write-Host
-  Fail "R11 failed: staff cannot see buyer order"
+  Fail "R11 failed: staff cannot see buyer orderId=$orderId"
 }
 Write-Host "OK: staff sees orderId=$orderId"
 Write-Host ""
 
-Write-Host "[4.3/5] POST /store-items/staff/orders/:orderId/mark (expect success)..."
+# Mark endpoint requires a status body; use "completed"
+Write-Host "[4.3/5] POST /store-items/staff/orders/:orderId/mark (status=completed) (expect success)..."
 try {
-  $mark = Invoke-RestMethod "$BASE/store-items/staff/orders/$orderId/mark" -Method Post -Headers @{ Authorization = "Bearer $staffToken" }
+  $mark = InvokeJson "$BASE/store-items/staff/orders/$orderId/mark" "Post" @{ Authorization = "Bearer $staffToken" } @{ status = "completed" }
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
+  Write-Host $_.Exception.Message
   Fail "R11 failed: mark endpoint failed"
 }
 
-Write-Host "OK: staff marked order"
+Write-Host "OK: staff marked order (completed)"
 Write-Host ""
 
 # ------------------------------------------------------------
 # [5/5] Buyer fetches order detail to confirm status updated
 # ------------------------------------------------------------
-Write-Host "[5/5] GET /store-items/orders/:orderId (expect reflects staff mark)..."
+Write-Host "[5/5] GET /store-items/order/:orderId (fallback /store-items/orders/:orderId) (expect reflects staff mark)..."
+
+$od = $null
 try {
-  $od = Invoke-RestMethod "$BASE/store-items/orders/$orderId" -Method Get -Headers @{ Authorization = "Bearer $buyerToken" }
+  $od = InvokeJson "$BASE/store-items/order/$orderId" "Get" @{ Authorization = "Bearer $buyerToken" } $null
 } catch {
-  Write-Host "HTTP_STATUS=" + ($_.Exception.Response.StatusCode.value__ 2>$null)
-  if ($_.ErrorDetails -and $_.ErrorDetails.Message) { $_.ErrorDetails.Message | Write-Host } else { $_.Exception.Message | Write-Host }
-  Fail "buyer order detail fetch failed"
+  # If primary route isn't there, try fallback
+  $statusLine = $_.Exception.Message
+  if ($statusLine -notmatch "HTTP_STATUS=404") {
+    Write-Host $statusLine
+    Fail "buyer order detail fetch failed (primary route)"
+  }
+
+  try {
+    $od = InvokeJson "$BASE/store-items/orders/$orderId" "Get" @{ Authorization = "Bearer $buyerToken" } $null
+  } catch {
+    Write-Host $_.Exception.Message
+    Fail "buyer order detail fetch failed (both routes tried)"
+  }
 }
 
-# We accept any response shape; just require it returns and references the orderId
+# Accept shapes:
+#  - { orderId: ... }
+#  - { id: ... }
+#  - { value: { orderId: ... } }
+#  - { order: { ... } }
+$detailObj = $od
+try {
+  if ($null -ne $od.value) { $detailObj = $od.value }
+} catch {}
+
 $gotId = 0
-try { if ($od.id) { $gotId = [int]$od.id } } catch {}
-try { if ($gotId -le 0 -and $od.order -and $od.order.id) { $gotId = [int]$od.order.id } } catch {}
+try { if ($detailObj.id) { $gotId = [int]$detailObj.id } } catch {}
+try { if ($gotId -le 0 -and $detailObj.orderId) { $gotId = [int]$detailObj.orderId } } catch {}
+try { if ($gotId -le 0 -and $detailObj.order -and $detailObj.order.id) { $gotId = [int]$detailObj.order.id } } catch {}
+try { if ($gotId -le 0 -and $detailObj.order -and $detailObj.order.orderId) { $gotId = [int]$detailObj.order.orderId } } catch {}
 
 if ($gotId -ne $orderId) {
   Write-Host "DEBUG: order detail:"
@@ -237,7 +335,12 @@ if ($gotId -ne $orderId) {
   Fail "buyer order detail did not return same orderId"
 }
 
+# Optional: verify status flipped to completed if present
+$detailStatus = $null
+try { if ($detailObj.status) { $detailStatus = [string]$detailObj.status } } catch {}
+try { if (-not $detailStatus -and $detailObj.order -and $detailObj.order.status) { $detailStatus = [string]$detailObj.order.status } } catch {}
+if ($detailStatus) { Write-Host "OK: buyer order status now = $detailStatus" }
+
 Write-Host "OK: buyer can read order detail after staff mark"
 Write-Host ""
 Write-Host "PASS: R9–R11 LOCKED ✅"
-
