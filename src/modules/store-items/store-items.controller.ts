@@ -29,6 +29,9 @@ export class StoreItemsController {
   @Get('venue/:venueId')
   async getItemsForVenue(@Param('venueId') venueId: string) {
     const id = Number(venueId);
+    if (!Number.isFinite(id) || !Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('venueId must be a positive integer.');
+    }
     const value = await this.storeItemsService.getItemsForVenue(id);
     return { value };
   }
@@ -43,10 +46,7 @@ export class StoreItemsController {
     if (user.role !== 'buyer') {
       throw new ForbiddenException('Only buyers can create orders.');
     }
-    const value = await this.storeItemsService.createOrderForUser(
-      Number(user.userId),
-      body,
-    );
+    const value = await this.storeItemsService.createOrderForUser(Number(user.userId), body);
     return value;
   }
 
@@ -57,9 +57,7 @@ export class StoreItemsController {
     if (user.role !== 'buyer') {
       throw new ForbiddenException('Only buyers can view their orders.');
     }
-    const value = await this.storeItemsService.findOrdersForBuyer(
-      Number(user.userId),
-    );
+    const value = await this.storeItemsService.findOrdersForBuyer(Number(user.userId));
     return { value };
   }
 
@@ -101,9 +99,7 @@ export class StoreItemsController {
     if (user.role !== 'owner') {
       throw new ForbiddenException('Only owners can view owner orders.');
     }
-    const value = await this.storeItemsService.findOrdersByOwnerLive(
-      Number(user.userId),
-    );
+    const value = await this.storeItemsService.findOrdersByOwnerLive(Number(user.userId));
     return { value };
   }
 
@@ -161,10 +157,7 @@ export class StoreItemsController {
     if (!venueId || venueId <= 0) {
       throw new BadRequestException('Invalid venueId on staff token.');
     }
-    const value = await this.storeItemsService.findStaffOrderById(
-      venueId,
-      Number(orderId),
-    );
+    const value = await this.storeItemsService.findStaffOrderById(venueId, Number(orderId));
     return { value };
   }
 
@@ -185,11 +178,7 @@ export class StoreItemsController {
     }
 
     const status = String(body?.status || '').toLowerCase().trim();
-    const value = await this.storeItemsService.staffMarkOrder(
-      venueId,
-      Number(orderId),
-      status,
-    );
+    const value = await this.storeItemsService.staffMarkOrder(venueId, Number(orderId), status);
     return value;
   }
 
@@ -205,10 +194,7 @@ export class StoreItemsController {
       throw new BadRequestException('Invalid venueId on staff token.');
     }
 
-    const value = await this.storeItemsService.staffCancelOrder(
-      venueId,
-      Number(orderId),
-    );
+    const value = await this.storeItemsService.staffCancelOrder(venueId, Number(orderId));
     return value;
   }
 

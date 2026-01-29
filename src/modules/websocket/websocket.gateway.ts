@@ -5,10 +5,19 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Logger } from '@nestjs/common';
+import type { Server } from 'socket.io';
+
+type WalletUpdatedPayload = {
+  userId: number;
+  walletId: number;
+  balanceCents: number;
+  spendableBalanceCents: number;
+  cashoutAvailableCents: number;
+};
 
 function buildCorsAllowSet(): Set<string> {
-  // Optional: production-safe list via env (comma separated)
+  // Production-safe list via env (comma separated)
   // Example:
   // TABZ_CORS_ORIGINS="https://8tabz.com,https://www.8tabz.com,http://localhost:19006"
   const env = (process.env.TABZ_CORS_ORIGINS || '').trim();
@@ -16,12 +25,12 @@ function buildCorsAllowSet(): Set<string> {
     return new Set(
       env
         .split(',')
-        .map(s => s.trim())
+        .map((s) => s.trim())
         .filter(Boolean),
     );
   }
 
-  // Fallback: dev allowlist (matches src/app/main.ts)
+  // Fallback: dev allowlist (keep aligned with src/app/main.ts)
   return new Set([
     'http://localhost:19006',
     'http://localhost:8081',
@@ -35,9 +44,11 @@ function buildCorsAllowSet(): Set<string> {
 @WebSocketGateway({
   cors: {
     origin: (origin, cb) => {
-      // allow non-browser callers (mobile native, server-to-server)
+      // Allow non-browser callers (native mobile, server-to-server)
       if (!origin) return cb(null, true);
 
+      // Build allow-set per request so runtime env changes take effect without restart.
+      // (Cost is tiny; if you want caching, we can add it later.)
       const allow = buildCorsAllowSet();
       return allow.has(origin) ? cb(null, true) : cb(null, false);
     },
@@ -53,62 +64,72 @@ function buildCorsAllowSet(): Set<string> {
       'x-dev-seed-secret',
     ],
   },
+  // root namespace
   namespace: '/',
   transports: ['websocket', 'polling'],
 })
 export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(WebsocketGateway.name);
+
   @WebSocketServer()
-  server: Server;
+  server?: Server;
 
   handleConnection(client: any) {
-    console.log('WebSocket client connected:', client.id);
+    // socket.io client has id, handshake, etc.
+    this.logger.log(`WebSocket client connected: ${client?.id ?? '(no id)'}`);
   }
 
   handleDisconnect(client: any) {
-    console.log('WebSocket client disconnected:', client.id);
+    this.logger.log(`WebSocket client disconnected: ${client?.id ?? '(no id)'}`);
   }
 
+  // ---- internal helpers ----
+  private safeEmit(event: string, payload: unknown): void {
+    // Prevent runtime crashes if emit happens before socket server is ready
+    if (!this.server) {
+      // Do NOT throw; just log once per call. If this happens a lot, caller is firing too early.
+      this.logger.warn(`WS emit skipped (server not ready): event="${event}"`);
+      return;
+    }
+    this.server.emit(event, payload);
+  }
+
+  // ---- public emitters (used by services) ----
   emitOrderCreated(order: any) {
-    this.server.emit('order.created', { ...order });
+    this.safeEmit('order.created', { ...order });
   }
 
   emitOrderUpdated(order: any) {
-    this.server.emit('order.updated', { ...order });
+    this.safeEmit('order.updated', { ...order });
   }
 
-  emitWalletUpdated(payload: {
-    userId: number;
-    walletId: number;
-    balanceCents: number;
-    spendableBalanceCents: number;
-    cashoutAvailableCents: number;
-  }) {
-    this.server.emit('wallet.updated', { ...payload });
+  emitWalletUpdated(payload: WalletUpdatedPayload) {
+    this.safeEmit('wallet.updated', { ...payload });
   }
 
   emitCashoutCreated(cashout: any) {
-    this.server.emit('cashout.created', {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: cashout.amountCents,
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4,
-      createdAt: cashout.createdAt,
-      updatedAt: cashout.updatedAt,
+    this.safeEmit('cashout.created', {
+      id: cashout?.id,
+      walletId: cashout?.walletId,
+      amountCents: cashout?.amountCents,
+      status: cashout?.status,
+      failureReason: cashout?.failureReason,
+      destinationLast4: cashout?.destinationLast4,
+      createdAt: cashout?.createdAt,
+      updatedAt: cashout?.updatedAt,
     });
   }
 
   emitCashoutUpdated(cashout: any) {
-    this.server.emit('cashout.updated', {
-      id: cashout.id,
-      walletId: cashout.walletId,
-      amountCents: cashout.amountCents,
-      status: cashout.status,
-      failureReason: cashout.failureReason,
-      destinationLast4: cashout.destinationLast4,
-      createdAt: cashout.createdAt,
-      updatedAt: cashout.updatedAt,
+    this.safeEmit('cashout.updated', {
+      id: cashout?.id,
+      walletId: cashout?.walletId,
+      amountCents: cashout?.amountCents,
+      status: cashout?.status,
+      failureReason: cashout?.failureReason,
+      destinationLast4: cashout?.destinationLast4,
+      createdAt: cashout?.createdAt,
+      updatedAt: cashout?.updatedAt,
     });
   }
 }

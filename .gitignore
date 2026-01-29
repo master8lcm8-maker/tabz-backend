@@ -46,3 +46,6 @@ order.json
 truth-run-prod.ps1
 truth-run-prod-*.log
 do-runlogs-*.log
+
+# generated build artifacts
+_tsconfig_build_resolved.json

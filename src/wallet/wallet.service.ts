@@ -163,8 +163,7 @@ export class WalletService {
     let wallet = await this.getOrCreateWallet(userId);
 
     wallet.balanceCents = Number(wallet.balanceCents) + amountCents;
-    wallet.spendableBalanceCents =
-      Number(wallet.spendableBalanceCents) + amountCents;
+    wallet.spendableBalanceCents = Number(wallet.spendableBalanceCents) + amountCents;
 
     wallet = await this.walletRepo.save(wallet);
 
@@ -193,8 +192,7 @@ export class WalletService {
     }
 
     wallet.balanceCents = Number(wallet.balanceCents) - amountCents;
-    wallet.spendableBalanceCents =
-      Number(wallet.spendableBalanceCents) - amountCents;
+    wallet.spendableBalanceCents = Number(wallet.spendableBalanceCents) - amountCents;
 
     wallet = await this.walletRepo.save(wallet);
 
@@ -242,11 +240,13 @@ export class WalletService {
       let buyerWallet = await walletRepo.findOne({ where: { userId: buyerId } });
       if (!buyerWallet) throw new BadRequestException('Buyer wallet not found');
 
-      if (Number(buyerWallet.spendableBalanceCents) < amountCents)
+      if (Number(buyerWallet.spendableBalanceCents) < amountCents) {
         throw new BadRequestException('Insufficient funds');
+      }
 
-      buyerWallet.balanceCents -= amountCents;
-      buyerWallet.spendableBalanceCents -= amountCents;
+      // ✅ FIX: avoid bigint-string concat/implicit types
+      buyerWallet.balanceCents = Number(buyerWallet.balanceCents) - amountCents;
+      buyerWallet.spendableBalanceCents = Number(buyerWallet.spendableBalanceCents) - amountCents;
       buyerWallet = await walletRepo.save(buyerWallet);
 
       // Record buyer spend WITH payout
@@ -278,8 +278,10 @@ export class WalletService {
         });
       }
 
-      ownerWallet.balanceCents += payoutCents;
-      ownerWallet.cashoutAvailableCents += payoutCents;
+      // ✅ FIX: avoid bigint-string concat
+      ownerWallet.balanceCents = Number(ownerWallet.balanceCents) + payoutCents;
+      ownerWallet.cashoutAvailableCents = Number(ownerWallet.cashoutAvailableCents) + payoutCents;
+
       ownerWallet = await walletRepo.save(ownerWallet);
 
       // Record owner payout credit
@@ -325,13 +327,10 @@ export class WalletService {
   // ==================================================
   // TRANSFERS
   // ==================================================
-  async transfer(
-    senderId: number,
-    receiverId: number,
-    amountCents: number,
-  ): Promise<void> {
-    if (amountCents <= 0)
+  async transfer(senderId: number, receiverId: number, amountCents: number): Promise<void> {
+    if (amountCents <= 0) {
       throw new BadRequestException('Transfer amount must be positive');
+    }
 
     let finalSender: Wallet | null = null;
     let finalReceiver: Wallet | null = null;
@@ -340,17 +339,16 @@ export class WalletService {
       const walletRepo = manager.getRepository(Wallet);
       const txRepo = manager.getRepository(WalletTransaction);
 
-      let senderWallet = await walletRepo.findOne({
-        where: { userId: senderId },
-      });
-      if (!senderWallet)
-        throw new BadRequestException('Sender wallet not found');
+      let senderWallet = await walletRepo.findOne({ where: { userId: senderId } });
+      if (!senderWallet) throw new BadRequestException('Sender wallet not found');
 
-      if (Number(senderWallet.spendableBalanceCents) < amountCents)
+      if (Number(senderWallet.spendableBalanceCents) < amountCents) {
         throw new BadRequestException('Insufficient funds');
+      }
 
-      senderWallet.balanceCents -= amountCents;
-      senderWallet.spendableBalanceCents -= amountCents;
+      // ✅ FIX: avoid bigint-string concat/implicit types
+      senderWallet.balanceCents = Number(senderWallet.balanceCents) - amountCents;
+      senderWallet.spendableBalanceCents = Number(senderWallet.spendableBalanceCents) - amountCents;
       senderWallet = await walletRepo.save(senderWallet);
 
       await txRepo.save(
@@ -362,9 +360,7 @@ export class WalletService {
         }),
       );
 
-      let receiverWallet = await walletRepo.findOne({
-        where: { userId: receiverId },
-      });
+      let receiverWallet = await walletRepo.findOne({ where: { userId: receiverId } });
       if (!receiverWallet) {
         receiverWallet = walletRepo.create({
           userId: receiverId,
@@ -374,8 +370,9 @@ export class WalletService {
         });
       }
 
-      receiverWallet.balanceCents += amountCents;
-      receiverWallet.spendableBalanceCents += amountCents;
+      // ✅ FIX: avoid bigint-string concat
+      receiverWallet.balanceCents = Number(receiverWallet.balanceCents) + amountCents;
+      receiverWallet.spendableBalanceCents = Number(receiverWallet.spendableBalanceCents) + amountCents;
       receiverWallet = await walletRepo.save(receiverWallet);
 
       await txRepo.save(
@@ -410,8 +407,9 @@ export class WalletService {
       throw new BadRequestException('Insufficient cashout balance');
     }
 
-    wallet.cashoutAvailableCents -= amountCents;
-    wallet.spendableBalanceCents += amountCents;
+    // ✅ FIX: avoid bigint-string concat/implicit types
+    wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amountCents;
+    wallet.spendableBalanceCents = Number(wallet.spendableBalanceCents) + amountCents;
 
     wallet = await this.walletRepo.save(wallet);
 
@@ -432,12 +430,14 @@ export class WalletService {
   // CASHOUT FLOW
   // ==================================================
   async cashout(userId: number, amountCents: number): Promise<CashoutRequest> {
-    if (amountCents <= 0)
+    if (amountCents <= 0) {
       throw new BadRequestException('Cashout amount must be positive');
+    }
 
     const bankInfo = await this.bankInfoService.getForUser(userId);
-    if (!bankInfo)
+    if (!bankInfo) {
       throw new BadRequestException('Bank info required before cashout.');
+    }
 
     let updatedWallet: Wallet | null = null;
 
@@ -457,10 +457,12 @@ export class WalletService {
         throw new BadRequestException('pending_cashout_exists');
       }
 
-      if (Number(wallet.cashoutAvailableCents) < amountCents)
+      if (Number(wallet.cashoutAvailableCents) < amountCents) {
         throw new BadRequestException('Insufficient cashout balance');
+      }
 
-      wallet.cashoutAvailableCents -= amountCents;
+      // ✅ FIX: avoid bigint-string concat/implicit types
+      wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amountCents;
       const savedWallet = await walletRepo.save(wallet);
 
       const cashout = cashoutRepo.create({
@@ -512,20 +514,14 @@ export class WalletService {
   // M6 / FV-12: Get single cashout by id (user-scoped)
   // GET /wallet/cashouts/:id
   // ==================================================
-  async getCashoutForUserById(
-    userId: number,
-    cashoutId: number,
-  ): Promise<CashoutDto> {
+  async getCashoutForUserById(userId: number, cashoutId: number): Promise<CashoutDto> {
     const wallet = await this.walletRepo.findOne({ where: { userId } });
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
     }
 
     const cashout = await this.cashoutRepo.findOne({
-      where: {
-        id: cashoutId,
-        wallet: { id: wallet.id },
-      },
+      where: { id: cashoutId, wallet: { id: wallet.id } },
       relations: ['wallet'],
     });
 
@@ -539,9 +535,7 @@ export class WalletService {
   // ==================================================
   // M6: Cashouts — canonical listing (status filter + normalized output)
   // ==================================================
-  private normalizeCashoutStatus(
-    input?: string | null,
-  ): CashoutStatusCanonical | 'ALL' {
+  private normalizeCashoutStatus(input?: string | null): CashoutStatusCanonical | 'ALL' {
     const v = String(input || '').trim().toLowerCase();
     if (!v) return 'ALL';
     if (v === 'pending') return 'PENDING';
@@ -564,30 +558,20 @@ export class WalletService {
 
   private toCashoutDto(c: CashoutRequest): CashoutDto {
     const status =
-      (String(c?.status || '').toUpperCase() as CashoutStatusCanonical) ||
-      'PENDING';
+      (String(c?.status || '').toUpperCase() as CashoutStatusCanonical) || 'PENDING';
 
     return {
       id: Number(c.id),
-      status:
-        status === 'PENDING' || status === 'COMPLETED' || status === 'FAILED'
-          ? status
-          : 'PENDING',
+      status: status === 'PENDING' || status === 'COMPLETED' || status === 'FAILED' ? status : 'PENDING',
       amountCents: Number(c.amountCents ?? 0),
       failureReason: c.failureReason ?? null,
       destinationLast4: (c as any).destinationLast4 ?? null,
-
-      // ✅ FIX: never throw here (map() must not 500 the endpoint)
       createdAt: this.safeIsoDate((c as any).createdAt),
-
-      retryOfCashoutId: (c as any).retryOfCashoutId ?? null, //
+      retryOfCashoutId: (c as any).retryOfCashoutId ?? null,
     };
   }
 
-  async listCashoutsCanonical(
-    userId: number,
-    statusQuery?: string | null,
-  ): Promise<CashoutListResponse> {
+  async listCashoutsCanonical(userId: number, statusQuery?: string | null): Promise<CashoutListResponse> {
     const wallet = await this.walletRepo.findOne({ where: { userId } });
     const normalized = this.normalizeCashoutStatus(statusQuery);
 
@@ -596,8 +580,7 @@ export class WalletService {
     }
 
     const whereBase: any = { wallet: { id: wallet.id } };
-    const where =
-      normalized === 'ALL' ? whereBase : { ...whereBase, status: normalized };
+    const where = normalized === 'ALL' ? whereBase : { ...whereBase, status: normalized };
 
     const rows = await this.cashoutRepo.find({
       where,
@@ -606,25 +589,22 @@ export class WalletService {
     });
 
     const items = (rows || []).map((r) => this.toCashoutDto(r));
-    return {
-      items,
-      meta: { count: items.length, status: normalized },
-    };
+    return { items, meta: { count: items.length, status: normalized } };
   }
 
   // ==================================================
   // DEV: Add cashout-ready balance directly (enum-safe)
   // ==================================================
-  async devAddCashoutBalance(
-    userId: number,
-    amountCents: number,
-  ): Promise<Wallet> {
-    if (amountCents <= 0)
+  async devAddCashoutBalance(userId: number, amountCents: number): Promise<Wallet> {
+    if (amountCents <= 0) {
       throw new BadRequestException('Amount must be positive');
+    }
 
     let wallet = await this.getOrCreateWallet(userId);
-    wallet.balanceCents += amountCents;
-    wallet.cashoutAvailableCents += amountCents;
+
+    // ✅ FIX: avoid bigint-string concat
+    wallet.balanceCents = Number(wallet.balanceCents) + amountCents;
+    wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amountCents;
 
     wallet = await this.walletRepo.save(wallet);
 
@@ -663,10 +643,7 @@ export class WalletService {
   }
 
   // ✅ UPDATED (PATCH): explicit QueryRunner txn to eliminate TransactionNotStartedError under concurrency (SQLite)
-  async adminFailCashout(
-    cashoutId: number,
-    failureReason: string,
-  ): Promise<CashoutRequest> {
+  async adminFailCashout(cashoutId: number, failureReason: string): Promise<CashoutRequest> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -678,7 +655,7 @@ export class WalletService {
       const manager = queryRunner.manager;
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
-      const txRepo = manager.getRepository(WalletTransaction); // ✅ ADDED (THIS WAS MISSING)
+      const txRepo = manager.getRepository(WalletTransaction);
 
       // Load minimal cashout first
       const cashout = await cashoutRepo.findOne({ where: { id: cashoutId } });
@@ -721,17 +698,16 @@ export class WalletService {
       }
 
       // Refund ONCE (only the winner reaches here)
-      const wallet = await walletRepo.findOne({
-        where: { id: cashout.walletId },
-      });
+      const wallet = await walletRepo.findOne({ where: { id: cashout.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
       const amount = Number(cashout.amountCents);
 
-      wallet.cashoutAvailableCents += amount;
+      // ✅ FIX: avoid bigint-string concat
+      wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
-      // ✅ ADDED: ledger refund entry (this is what your test proved was missing)
+      // ✅ Ledger refund entry
       await txRepo.save(
         txRepo.create({
           walletId: wallet.id,
@@ -753,9 +729,7 @@ export class WalletService {
       txnStarted = false;
 
       // Post-txn emits
-      const latestWallet = await this.walletRepo.findOne({
-        where: { id: updated.walletId },
-      });
+      const latestWallet = await this.walletRepo.findOne({ where: { id: updated.walletId } });
       if (latestWallet) this.emitWalletUpdated(latestWallet);
 
       this.websocketGateway.emitCashoutUpdated(updated);
@@ -777,9 +751,7 @@ export class WalletService {
   // ==================================================
   // ADMIN/DEV: Repair FAILED cashout that is debit-only (FV-10)
   // ==================================================
-  async adminRepairFailedCashoutRefund(
-    cashoutId: number,
-  ): Promise<CashoutRequest> {
+  async adminRepairFailedCashoutRefund(cashoutId: number): Promise<CashoutRequest> {
     const saved = await this.dataSource.transaction(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
@@ -798,10 +770,7 @@ export class WalletService {
       }
 
       const all = await txRepo.find({
-        where: {
-          walletId: cashout.walletId as any,
-          type: 'cashout' as any,
-        } as any,
+        where: { walletId: cashout.walletId as any, type: 'cashout' as any } as any,
         order: { createdAt: 'ASC' as any },
       });
 
@@ -814,10 +783,7 @@ export class WalletService {
         throw new BadRequestException('No ledger rows found for this cashout');
       }
 
-      const sum = rows.reduce(
-        (s: number, r: any) => s + Number(r.amountCents || 0),
-        0,
-      );
+      const sum = rows.reduce((s: number, r: any) => s + Number(r.amountCents || 0), 0);
 
       if (sum === 0 || sum === amount) {
         return cashout;
@@ -829,12 +795,11 @@ export class WalletService {
         );
       }
 
-      const wallet = await walletRepo.findOne({
-        where: { id: cashout.walletId },
-      });
+      const wallet = await walletRepo.findOne({ where: { id: cashout.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
-      wallet.cashoutAvailableCents += amount;
+      // ✅ FIX: avoid bigint-string concat
+      wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
       await txRepo.save(
@@ -857,9 +822,7 @@ export class WalletService {
       return updated;
     });
 
-    const wallet = await this.walletRepo.findOne({
-      where: { id: saved.walletId },
-    });
+    const wallet = await this.walletRepo.findOne({ where: { id: saved.walletId } });
     if (wallet) this.emitWalletUpdated(wallet);
 
     this.websocketGateway.emitCashoutUpdated(saved);
@@ -869,10 +832,7 @@ export class WalletService {
   // ==================================================
   // OWNER: Cancel own cashout (PENDING → FAILED + refund)
   // ==================================================
-  async cancelCashout(
-    userId: number,
-    cashoutId: number,
-  ): Promise<CashoutRequest> {
+  async cancelCashout(userId: number, cashoutId: number): Promise<CashoutRequest> {
     const savedCashout = await this.dataSource.transaction(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
@@ -884,8 +844,9 @@ export class WalletService {
       });
 
       if (!cashout) throw new NotFoundException('Cashout not found');
-      if (!cashout.wallet || cashout.wallet.userId !== userId)
+      if (!cashout.wallet || cashout.wallet.userId !== userId) {
         throw new BadRequestException('Cashout does not belong to this user');
+      }
 
       const res = await cashoutRepo.update(
         { id: cashoutId, status: 'PENDING' as any },
@@ -896,14 +857,13 @@ export class WalletService {
         throw new BadRequestException('Only pending cashouts can be cancelled');
       }
 
-      const wallet = await walletRepo.findOne({
-        where: { id: cashout.walletId },
-      });
+      const wallet = await walletRepo.findOne({ where: { id: cashout.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
       const amount = Number(cashout.amountCents);
 
-      wallet.cashoutAvailableCents += amount;
+      // ✅ FIX: avoid bigint-string concat
+      wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
       await txRepo.save(
@@ -928,9 +888,7 @@ export class WalletService {
       return updated;
     });
 
-    const wallet = await this.walletRepo.findOne({
-      where: { id: savedCashout.walletId },
-    });
+    const wallet = await this.walletRepo.findOne({ where: { id: savedCashout.walletId } });
     if (wallet) this.emitWalletUpdated(wallet);
 
     this.websocketGateway.emitCashoutUpdated(savedCashout);
@@ -940,11 +898,7 @@ export class WalletService {
   // ==================================================
   // OWNER: Retry failed cashout (creates new PENDING)
   // ==================================================
-  async retryCashout(
-    userId: number,
-    cashoutId: number,
-  ): Promise<CashoutRequest> {
-    // ✅ ADDED: generic return type to stop TS inferring CashoutRequest | CashoutRequest[]
+  async retryCashout(userId: number, cashoutId: number): Promise<CashoutRequest> {
     return this.dataSource.transaction<CashoutRequest>(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
       const walletRepo = manager.getRepository(Wallet);
@@ -969,34 +923,27 @@ export class WalletService {
       }
 
       const existingPending = await cashoutRepo.findOne({
-        where: {
-          retryOfCashoutId: original.id as any,
-          status: 'PENDING' as any,
-        } as any,
+        where: { retryOfCashoutId: original.id as any, status: 'PENDING' as any } as any,
       });
-
       if (existingPending) return existingPending;
 
-      const wallet = await walletRepo.findOne({
-        where: { id: original.walletId },
-      });
+      const wallet = await walletRepo.findOne({ where: { id: original.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
       if (Number(wallet.cashoutAvailableCents) < amount) {
         throw new BadRequestException('Insufficient cashout balance');
       }
 
-      wallet.cashoutAvailableCents =
-        Number(wallet.cashoutAvailableCents) - amount;
+      // ✅ FIX: avoid bigint-string concat/implicit types
+      wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
-      // ✅ Single-object DeepPartial prevents TS from selecting the array overload
       const retryPartial: DeepPartial<CashoutRequest> = {
         walletId: wallet.id,
         amountCents: amount,
         status: 'PENDING',
         failureReason: null,
-        destinationLast4: original.destinationLast4 ?? null,
+        destinationLast4: (original as any).destinationLast4 ?? null,
         retryOfCashoutId: original.id as any,
       };
 
@@ -1012,7 +959,7 @@ export class WalletService {
             reason: 'cashout_request',
             via: 'wallet_cashout_retry',
             retryOfCashoutId: original.id,
-            destinationLast4: original.destinationLast4 ?? null,
+            destinationLast4: (original as any).destinationLast4 ?? null,
           },
         }),
       );
@@ -1079,17 +1026,16 @@ export class WalletService {
       .filter((c) => c.status === 'FAILED')
       .reduce((sum, c) => sum + Number(c.amountCents), 0);
 
-    const latestCompleted =
-      completedCashouts.length ? completedCashouts[0] : null;
+    const latestCompleted = completedCashouts.length ? completedCashouts[0] : null;
 
     const latestCompletedCashout = latestCompleted
       ? {
           id: latestCompleted.id,
           amountCents: Number(latestCompleted.amountCents),
           status: latestCompleted.status,
-          destinationLast4: latestCompleted.destinationLast4,
+          destinationLast4: (latestCompleted as any).destinationLast4 ?? null,
           failureReason: latestCompleted.failureReason,
-          createdAt: latestCompleted.createdAt,
+          createdAt: (latestCompleted as any).createdAt,
         }
       : null;
 
@@ -1119,7 +1065,7 @@ export class WalletService {
     if (!wallet) return null;
 
     const next = await this.cashoutRepo.findOne({
-      where: { wallet: { id: wallet.id }, status: 'PENDING' },
+      where: { wallet: { id: wallet.id }, status: 'PENDING' as any } as any,
       order: { createdAt: 'ASC' },
     });
 
@@ -1129,8 +1075,8 @@ export class WalletService {
       id: next.id,
       amountCents: Number(next.amountCents),
       status: next.status,
-      destinationLast4: next.destinationLast4,
-      createdAt: next.createdAt,
+      destinationLast4: (next as any).destinationLast4 ?? null,
+      createdAt: (next as any).createdAt,
     };
   }
 
@@ -1139,7 +1085,7 @@ export class WalletService {
   // ==================================================
   async getCashoutsByStatus(status: CashoutStatus) {
     return this.cashoutRepo.find({
-      where: { status },
+      where: { status } as any,
       order: { createdAt: 'DESC' },
     });
   }
