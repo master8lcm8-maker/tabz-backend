@@ -10,7 +10,7 @@ import {
   UseGuards,
   ForbiddenException,
   Query,
-  HttpException, // âœ… M31.1: preserve upstream status codes
+  HttpException, // ✅ M31.1: preserve upstream status codes
 } from '@nestjs/common';
 import { DevEndpointGuard } from '../app/dev-endpoint.guard';
 import { WalletService } from './wallet.service';
@@ -109,6 +109,15 @@ export class WalletController {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
 
+    // ============================
+    // R12: CASHOUT IS OWNER-ONLY
+    // ============================
+    // Must be outside try{} so buyer rejection is NOT wrapped
+    const role = String(req?.user?.role ?? '').toLowerCase();
+    if (role !== 'owner') {
+      throw new ForbiddenException('owner_only');
+    }
+
     try {
       // ===== GATE 1: Identity must be verified =====
       const identity: any = await this.identityService.getStatus(userId);
@@ -172,15 +181,11 @@ export class WalletController {
         createdAt: cashout.createdAt,
       };
     } catch (e: any) {
-      // ðŸ”’ M30: FORCE JSON ERROR BODY (NO BEHAVIOR CHANGE)
-      // eslint-disable-next-line no-console
       console.error('[wallet.cashout] error', e);
 
-      const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+      const detail =
+        e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
 
-      // âœ… M31.1 FIX:
-      // Preserve the original status code on the HTTP transport
-      // while still returning our structured JSON body.
       const status = Number(e?.status);
       const httpStatus = Number.isFinite(status) && status > 0 ? status : 400;
 
@@ -231,8 +236,7 @@ export class WalletController {
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-    const cashout = await this.walletService.adminCompleteCashout(cashoutId);
-    return cashout;
+    return this.walletService.adminCompleteCashout(cashoutId);
   }
 
   @Post('cashouts/:id/fail')
@@ -285,7 +289,7 @@ export class WalletController {
   }
 
   @UseGuards(DevEndpointGuard)
-@Post('dev/add-cashout-balance')
+  @Post('dev/add-cashout-balance')
   async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
@@ -297,7 +301,7 @@ export class WalletController {
   }
 
   @UseGuards(DevEndpointGuard)
-@Post('unlock-spendable')
+  @Post('unlock-spendable')
   async unlockSpendable(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     if (String(req?.user?.role).toLowerCase() !== 'buyer') {
@@ -346,4 +350,3 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }
-
