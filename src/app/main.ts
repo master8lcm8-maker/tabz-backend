@@ -16,34 +16,59 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpStatusBodySyncFilter());
   app.getHttpAdapter().getInstance().set('etag', false);
 
-  // Enable CORS for web (Expo web at localhost:8081/8082/8083)
+  // Enable CORS for web (local dev + production web origins)
+  const allow = new Set([
+    // --- PROD WEB ORIGINS ---
+    'https://8tabz.com',
+    'https://www.8tabz.com',
+
+    // --- LOCAL DEV ---
+    'http://localhost:19006',        // Expo web default
+    'http://localhost:8081',         // sometimes used by RN tooling
+    'http://127.0.0.1:19006',
+    'http://127.0.0.1:8081',
+    'http://10.0.0.239:19006',       // your LAN host if you open web from another device
+    'http://10.0.0.239:8081'
+  ]);
+
+  const allowedHeaders = [
+    'Content-Type',
+    'Authorization',
+    'x-user-id',
+    'Cache-Control',
+    'Pragma',
+    'If-None-Match',
+    'x-dev-seed-secret'
+  ];
+
+  // ✅ HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
+  // This is minimal and safe: it only affects OPTIONS requests.
+  app.getHttpAdapter().getInstance().use((req, res, next) => {
+    if (req.method !== 'OPTIONS') return next();
+
+    const origin = req.headers?.origin;
+    if (origin && allow.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(','));
+
+    // 204 = standard preflight success
+    return res.status(204).send();
+  });
+
   app.enableCors({
     origin: (origin, cb) => {
       // allow non-browser callers (curl, mobile native, server-to-server)
       if (!origin) return cb(null, true);
-
-      const allow = new Set([
-        'http://localhost:19006',        // Expo web default
-        'http://localhost:8081',         // sometimes used by RN tooling
-        'http://127.0.0.1:19006',
-        'http://127.0.0.1:8081',
-        'http://10.0.0.239:19006',       // your LAN host if you open web from another device
-        'http://10.0.0.239:8081'
-      ]);
-
       return allow.has(origin) ? cb(null, true) : cb(null, false);
     },
     credentials: true,
-    methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'x-user-id',
-      'Cache-Control',
-      'Pragma',
-      'If-None-Match',
-      'x-dev-seed-secret'
-    ],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders,
   });
 
   // R4 proof: do NOT log the secret, only presence + length
