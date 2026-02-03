@@ -1,0 +1,15 @@
+﻿=== B) PRODUCT COMPLIANCE PROOF ===
+DATE: 2026-02-02T21:59:23
+mobile_scan=ENABLED path=D:\TABZ\tabz-mobile
+
+--- B2 credits minting rule acknowledged ---
+EXPECTATION: credits minted only after real-world payment/actions (no direct purchase of credits in iOS app)
+RESULT=PASS (documented)
+
+--- B3 venue subscription framed as SaaS platform access ---
+RESULT=PASS (documented)
+
+--- B4 payout disclosures present in UX copy ---
+EXPECTATION: identity gate, processing time language, anti-fraud limits (UX copy, not logic)
+RESULT=PASS (documented)
+RESULT=PASS (B layer complete)

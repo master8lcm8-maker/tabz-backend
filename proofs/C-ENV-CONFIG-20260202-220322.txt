@@ -1,0 +1,78 @@
+﻿=== C) ENV + CONFIG PROOF ===
+DATE: 2026-02-02T22:03:22
+BASE: https://api.8tabz.com
+ORIGIN: https://8tabz.com
+
+--- C1a GET / (root) ---
+HTTP/1.1 200 OK
+Date: Tue, 03 Feb 2026 03:03:22 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 81
+Connection: keep-alive
+CF-RAY: 9c7eb1db3df4c13a-EWR
+x-powered-by: Express
+vary: Origin
+access-control-allow-credentials: true
+x-do-app-origin: b0553e7c-203e-45f5-9ba3-ed3a052aec13
+Cache-Control: private
+x-do-orig-status: 200
+CF-Cache-Status: MISS
+Last-Modified: Tue, 03 Feb 2026 03:03:22 GMT
+Accept-Ranges: bytes
+Set-Cookie: __cf_bm=Qfkq14meBka.SclnpUF5k41BZj0GbOY2PeF_IlLNUNU-1770087802-1.0.1.1-d9dYT05zHtjieJfFzibSf6LxJ7_kHUwKUkSIQr5JYoC6AdeXKl_S5tSqZ9De0_153YhKq6oTnEYlhzlRFxEtKaO1V6mj3PPgFf4Pec8tzfs; path=/; expires=Tue, 03-Feb-26 03:33:22 GMT; domain=.api.8tabz.com; HttpOnly; Secure; SameSite=None
+Server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+{"ok":true,"service":"tabz-backend","message":"TABZ API is running. Try /health"}
+RESULT=PASS : C1a GET / (root)
+
+--- C3  GET /health ---
+HTTP/1.1 200 OK
+Date: Tue, 03 Feb 2026 03:03:22 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 79
+Connection: keep-alive
+CF-RAY: 9c7eb1dc5b868a15-EWR
+x-powered-by: Express
+vary: Origin
+access-control-allow-credentials: true
+Accept-Ranges: bytes
+x-do-app-origin: b0553e7c-203e-45f5-9ba3-ed3a052aec13
+Cache-Control: private
+x-do-orig-status: 200
+cf-cache-status: MISS
+Set-Cookie: __cf_bm=g1cOwd.h962OKq3tICNx44dgB2z3D2A.Fvw5NOdAfbg-1770087802-1.0.1.1-KE_YqkEmmolzaGhISF1AJJyJxRvWmnjbKyp1rnGQXuQp3A6CYG9CBQc5OU2jhXLhgQSzxCcEgghnt4.p8f6NneOACvbtn15yxx3CIbJ4W9E; path=/; expires=Tue, 03-Feb-26 03:33:22 GMT; domain=.api.8tabz.com; HttpOnly; Secure; SameSite=None
+Server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+{"status":"ok","service":"tabz-backend","timestamp":"2026-02-03T03:03:22.323Z"}
+RESULT=PASS : C3  GET /health
+
+--- C2 env var inventory (names only) ---
+present_env_keys_count=0
+NOTE: This is local shell inventory only; production secret manager must contain required vars.
+
+--- C4 CORS header check (GET / with Origin) ---
+HTTP/1.1 200 OK
+Date: Tue, 03 Feb 2026 03:03:22 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 81
+Connection: keep-alive
+CF-RAY: 9c7eb1decd670aae-EWR
+x-powered-by: Express
+access-control-allow-origin: https://8tabz.com
+vary: Origin
+access-control-allow-credentials: true
+x-do-app-origin: b0553e7c-203e-45f5-9ba3-ed3a052aec13
+Cache-Control: private
+x-do-orig-status: 200
+Last-Modified: Tue, 03 Feb 2026 03:03:22 GMT
+CF-Cache-Status: MISS
+Accept-Ranges: bytes
+Set-Cookie: __cf_bm=EzyTlAiiDTpzEeikO1BVx7C4ZnSqo86bzrTggP4B5AI-1770087802-1.0.1.1-WpKtW3EIUQZytuMFOKN9ddVLff93DT7qQo8mlZGFKOc5EcJHNuSixmKSCm9nKXbhNkZCII4pyk9qDt3Q_jAWdEFGIAvOUmeVHZwPJJkv9H4; path=/; expires=Tue, 03-Feb-26 03:33:22 GMT; domain=.api.8tabz.com; HttpOnly; Secure; SameSite=None
+Server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+{"ok":true,"service":"tabz-backend","message":"TABZ API is running. Try /health"}
+RESULT=PASS : C4 CORS header check (GET / with Origin)
+RESULT=PASS (C layer complete)

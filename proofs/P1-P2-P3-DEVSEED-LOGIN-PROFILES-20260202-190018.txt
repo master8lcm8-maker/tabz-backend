@@ -1,0 +1,57 @@
+﻿=== P1-P2-P3 PROOF ===
+DATE: 2026-02-02T19:00:18
+BASE: https://api.8tabz.com
+ORIGIN: https://8tabz.com
+DEVSEED_LEN: 42
+
+--- P1: /dev-seed/buyer ---
+HTTP/1.1 201 Created
+Date: Tue, 03 Feb 2026 00:00:18 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 70
+Connection: keep-alive
+CF-RAY: 9c7da5b25e464693-EWR
+x-powered-by: Express
+access-control-allow-origin: https://8tabz.com
+vary: Origin
+access-control-allow-credentials: true
+x-do-app-origin: b0553e7c-203e-45f5-9ba3-ed3a052aec13
+Cache-Control: private
+x-do-orig-status: 201
+cf-cache-status: DYNAMIC
+Set-Cookie: __cf_bm=iH1ACJLvFoZ79KEfJoyxb.LUFuztGfBr7fzvQVmT5U8-1770076818-1.0.1.1-2gUpSL1Zhg6lhysRutOA7PMhMQ2XAAvyfk7Y5XtGYZ0Lbr7lty2cd1Xg10RpfHfY8jhd1XOgf3GRYOehJyzxphML13yF7wm9qYwngWSEtyU; path=/; expires=Tue, 03-Feb-26 00:30:18 GMT; domain=.api.8tabz.com; HttpOnly; Secure; SameSite=None
+Server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+{"ok":true,"createdOrExists":true,"email":"buyer@tabz.app","userId":4}
+
+--- P2: /auth/login-buyer (password=password) ---
+{"access_token":"[REDACTED]"}
+
+
+token_len=192 token_parts=3
+
+--- P3: /profiles/me ---
+HTTP/1.1 200 OK
+Date: Tue, 03 Feb 2026 00:00:19 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 493
+Connection: keep-alive
+CF-RAY: 9c7da5b86f730f70-EWR
+x-powered-by: Express
+access-control-allow-origin: https://8tabz.com
+vary: Origin
+access-control-allow-credentials: true
+Accept-Ranges: bytes
+x-do-app-origin: b0553e7c-203e-45f5-9ba3-ed3a052aec13
+Cache-Control: private
+x-do-orig-status: 200
+cf-cache-status: MISS
+Set-Cookie: __cf_bm=frew_1pxXF2YlMSyN89g29RXNL3u0dhok8EEVs0Ce3o-1770076819-1.0.1.1-M.8Y4ZyGhFVM7VIzHYkfwb3DuVUvZ5H5zaEh.TyjrHvW8ILfbAJ0AWvG7lRn6.jmD_sPCJHBz2Y_JYdgDZiPVN7ktFB_MLn1RIZZrzE4tXg; path=/; expires=Tue, 03-Feb-26 00:30:19 GMT; domain=.api.8tabz.com; HttpOnly; Secure; SameSite=None
+Server: cloudflare
+alt-svc: h3=":443"; ma=86400
+
+{"ok":true,"userId":4,"profileId":2,"profile":{"id":2,"userId":4,"type":"buyer","displayName":"Demo Buyer","slug":"buyer-4","bio":null,"avatarUrl":null,"coverUrl":null,"isActive":true,"createdAt":"2026-01-23T06:46:10.812Z","updatedAt":"2026-01-23T06:46:10.812Z"},"profiles":[{"id":2,"userId":4,"type":"buyer","displayName":"Demo Buyer","slug":"buyer-4","bio":null,"avatarUrl":null,"coverUrl":null,"isActive":true,"createdAt":"2026-01-23T06:46:10.812Z","updatedAt":"2026-01-23T06:46:10.812Z"}]}
+
+=== END ===
+

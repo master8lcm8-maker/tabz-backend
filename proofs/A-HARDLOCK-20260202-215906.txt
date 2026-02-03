@@ -1,0 +1,189 @@
+﻿=== A) HARD LOCK PROOF ===
+DATE: 2026-02-02T21:59:06
+
+--- A1 git status --porcelain ---
+?? curl-login-buyer.log
+?? payload.json
+?? proofs/A-HARDLOCK-20260202-215906.txt
+?? proofs/ABC-MASTER-20260202-215906.txt
+?? proofs/P1-APP-SPEC-RAW-20260202-001044.yaml
+?? proofs/P1-P2-P3-DEVSEED-LOGIN-PROFILES-20260202-190018.txt
+?? proofs/P10-JWT-TIME-VALIDITY-20260202-193818.txt
+?? proofs/P4-PROFILES-ME-AUTH-20260202-190813.txt
+?? proofs/P5-AUTH-NEGATIVE-CONTROL-20260202-191818.txt
+?? proofs/P6-AUTH-BAD-TOKEN-20260202-192106.txt
+?? proofs/P7-AUTH-GOOD-TOKEN-20260202-192658.txt
+?? proofs/P8-TOKEN-INTEGRITY-20260202-193110.txt
+?? proofs/P9-JWT-CLAIMS-20260202-193421.txt
+RESULT=PASS : A1 git status --porcelain
+A1_count=13
+
+--- A2a git tag --list ---
+M35
+M35_LOCK
+M36
+M36_AUTHORIZED
+M36_FINAL_LOCK
+M36_LOCK
+M37
+M38
+M39
+R1-LOCK-20260129
+R10-LOCK-20260117
+R10-OWNER-VENUE-PROD-GREEN
+R11-LOCK-20260129
+R12-LOCK-20260129
+R2-LOCK-20260129
+R3_LOCK_2026-01-20
+R4-LOCK-20260129
+R5-AUTH-PROD-GREEN-20260123
+R5-LOCK-20260123
+R6-CORS-LOCAL-PROOF-20260118
+R6-CORS-WS-LOCAL-PROOF-20260118
+R6-LOCK-20260123
+R6-WALLET-SUMMARY-PROD-GREEN-20260123
+R7-LOCK-20260129
+R8-LOCK-20260129
+R9-AUTH-PROD-GREEN
+R9-DEPLOY-ACTIVE-20260117
+R9-LOCK-20260117
+TRUTHRUN-PROD-20260123
+checkpoint-devseed-profiles
+checkpoint-health-auth-profiles
+checkpoint-m31-status-sync
+checkpoint-m32-dev-endpoints-locked
+checkpoint-m33-devseed-locked
+m37-initdb-green
+verified-finance-baseline
+RESULT=PASS : A2a git tag --list
+
+--- A2b git log -5 --oneline ---
+320aaff fix(cors): handle OPTIONS preflight globally
+4e6364e docs(proofs): add R1-R12 tag map (anti-drift)
+dd5695f docs(proofs): index + lock R9-R11 proof log
+641c41b proofs: add R1/R2/R7/R8 discovery reports
+80fe83a R12 LOCK: cashout gating + status-preserving errors (formal lock)
+RESULT=PASS : A2b git log -5 --oneline
+
+--- A2c git ls-remote --tags origin ---
+787833a670e7d3e7a6d9f4eabb45129556903875	refs/tags/M35
+787833a670e7d3e7a6d9f4eabb45129556903875	refs/tags/M35_LOCK
+c0fa4076821b5730dee41df453ada7a80bff1322	refs/tags/M36
+c0fa4076821b5730dee41df453ada7a80bff1322	refs/tags/M36_AUTHORIZED
+c0fa4076821b5730dee41df453ada7a80bff1322	refs/tags/M36_FINAL_LOCK
+34367f26bea0502ce7f5b516c32597294a7cef8d	refs/tags/M36_LOCK
+c0fa4076821b5730dee41df453ada7a80bff1322	refs/tags/M36_LOCK^{}
+2bc886c9d5aa0d6c5a4d02132ec4c3ceb3b190a4	refs/tags/M37
+5e31514b0d41c36832eb0e4f7276320f94d5269a	refs/tags/M38
+5e31514b0d41c36832eb0e4f7276320f94d5269a	refs/tags/M39
+863ac518640e0e52a8e0eb8fefebb13878d6f436	refs/tags/R1-LOCK-20260129
+a7d491ab82025c61d93f6d7af6a461e936ed060c	refs/tags/R1-LOCK-20260129^{}
+31d63dd40d847ead8daaf25fce6cb744f13187ff	refs/tags/R10-LOCK-20260117
+4c9f7f5e49ba9a745b2ab282053b64da2f85d583	refs/tags/R10-LOCK-20260117^{}
+301b98db9b669698f847cd57258d9b4000f1d7b3	refs/tags/R10-OWNER-VENUE-PROD-GREEN
+1732693673ad779b2186b6f3c1c5a19c9d979991	refs/tags/R11-LOCK-20260129
+041ba8716079c53c29b0aebc213ec42af8d381d7	refs/tags/R11-LOCK-20260129^{}
+35fc19e47d788bc318e2ae212e13899de24e9ded	refs/tags/R12-LOCK-20260129
+80fe83aee5360f32838a1b556be680c8f8b62da0	refs/tags/R12-LOCK-20260129^{}
+b1d500b48fd3f9f4047732791303cf28b2c99347	refs/tags/R2-LOCK-20260129
+ef595f7ba1de79e6de413365e184846c949f2439	refs/tags/R2-LOCK-20260129^{}
+e5cb0bd5cb0691dfe71318fce1ef60caeabd8379	refs/tags/R3_LOCK_2026-01-20
+6989bf272f9680626b05907ee0cc84e97fb8ddaf	refs/tags/R3_LOCK_2026-01-20^{}
+106ae70e1db65bc632e5d26632ae24164ab94d0a	refs/tags/R4-LOCK-20260129
+91170aafb592093889966d8b6cb8a67360a91523	refs/tags/R4-LOCK-20260129^{}
+cf261c805c292ce648e3dc07dad6a471b8d7ed6e	refs/tags/R5-AUTH-PROD-GREEN-20260123
+cf261c805c292ce648e3dc07dad6a471b8d7ed6e	refs/tags/R5-LOCK-20260123
+1fcb9752175773e8bd51e4fa822d0072b01c6035	refs/tags/R6-CORS-LOCAL-PROOF-20260118
+2968ec41eb6d0b429c8ff2b5466d1d2c7a12563c	refs/tags/R6-CORS-LOCAL-PROOF-20260118^{}
+28f5b05ad08719a35a6b8c86934f8bbbdf002b36	refs/tags/R6-CORS-WS-LOCAL-PROOF-20260118
+85c4cc91b75229d6662d7b9a778798717cf40d1a	refs/tags/R6-CORS-WS-LOCAL-PROOF-20260118^{}
+1fedd01c7c7fb075fffe26644de2be9802fc5abf	refs/tags/R6-LOCK-20260123
+1fedd01c7c7fb075fffe26644de2be9802fc5abf	refs/tags/R6-WALLET-SUMMARY-PROD-GREEN-20260123
+a3c00686797de5b87c8bc20eeca3435b623e2fae	refs/tags/R7-LOCK-20260129
+84d02c0ed4ed23eb008aaf76275c252ebcae2379	refs/tags/R7-LOCK-20260129^{}
+bd26feecb4953ebee9545b6cc76713383ce52d92	refs/tags/R8-LOCK-20260129
+ac14ce2a66fde9ed90ee6077b520c8c575fa3aab	refs/tags/R8-LOCK-20260129^{}
+85c4cc91b75229d6662d7b9a778798717cf40d1a	refs/tags/R9-AUTH-PROD-GREEN
+fa9e48514679d6b692c9f3cfb9e36afd94065ea9	refs/tags/R9-DEPLOY-ACTIVE-20260117
+29d14c835f3598dfeadd0a5b1e7f79b278cf2222	refs/tags/R9-DEPLOY-ACTIVE-20260117^{}
+ff8c22ca2de6c8aa08fe8820d5825a4836739beb	refs/tags/R9-LOCK-20260117
+0eb8c138d323d006e80284ec3f6b396cd12bb1ec	refs/tags/R9-LOCK-20260117^{}
+cf261c805c292ce648e3dc07dad6a471b8d7ed6e	refs/tags/TRUTHRUN-PROD-20260123
+c17af5fc3db84cd3e61f992bfd1eb5df1a543d93	refs/tags/checkpoint-devseed-profiles
+ef595f7ba1de79e6de413365e184846c949f2439	refs/tags/checkpoint-devseed-profiles^{}
+289a9eca4b9dfb7ff0c9fffe507df39e9e915c3a	refs/tags/checkpoint-health-auth-profiles
+a7d491ab82025c61d93f6d7af6a461e936ed060c	refs/tags/checkpoint-health-auth-profiles^{}
+f7b6cc3c6c8d037e521c39f3d9e207820e02fef3	refs/tags/checkpoint-m31-status-sync
+59959b06936d0c495ca283e537ec1cbbace0853e	refs/tags/checkpoint-m31-status-sync^{}
+7d879cf103a85256ec1d1081473ac529ee1a46d2	refs/tags/checkpoint-m32-dev-endpoints-locked
+a33f07baed1cd3e74dfd7a0d6b2101ecf0058c17	refs/tags/checkpoint-m32-dev-endpoints-locked^{}
+b431d8c0fa28e1d79d861718c7aed3571c725581	refs/tags/checkpoint-m33-devseed-locked
+6c576154c5b1c698330ffcb791b88a2f25bfb164	refs/tags/checkpoint-m33-devseed-locked^{}
+8364308356dd37a5d6558e92702849b40a87e829	refs/tags/m37-initdb-green
+5f3dafb079f8bf1d2580e98ebbf89bc632d1b567	refs/tags/m37-initdb-green^{}
+84d02c0ed4ed23eb008aaf76275c252ebcae2379	refs/tags/verified-finance-baseline
+RESULT=PASS : A2c git ls-remote --tags origin
+tag_local_prefix_M35=YES
+tag_local_prefix_M36=YES
+tag_local_prefix_M37=YES
+tag_local_prefix_M38=YES
+tag_local_prefix_M39=YES
+
+--- A3 git ls-files proofs ---
+proofs/INDEX.md
+proofs/R1-R12-TAG-MAP-20260201-231215.txt
+proofs/R1-R2-R7-R8-CANDIDATE-RANGE-20260129-050946.txt
+proofs/R1-R2-R7-R8-GIT-DISCOVERY-20260129-044454.txt
+proofs/R10-health-and-logs-pass-20260117-035321.txt
+proofs/R10-owner-venue-prod-proof.ps1
+proofs/R11-LOCK-20260130-060339.log
+proofs/R12-LOCK-20260129-030505.md
+proofs/R6-cors-local-proof-20260118-011808.txt
+proofs/R6-cors-ws-local-proof-20260118-013149.txt
+proofs/R9-active-migrations-pass-20260117-031235.txt
+proofs/R9-app-get.json
+proofs/R9-appspec-env-check.txt
+proofs/R9-auth-prod-proof.ps1
+proofs/R9-db-debug-20260117-010047.log
+proofs/R9-db-debug-auth-20260117-010341.log
+proofs/R9-deploy-pass-20260117-023631.txt
+proofs/R9-truthrun-20260117-003506.log
+proofs/R9-truthrun-20260117-003640.log
+proofs/assets/m38_cover.png
+proofs/assets/m39_owner_avatar.png
+proofs/credits-multifunder-proof.ps1
+proofs/proof-auth-20251231-070545.log
+proofs/proof-auth-me-20251231-101653.log
+proofs/proof-health-20251231-075535.log
+proofs/proof-profiles-20251231-095219.log
+proofs/proof-run-20251231-090443.log
+RESULT=PASS : A3 git ls-files proofs
+
+--- A4 npm run build ---
+
+> tabz-backend@1.0.0 build
+> tsc -p tsconfig.build.json
+
+RESULT=PASS : A4 npm run build
+
+--- A5 migrations list (src/migrations) ---
+
+Name                                                         Length LastWriteTime       
+----                                                         ------ -------------       
+1700000000000-0000-CreateBaseTables.ts                         5455 1/17/2026 1:50:34 AM
+1768109000000-create-credits-ledger.ts                         4505 1/16/2026 8:11:28 PM
+1768109000000-create-credits-ledger.ts.bak_pgfix               3887 1/11/2026 4:03:21 AM
+1768723743137-add-users-displayName.ts                         1291 1/18/2026 3:09:59 AM
+1768804022771-CreateStaffTable.ts                              2574 1/19/2026 2:19:42 AM
+1768891965353-Prod_WalletsBaseline.ts                          2357 1/20/2026 2:00:28 AM
+1768897364993-CreateDrinkOrdersOnly.ts                         2139 1/20/2026 3:29:14 AM
+3045-AddDestinationLast4ToCashoutRequests.ts                   1140 1/16/2026 8:11:28 PM
+3045-create-owner-bank-info.ts                                 1480 1/16/2026 7:30:51 PM
+3045-create-owner-bank-info.ts.bak_pluralfix                   1473 1/9/2026 6:42:10 PM 
+3046-add-owner-profile-id-to-venues.ts                         1043 1/16/2026 8:11:28 PM
+3046-AddWalletIdToCashoutRequests.ts                            734 1/27/2026 1:26:46 AM
+3047-AddFailureReasonAndRetryOfCashoutIdToCashoutRequests.ts   5417 1/26/2026 9:35:37 PM
+
+
+RESULT=PASS : A5 migrations list (src/migrations)
+RESULT=PASS (A layer complete)
