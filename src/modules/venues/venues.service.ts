@@ -175,6 +175,32 @@ export class VenuesService {
   }
 
   // ----------------------------
+  // FV-25 — update venue media (avatar/cover)
+  // Controller already owner-checks the venue; service just applies patch.
+  // ----------------------------
+  async updateMedia(
+    venueId: number,
+    patch: { avatarUrl?: string | null; coverUrl?: string | null },
+  ): Promise<Venue> {
+    const id = Number(venueId);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new BadRequestException('invalid_venue_id');
+    }
+
+    const venue = await this.venueRepo.findOne({ where: { id } });
+    if (!venue) throw new NotFoundException('venue_not_found');
+
+    if ('avatarUrl' in patch) {
+      venue.avatarUrl = patch.avatarUrl ?? null;
+    }
+    if ('coverUrl' in patch) {
+      venue.coverUrl = patch.coverUrl ?? null;
+    }
+
+    return this.venueRepo.save(venue);
+  }
+
+  // ----------------------------
   // helpers
   // ----------------------------
   private slugify(input: string): string {

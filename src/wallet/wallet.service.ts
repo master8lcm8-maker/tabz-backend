@@ -7,7 +7,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, DeepPartial } from 'typeorm';
 
-
 import { Wallet } from './wallet.entity';
 import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
 import { WalletTransaction } from './wallet-transaction.entity';
@@ -166,6 +165,61 @@ export class WalletService {
 
     this.emitWalletUpdated(wallet);
     return wallet;
+  }
+
+  // ==================================================
+  // DEV/OPS: Unlock spendable balance (moves from locked -> spendable)
+  // This is used by WalletController: POST /wallet/unlock-spendable
+  // ==================================================
+  async unlockSpendableBalance(userId: number, amountCents: number): Promise<Wallet> {
+    const amt = Number(amountCents);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      throw new BadRequestException('amountCents must be a positive number');
+    }
+
+    let updatedWallet: Wallet | null = null;
+
+    await this.dataSource.transaction(async (manager) => {
+      const walletRepo = manager.getRepository(Wallet);
+      const txRepo = manager.getRepository(WalletTransaction);
+
+      const wallet = await walletRepo.findOne({ where: { userId } });
+      if (!wallet) throw new NotFoundException('Wallet not found');
+
+      const balance = Number(wallet.balanceCents ?? 0);
+      const spendable = Number(wallet.spendableBalanceCents ?? 0);
+      const cashoutAvail = Number(wallet.cashoutAvailableCents ?? 0);
+
+      // Anything not in spendable/cashoutAvailable is considered "locked"
+      const locked = balance - spendable - cashoutAvail;
+
+      if (locked < amt) {
+        throw new BadRequestException('Insufficient locked balance to unlock');
+      }
+
+      wallet.spendableBalanceCents = spendable + amt;
+      const saved = await walletRepo.save(wallet);
+
+      await txRepo.save(
+  txRepo.create({
+    wallet: { id: saved.id } as any, // <-- FIX: use relation, not walletId
+    type: 'deposit',
+    amountCents: 0,
+    metadata: {
+      reason: 'unlock_spendable_balance',
+      unlockedCents: amt,
+    },
+  } as any),
+);
+
+
+
+
+      updatedWallet = saved;
+    });
+
+    if (updatedWallet) this.emitWalletUpdated(updatedWallet);
+    return updatedWallet as Wallet;
   }
 
   // ==================================================
@@ -893,19 +947,17 @@ export class WalletService {
         Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
-     // ✅ Single-object DeepPartial prevents TS from selecting the array overload
-const retryPartial: DeepPartial<CashoutRequest> = {
-  walletId: wallet.id,
-  amountCents: amount,
-  status: 'PENDING',
-  failureReason: null,
-  destinationLast4: original.destinationLast4 ?? null,
-  retryOfCashoutId: original.id as any,
-};
+      // ✅ Single-object DeepPartial prevents TS from selecting the array overload
+      const retryPartial: DeepPartial<CashoutRequest> = {
+        walletId: wallet.id,
+        amountCents: amount,
+        status: 'PENDING',
+        failureReason: null,
+        destinationLast4: original.destinationLast4 ?? null,
+        retryOfCashoutId: original.id as any,
+      };
 
-const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
-
-
+      const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
 
       await txRepo.save(
         txRepo.create({
@@ -933,10 +985,12 @@ const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
     const wallet = await this.walletRepo.findOne({ where: { userId } });
     if (!wallet) return [];
 
-    return this.txRepo.find({
-      where: { walletId: wallet.id },
-      order: { createdAt: 'DESC' },
-    });
+   return this.txRepo.find({
+  where: { wallet: { id: wallet.id } as any },
+  order: { createdAt: 'DESC' },
+});
+
+
   }
 
   // ==================================================
