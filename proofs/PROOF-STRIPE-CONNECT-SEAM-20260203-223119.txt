@@ -1,0 +1,1453 @@
+﻿=== TABZ PROOF: STRIPE CONNECT SEAM (PROOF ONLY) ===
+DATE: 2026-02-03T22:31:19
+PWD:  D:\TABZ\tabz-backend-full\tabz-backend
+
+=== GIT STATE ===
+BRANCH: fix/build-integrity-wallet-venue
+HEAD:    ead782f98b0fc10c063a6d120957726245139b52
+REMOTE:  origin	https://github.com/master8lcm8-maker/tabz-backend.git (fetch) | origin	https://github.com/master8lcm8-maker/tabz-backend.git (push)
+STATUS:
+?? proofs/PROOF-STRIPE-CONNECT-CODE.txt
+?? proofs/PROOF-STRIPE-CONNECT-SEAM-20260203-223119.txt
+
+=== BUILD (tsc) ===
+
+=== SEARCH: STRIPE/CONNECT SURFACE (code) ===
+
+----- MATCHES FOR: STRIPE_SECRET_KEY -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:17: // ✅ NEW: Stripe is OPTIONAL. Only used if STRIPE_SECRET_KEY is set.
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:18: private readonly STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:24: if (!this.STRIPE_SECRET_KEY) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:26: throw new Error("Missing STRIPE_SECRET_KEY in backend env");
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:29: this.stripeClient = new Stripe(this.STRIPE_SECRET_KEY, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:65: if (!this.STRIPE_SECRET_KEY) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:78: // ✅ Create real Stripe Identity hosted session (only when STRIPE_SECRET_KEY exists)
+
+----- MATCHES FOR: STRIPE_WEBHOOK_SECRET -----
+(none)
+
+----- MATCHES FOR: STRIPE_CONNECT -----
+(none)
+
+----- MATCHES FOR: CONNECT -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:137: 'connection_timeout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:90: 'connection_timeout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:628: await queryRunner.connect();
+
+----- MATCHES FOR: webhook -----
+(none)
+
+----- MATCHES FOR: webhooks -----
+(none)
+
+----- MATCHES FOR: stripe.webhooks -----
+(none)
+
+----- MATCHES FOR: Stripe -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:2: import Stripe from "stripe";
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:8: // In-memory dev store (will be replaced by DB + Stripe later)
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:14: // ✅ DEV: where to send user for the hosted flow (placeholder until real Stripe)
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:17: // ✅ NEW: Stripe is OPTIONAL. Only used if STRIPE_SECRET_KEY is set.
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:18: private readonly STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:19: private stripeClient: Stripe | null = null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:21: private getStripe(): Stripe {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:22: if (this.stripeClient) return this.stripeClient;
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:24: if (!this.STRIPE_SECRET_KEY) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:26: throw new Error("Missing STRIPE_SECRET_KEY in backend env");
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:29: this.stripeClient = new Stripe(this.STRIPE_SECRET_KEY, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:33: return this.stripeClient;
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:49: provider: "stripe_identity",
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:54: // ❌ If it's the DEV placeholder, generate a real Stripe session URL (when configured).
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:61: return { userId, ...existing, provider: "stripe_identity" };
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:64: // ✅ If Stripe isn't configured, fallback to DEV URL (keeps your current dev behavior)
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:65: if (!this.STRIPE_SECRET_KEY) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:73: provider: "stripe_identity",
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:78: // ✅ Create real Stripe Identity hosted session (only when STRIPE_SECRET_KEY exists)
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:79: const stripe = this.getStripe();
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:80: const vs = await stripe.identity.verificationSessions.create({
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:90: throw new Error("Stripe Identity did not return a hosted session url");
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:99: provider: "stripe_identity",
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:115: provider: "stripe_identity",
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.service.ts:119: return { userId, ...existing, provider: "stripe_identity" };
+
+----- MATCHES FOR: accountLinks -----
+(none)
+
+----- MATCHES FOR: account_links -----
+(none)
+
+----- MATCHES FOR: accounts.create -----
+(none)
+
+----- MATCHES FOR: account.create -----
+(none)
+
+----- MATCHES FOR: accountLink -----
+(none)
+
+----- MATCHES FOR: onboarding -----
+(none)
+
+----- MATCHES FOR: express -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:12: import { Request } from 'express';
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:17: import { FileInterceptor } from '@nestjs/platform-express';
+
+----- MATCHES FOR: external_account -----
+(none)
+
+----- MATCHES FOR: external account -----
+(none)
+
+----- MATCHES FOR: capabilities -----
+(none)
+
+----- MATCHES FOR: payouts -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:1: // src/payouts/payout.entity.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:12: @Entity('payouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:3: import { PayoutsService } from './payouts.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:5: @Controller('owner/payouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:7: export class PayoutsController {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:8: constructor(private readonly payoutsService: PayoutsService) {}
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:14: return this.payoutsService.getPayoutsForUser(userId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:1: // src/payouts/payouts.module.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:6: import { PayoutsService } from './payouts.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:7: import { PayoutsController } from './payouts.controller';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:11: controllers: [PayoutsController],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:12: providers: [PayoutsService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:13: exports: [PayoutsService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:15: export class PayoutsModule {}
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:12: export class PayoutsService {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:68: throw new BadRequestException('Only pending payouts can be cancelled');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:95: throw new BadRequestException('Only failed payouts can be retried');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:112: async getPayoutsForUser(userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:124: // in the same transaction. Payouts have no ledger, so this engine is disabled.
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:126: 'Payout engine disabled: payouts cannot change status without ledger entries. Use /wallet/cashout.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:226: // STORE ITEMS / PAYOUTS
+
+----- MATCHES FOR: payout -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:1: // src/payouts/payout.entity.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:12: @Entity('payouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:13: export class Payout {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:3: import { PayoutsService } from './payouts.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:5: @Controller('owner/payouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:7: export class PayoutsController {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:8: constructor(private readonly payoutsService: PayoutsService) {}
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:14: return this.payoutsService.getPayoutsForUser(userId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:1: // src/payouts/payouts.module.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:4: import { Payout } from './payout.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:6: import { PayoutsService } from './payouts.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:7: import { PayoutsController } from './payouts.controller';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:10: imports: [TypeOrmModule.forFeature([Payout, Wallet])],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:11: controllers: [PayoutsController],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:12: providers: [PayoutsService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:13: exports: [PayoutsService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.module.ts:15: export class PayoutsModule {}
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:8: import { Payout } from './payout.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:12: export class PayoutsService {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:14: @InjectRepository(Payout)
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:15: private readonly payoutRepo: Repository<Payout>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:21: async createPayout(userId: number, amountCents: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:38: const payout = this.payoutRepo.create({
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:46: const saved = await this.payoutRepo.save(payout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:48: await this.runMockPayoutEngine(saved.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:50: return this.payoutRepo.findOne({ where: { id: saved.id } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:53: async cancelPayout(id: number, userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:58: const payout = await this.payoutRepo.findOne({ where: { id } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:59: if (!payout) throw new NotFoundException('Payout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:62: where: { id: payout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:65: throw new NotFoundException('Payout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:67: if (payout.status !== 'PENDING')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:68: throw new BadRequestException('Only pending payouts can be cancelled');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:70: payout.status = 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:71: payout.failureReason = 'Cancelled by owner';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:72: await this.payoutRepo.save(payout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:74: wallet.cashoutAvailableCents += payout.amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:77: return payout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:80: async retryPayout(id: number, userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:85: const failed = await this.payoutRepo.findOne({ where: { id } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:86: if (!failed) throw new NotFoundException('Payout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:92: throw new NotFoundException('Payout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:95: throw new BadRequestException('Only failed payouts can be retried');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:97: const newPayout = this.payoutRepo.create({
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:105: const saved = await this.payoutRepo.save(newPayout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:107: await this.runMockPayoutEngine(saved.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:109: return this.payoutRepo.findOne({ where: { id } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:112: async getPayoutsForUser(userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:115: return this.payoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:121: private async runMockPayoutEngine(id: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:124: // in the same transaction. Payouts have no ledger, so this engine is disabled.
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:126: 'Payout engine disabled: payouts cannot change status without ledger entries. Use /wallet/cashout.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:129: const payout = await this.payoutRepo.findOne({ where: { id } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:130: if (!payout || payout.status !== 'PENDING') return;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:141: payout.status = 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:142: payout.failureReason =
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:145: payout.status = 'COMPLETED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:146: payout.failureReason = null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:149: await this.payoutRepo.save(payout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:15: | 'payout_credit'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:16: | 'spend_no_payout'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:17: | 'spend_self_payout'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:18: | 'spend_with_payout'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:19: | 'payout_credit'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:321: @Get('next-payout')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:322: async getNextPayout(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:325: return { next: (await this.walletService.getNextPayout(userId)) ?? null };
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:226: // STORE ITEMS / PAYOUTS
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:228: async spendWithPayout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:234: ): Promise<{ feeCents: number; payoutCents: number }> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:243: const payoutCents = amountCents - feeCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:263: // Record buyer spend WITH payout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:267: type: 'spend_with_payout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:273: payoutCents,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:292: ownerWallet.balanceCents += payoutCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:293: ownerWallet.cashoutAvailableCents += payoutCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:296: // Record owner payout credit
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:300: type: 'payout_credit',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:301: amountCents: payoutCents,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:317: return { feeCents, payoutCents };
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:326: ): Promise<{ feeCents: number; payoutCents: number }> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:327: return this.spendWithPayout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1074: // NEXT PAYOUT INFO
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1076: async getNextPayout(userId: number) {
+
+----- MATCHES FOR: transfers -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:10: @Entity('transfers')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:15: @ManyToOne(() => Wallet, (wallet) => wallet.outgoingTransfers, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:20: @ManyToOne(() => Wallet, (wallet) => wallet.incomingTransfers, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:39: outgoingTransfers: Transfer[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:42: incomingTransfers: Transfer[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:337: // TRANSFERS
+
+----- MATCHES FOR: transfer -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\index.ts:3: export * from './transfer.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:10: @Entity('transfers')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:11: export class Transfer {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:15: @ManyToOne(() => Wallet, (wallet) => wallet.outgoingTransfers, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:20: @ManyToOne(() => Wallet, (wallet) => wallet.incomingTransfers, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:16: | 'transfer_in'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:17: | 'transfer_out'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:20: | 'transfer_in'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:21: | 'transfer_out'
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:80: // TRANSFER
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:82: @Post('transfer')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:83: async transfer(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:96: throw new BadRequestException('Invalid transfer amount');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:99: await this.walletService.transfer(senderId, receiverId, amount);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:11: import { Transfer } from './transfer.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:38: @OneToMany(() => Transfer, (t) => t.senderWallet)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:39: outgoingTransfers: Transfer[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:41: @OneToMany(() => Transfer, (t) => t.receiverWallet)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:42: incomingTransfers: Transfer[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:10: import { Transfer } from '../wallet/transfer.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:36: Transfer,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:337: // TRANSFERS
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:339: async transfer(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:345: throw new BadRequestException('Transfer amount must be positive');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:370: type: 'transfer_out',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:395: type: 'transfer_in',
+
+----- MATCHES FOR: destination -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:3: export class AddDestinationLast4ToCashoutRequests1733290000000
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:6: name = 'AddDestinationLast4ToCashoutRequests1733290000000';
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:10: `ALTER TABLE "cashout_requests" ADD "destinationLast4" character varying(4)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:16: `ALTER TABLE "cashout_requests" DROP COLUMN "destinationLast4"`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:33: destinationLast4: string | null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:43: destinationLast4: '9012',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:102: destinationLast4: failed.destinationLast4 ?? '9012',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.entity.ts:31: // Convenience: last 4 digits used for display & cashout destination
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:36: destinationLast4: string | null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:171: destinationLast4: cashout.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:36: destinationLast4: string | null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:441: destinationLast4: bankInfo.accountLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:453: destinationLast4: bankInfo.accountLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:536: destinationLast4: (c as any).destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:956: destinationLast4: original.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:972: destinationLast4: original.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1049: destinationLast4: latestCompleted.destinationLast4,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1091: destinationLast4: next.destinationLast4,
+
+----- MATCHES FOR: stripeAccountId -----
+(none)
+
+----- MATCHES FOR: stripe_account_id -----
+(none)
+
+----- MATCHES FOR: connectAccountId -----
+(none)
+
+----- MATCHES FOR: expressAccountId -----
+(none)
+
+----- MATCHES FOR: cashout -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\app\http-status-body-sync.filter.ts:23: const allowed = msg === 'cashout_failed' || msg === 'm31_2_probe';
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:3: export class AddDestinationLast4ToCashoutRequests1733290000000
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:6: name = 'AddDestinationLast4ToCashoutRequests1733290000000';
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:10: `ALTER TABLE "cashout_requests" ADD "destinationLast4" character varying(4)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:16: `ALTER TABLE "cashout_requests" DROP COLUMN "destinationLast4"`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:32: if (wallet.cashoutAvailableCents < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:33: throw new BadRequestException('Insufficient cashout available balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:35: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:74: wallet.cashoutAvailableCents += payout.amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:126: 'Payout engine disabled: payouts cannot change status without ledger entries. Use /wallet/cashout.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.entity.ts:31: // Convenience: last 4 digits used for display & cashout destination
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:9: @Entity('cashout_locks')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:10: export class CashoutLock {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:23: // When this amount becomes eligible for cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:10: export type CashoutStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:12: @Entity('cashout_requests')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:13: export class CashoutRequest {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:20: @ManyToOne(() => Wallet, (wallet) => wallet.cashouts, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:29: status: CashoutStatus;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:34: // NEW: last 4 digits of bank account for this cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:38: // ✅ NEW: idempotency link — this cashout is a retry of another cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:40: retryOfCashoutId: number | null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:5: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:11: * CashoutSchedulerService
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:15: * - Every 30 seconds, it looks for all PENDING cashouts.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:16: * - For each PENDING cashout, it randomly decides:
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:20: *    - locked when cashout is created,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:22: *      or an admin uses adminFailCashout().
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:31: export class CashoutSchedulerService {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:32: private readonly logger = new Logger(CashoutSchedulerService.name);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:35: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:36: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:51: // Set env: MOCK_CASHOUT_ENGINE=true
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:53: String(process.env.MOCK_CASHOUT_ENGINE || '').toLowerCase() === 'true';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:56: // Find all cashouts that are still pending
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:57: const pending = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:63: this.logger.log('💸 Cashout scheduler tick – no pending cashouts');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:68: `💸 Cashout scheduler processing ${pending.length} pending cashout(s)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:71: for (const cashout of pending) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:72: await this.processSingleCashout(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:77: * Apply mock success/failure decision to a single cashout.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:79: private async processSingleCashout(cashout: CashoutRequest) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:81: if (cashout.status !== 'PENDING') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:97: const saved = await this.cashoutRepo.manager.transaction(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:99: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:103: const fresh = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:104: where: { id: cashout.id },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:113: throw new Error('Wallet not found for cashout refund');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:118: throw new Error('Invalid cashout amount for refund');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:121: wallet.cashoutAvailableCents += amt;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:127: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:130: reason: 'cashout_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:131: cashoutId: fresh.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:133: via: 'mock_cashout_engine',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:141: return await cashoutRepo.save(fresh);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:147: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:150: `💸 Cashout ${saved.id} FAILED – reason=${saved.failureReason}, amountCents=${saved.amountCents}`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:156: const saved = await this.cashoutRepo.manager.transaction(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:158: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:161: const fresh = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:162: where: { id: cashout.id },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:169: throw new Error('Invalid cashout amount for completion');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:176: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:179: reason: 'cashout_complete',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:180: cashoutId: fresh.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:181: via: 'mock_cashout_engine',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:189: return await cashoutRepo.save(fresh);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:195: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:198: `💸 Cashout ${saved.id} COMPLETED – amountCents=${saved.amountCents}`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\index.ts:4: export * from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:32: unlockedForCashout: boolean;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:18: | 'cashout';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:24: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:22: | 'cashout';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:17: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:104: // CREATE CASHOUT REQUEST (CUSTOM AMOUNT)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:107: @Post('cashout')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:108: async cashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:117: 'Identity verification is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:125: 'Bank information is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:134: 'Cashout amount must be a positive number of cents.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:141: `Minimum cashout is ${minAmountCents} cents ($${(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:148: const available = Number(summary.cashoutAvailableCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:151: throw new BadRequestException('No cashout-ready balance available.');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:156: `Cashout amount exceeds available cashout balance (${available} cents).`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:160: const cashout: CashoutRequest = await this.walletService.cashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:166: id: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:167: walletId: cashout.walletId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:168: amountCents: Number(cashout.amountCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:169: status: cashout.status,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:170: failureReason: cashout.failureReason,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:171: destinationLast4: cashout.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:172: createdAt: cashout.createdAt,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:177: console.error('[wallet.cashout] error', e);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:179: const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:189: message: 'cashout_failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:200: // M6: UNIFIED CASHOUT HISTORY (canonical)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:202: @Get('cashouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:203: async getCashouts(@Req() req, @Query('status') status?: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:206: return this.walletService.listCashoutsCanonical(userId, status ?? null);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:209: @Get('cashouts/:id')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:210: async getCashoutById(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:213: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:214: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:215: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:217: return this.walletService.getCashoutForUserById(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:220: @Get('cashouts/failed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:221: async getFailedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:224: return this.walletService.listCashoutsCanonical(userId, 'failed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:227: @Post('cashouts/:id/complete')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:228: async completeCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:230: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:231: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:232: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:234: const cashout = await this.walletService.adminCompleteCashout(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:235: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:238: @Post('cashouts/:id/fail')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:239: async failCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:245: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:246: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:247: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:249: return this.walletService.adminFailCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:250: cashoutId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:251: body.failureReason ?? 'Cashout failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:255: @Post('cashouts/:id/repair-refund')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:256: async repairFailedCashoutRefund(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:258: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:259: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:260: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:262: return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:265: @Post('cashouts/:id/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:266: async cancelOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:269: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:270: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:271: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:273: return this.walletService.cancelCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:276: @Post('cashouts/:id/retry')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:277: async retryOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:280: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:281: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:282: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:284: return this.walletService.retryCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:288: @Post('dev/add-cashout-balance')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:289: async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:296: return this.walletService.devAddCashoutBalance(userId, amount);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:318: return this.walletService.getCashoutMetrics(userId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:335: @Get('cashouts/pending')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:336: async getPendingCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:339: return this.walletService.listCashoutsCanonical(userId, 'pending');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:342: @Get('cashouts/completed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:343: async getCompletedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:346: return this.walletService.listCashoutsCanonical(userId, 'completed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:10: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:30: // Available for cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:32: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:35: @OneToMany(() => CashoutRequest, (c) => c.wallet)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:36: cashouts: CashoutRequest[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:6: import { CashoutRequest } from '../wallet/cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:9: import { CashoutLock } from '../wallet/cashout-lock.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:18: import { CashoutSchedulerService } from '../wallet/cashout-scheduler.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:31: CashoutRequest,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:35: CashoutLock,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:51: providers: [WalletService, CashoutSchedulerService, BankInfoService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:11: import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:21: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:27: // M6: Canonical cashout API shapes (frontend-stable)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:29: export type CashoutStatusCanonical = 'PENDING' | 'COMPLETED' | 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:31: export type CashoutDto = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:33: status: CashoutStatusCanonical;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:38: retryOfCashoutId: number | null; // ✅ ADDED
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:41: export type CashoutListResponse = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:42: items: CashoutDto[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:43: meta: { count: number; status: CashoutStatusCanonical | 'ALL' };
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:52: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:53: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:73: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:87: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:105: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:191: const cashoutAvail = Number(wallet.cashoutAvailableCents ?? 0);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:193: // Anything not in spendable/cashoutAvailable is considered "locked"
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:194: const locked = balance - spendable - cashoutAvail;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:288: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:293: ownerWallet.cashoutAvailableCents += payoutCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:384: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:410: // CASHOUT FLOW
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:412: async cashout(userId: number, amountCents: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:414: throw new BadRequestException('Cashout amount must be positive');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:418: throw new BadRequestException('Bank info required before cashout.');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:422: const savedCashout = await this.dataSource.transaction(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:424: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:430: if (Number(wallet.cashoutAvailableCents) < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:431: throw new BadRequestException('Insufficient cashout balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:433: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:436: const cashout = cashoutRepo.create({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:444: const result = await cashoutRepo.save(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:449: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:452: cashoutId: result.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:454: reason: 'cashout_request',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:455: via: 'wallet_cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:465: this.websocketGateway.emitCashoutCreated(savedCashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:467: return savedCashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:470: async getCashoutsForUser(userId: number): Promise<CashoutRequest[]> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:474: return this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:482: // M6 / FV-12: Get single cashout by id (user-scoped)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:483: // GET /wallet/cashouts/:id
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:485: async getCashoutForUserById(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:487: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:488: ): Promise<CashoutDto> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:494: const cashout = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:496: id: cashoutId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:502: if (!cashout) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:503: throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:506: return this.toCashoutDto(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:510: // M6: Cashouts — canonical listing (status filter + normalized output)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:512: private normalizeCashoutStatus(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:514: ): CashoutStatusCanonical | 'ALL' {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:523: private toCashoutDto(c: CashoutRequest): CashoutDto {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:525: (String(c?.status || '').toUpperCase() as CashoutStatusCanonical) ||
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:540: retryOfCashoutId: (c as any).retryOfCashoutId ?? null, //
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:544: async listCashoutsCanonical(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:547: ): Promise<CashoutListResponse> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:549: const normalized = this.normalizeCashoutStatus(statusQuery);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:559: const rows = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:565: const items = (rows || []).map((r) => this.toCashoutDto(r));
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:573: // DEV: Add cashout-ready balance directly (enum-safe)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:575: async devAddCashoutBalance(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:584: wallet.cashoutAvailableCents += amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:593: metadata: { dev: true, reason: 'dev_add_cashout_balance' },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:604: async adminCompleteCashout(cashoutId: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:605: const cashout = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:606: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:610: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:611: if (cashout.status === 'COMPLETED') return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:613: cashout.status = 'COMPLETED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:614: cashout.failureReason = null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:616: const saved = await this.cashoutRepo.save(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:617: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:623: async adminFailCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:624: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:626: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:636: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:640: // Load minimal cashout first
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:641: const cashout = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:642: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:645: if (cashout.status === 'COMPLETED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:646: throw new BadRequestException('Cannot fail a completed cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:650: if (cashout.status === 'FAILED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:653: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:657: const reason = failureReason || 'Cashout failed';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:659: const res = await cashoutRepo.update(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:660: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:665: const fresh = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:666: if (!fresh) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:674: throw new BadRequestException('Cannot fail a completed cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:677: throw new BadRequestException('Only pending cashouts can be failed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:682: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:686: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:688: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:695: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:698: reason: 'cashout_fail_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:699: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:706: const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:707: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:718: this.websocketGateway.emitCashoutUpdated(updated);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:735: // ADMIN/DEV: Repair FAILED cashout that is debit-only (FV-10)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:737: async adminRepairFailedCashoutRefund(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:738: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:739: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:741: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:745: const cashout = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:746: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:748: if (cashout.status !== 'FAILED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:749: throw new BadRequestException('Only FAILED cashouts can be repaired');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:752: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:754: throw new BadRequestException('Invalid cashout amount');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:759: walletId: cashout.walletId as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:760: type: 'cashout' as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:767: return m && Number(m.cashoutId) === Number(cashout.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:771: throw new BadRequestException('No ledger rows found for this cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:780: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:785: `Not a debit-only FAILED cashout (sum=${sum}, amount=${amount})`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:790: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:794: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:800: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:803: reason: 'cashout_repair_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:804: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:806: failureReason: cashout.failureReason ?? 'repaired',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:811: const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:812: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:822: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:827: // OWNER: Cancel own cashout (PENDING → FAILED + refund)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:829: async cancelCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:831: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:832: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:833: const savedCashout = await this.dataSource.transaction(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:834: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:838: const cashout = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:839: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:843: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:844: if (!cashout.wallet || cashout.wallet.userId !== userId)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:845: throw new BadRequestException('Cashout does not belong to this user');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:847: const res = await cashoutRepo.update(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:848: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:853: throw new BadRequestException('Only pending cashouts can be cancelled');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:857: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:861: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:863: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:869: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:872: reason: 'cashout_cancel_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:873: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:879: const updated = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:880: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:883: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:889: where: { id: savedCashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:893: this.websocketGateway.emitCashoutUpdated(savedCashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:894: return savedCashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:898: // OWNER: Retry failed cashout (creates new PENDING)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:900: async retryCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:902: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:903: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:904: // ✅ ADDED: generic return type to stop TS inferring CashoutRequest | CashoutRequest[]
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:905: return this.dataSource.transaction<CashoutRequest>(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:906: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:910: const original = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:911: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:915: if (!original) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:917: throw new BadRequestException('Cashout does not belong to this user');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:920: throw new BadRequestException('Only failed cashouts can be retried');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:925: throw new BadRequestException('Invalid cashout amount on original');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:928: const existingPending = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:930: retryOfCashoutId: original.id as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:942: if (Number(wallet.cashoutAvailableCents) < amount) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:943: throw new BadRequestException('Insufficient cashout balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:946: wallet.cashoutAvailableCents =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:947: Number(wallet.cashoutAvailableCents) - amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:951: const retryPartial: DeepPartial<CashoutRequest> = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:957: retryOfCashoutId: original.id as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:960: const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:965: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:968: cashoutId: retry.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:969: reason: 'cashout_request',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:970: via: 'wallet_cashout_retry',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:971: retryOfCashoutId: original.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:999: async getCashoutMetrics(userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1003: totalCashouts: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1013: latestCompletedCashout: null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1017: const all = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1027: const completedCashouts = all.filter((c) => c.status === 'COMPLETED');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1028: const totalPaidOutCents = completedCashouts.reduce(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1042: completedCashouts.length ? completedCashouts[0] : null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1044: const latestCompletedCashout = latestCompleted
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1056: totalCashouts: total,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1069: latestCompletedCashout,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1080: const next = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1099: async getCashoutsByStatus(status: CashoutStatus) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1100: return this.cashoutRepo.find({
+
+----- MATCHES FOR: Cashout -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\app\http-status-body-sync.filter.ts:23: const allowed = msg === 'cashout_failed' || msg === 'm31_2_probe';
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:3: export class AddDestinationLast4ToCashoutRequests1733290000000
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:6: name = 'AddDestinationLast4ToCashoutRequests1733290000000';
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:10: `ALTER TABLE "cashout_requests" ADD "destinationLast4" character varying(4)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:16: `ALTER TABLE "cashout_requests" DROP COLUMN "destinationLast4"`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:32: if (wallet.cashoutAvailableCents < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:33: throw new BadRequestException('Insufficient cashout available balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:35: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:74: wallet.cashoutAvailableCents += payout.amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:126: 'Payout engine disabled: payouts cannot change status without ledger entries. Use /wallet/cashout.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.entity.ts:31: // Convenience: last 4 digits used for display & cashout destination
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:9: @Entity('cashout_locks')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:10: export class CashoutLock {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-lock.entity.ts:23: // When this amount becomes eligible for cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:10: export type CashoutStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:12: @Entity('cashout_requests')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:13: export class CashoutRequest {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:20: @ManyToOne(() => Wallet, (wallet) => wallet.cashouts, {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:29: status: CashoutStatus;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:34: // NEW: last 4 digits of bank account for this cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:38: // ✅ NEW: idempotency link — this cashout is a retry of another cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:40: retryOfCashoutId: number | null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:5: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:11: * CashoutSchedulerService
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:15: * - Every 30 seconds, it looks for all PENDING cashouts.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:16: * - For each PENDING cashout, it randomly decides:
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:20: *    - locked when cashout is created,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:22: *      or an admin uses adminFailCashout().
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:31: export class CashoutSchedulerService {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:32: private readonly logger = new Logger(CashoutSchedulerService.name);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:35: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:36: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:51: // Set env: MOCK_CASHOUT_ENGINE=true
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:53: String(process.env.MOCK_CASHOUT_ENGINE || '').toLowerCase() === 'true';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:56: // Find all cashouts that are still pending
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:57: const pending = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:63: this.logger.log('💸 Cashout scheduler tick – no pending cashouts');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:68: `💸 Cashout scheduler processing ${pending.length} pending cashout(s)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:71: for (const cashout of pending) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:72: await this.processSingleCashout(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:77: * Apply mock success/failure decision to a single cashout.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:79: private async processSingleCashout(cashout: CashoutRequest) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:81: if (cashout.status !== 'PENDING') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:97: const saved = await this.cashoutRepo.manager.transaction(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:99: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:103: const fresh = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:104: where: { id: cashout.id },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:113: throw new Error('Wallet not found for cashout refund');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:118: throw new Error('Invalid cashout amount for refund');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:121: wallet.cashoutAvailableCents += amt;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:127: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:130: reason: 'cashout_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:131: cashoutId: fresh.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:133: via: 'mock_cashout_engine',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:141: return await cashoutRepo.save(fresh);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:147: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:150: `💸 Cashout ${saved.id} FAILED – reason=${saved.failureReason}, amountCents=${saved.amountCents}`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:156: const saved = await this.cashoutRepo.manager.transaction(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:158: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:161: const fresh = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:162: where: { id: cashout.id },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:169: throw new Error('Invalid cashout amount for completion');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:176: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:179: reason: 'cashout_complete',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:180: cashoutId: fresh.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:181: via: 'mock_cashout_engine',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:189: return await cashoutRepo.save(fresh);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:195: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:198: `💸 Cashout ${saved.id} COMPLETED – amountCents=${saved.amountCents}`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\index.ts:4: export * from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\transfer.entity.ts:32: unlockedForCashout: boolean;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:18: | 'cashout';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:24: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:22: | 'cashout';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:17: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:104: // CREATE CASHOUT REQUEST (CUSTOM AMOUNT)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:107: @Post('cashout')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:108: async cashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:117: 'Identity verification is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:125: 'Bank information is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:134: 'Cashout amount must be a positive number of cents.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:141: `Minimum cashout is ${minAmountCents} cents ($${(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:148: const available = Number(summary.cashoutAvailableCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:151: throw new BadRequestException('No cashout-ready balance available.');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:156: `Cashout amount exceeds available cashout balance (${available} cents).`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:160: const cashout: CashoutRequest = await this.walletService.cashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:166: id: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:167: walletId: cashout.walletId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:168: amountCents: Number(cashout.amountCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:169: status: cashout.status,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:170: failureReason: cashout.failureReason,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:171: destinationLast4: cashout.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:172: createdAt: cashout.createdAt,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:177: console.error('[wallet.cashout] error', e);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:179: const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:189: message: 'cashout_failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:200: // M6: UNIFIED CASHOUT HISTORY (canonical)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:202: @Get('cashouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:203: async getCashouts(@Req() req, @Query('status') status?: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:206: return this.walletService.listCashoutsCanonical(userId, status ?? null);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:209: @Get('cashouts/:id')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:210: async getCashoutById(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:213: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:214: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:215: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:217: return this.walletService.getCashoutForUserById(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:220: @Get('cashouts/failed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:221: async getFailedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:224: return this.walletService.listCashoutsCanonical(userId, 'failed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:227: @Post('cashouts/:id/complete')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:228: async completeCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:230: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:231: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:232: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:234: const cashout = await this.walletService.adminCompleteCashout(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:235: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:238: @Post('cashouts/:id/fail')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:239: async failCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:245: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:246: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:247: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:249: return this.walletService.adminFailCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:250: cashoutId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:251: body.failureReason ?? 'Cashout failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:255: @Post('cashouts/:id/repair-refund')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:256: async repairFailedCashoutRefund(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:258: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:259: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:260: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:262: return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:265: @Post('cashouts/:id/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:266: async cancelOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:269: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:270: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:271: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:273: return this.walletService.cancelCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:276: @Post('cashouts/:id/retry')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:277: async retryOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:280: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:281: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:282: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:284: return this.walletService.retryCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:288: @Post('dev/add-cashout-balance')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:289: async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:296: return this.walletService.devAddCashoutBalance(userId, amount);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:318: return this.walletService.getCashoutMetrics(userId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:335: @Get('cashouts/pending')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:336: async getPendingCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:339: return this.walletService.listCashoutsCanonical(userId, 'pending');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:342: @Get('cashouts/completed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:343: async getCompletedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:346: return this.walletService.listCashoutsCanonical(userId, 'completed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:10: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:30: // Available for cashout
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:32: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:35: @OneToMany(() => CashoutRequest, (c) => c.wallet)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:36: cashouts: CashoutRequest[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:6: import { CashoutRequest } from '../wallet/cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:9: import { CashoutLock } from '../wallet/cashout-lock.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:18: import { CashoutSchedulerService } from '../wallet/cashout-scheduler.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:31: CashoutRequest,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:35: CashoutLock,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:51: providers: [WalletService, CashoutSchedulerService, BankInfoService],
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:11: import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:21: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:27: // M6: Canonical cashout API shapes (frontend-stable)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:29: export type CashoutStatusCanonical = 'PENDING' | 'COMPLETED' | 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:31: export type CashoutDto = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:33: status: CashoutStatusCanonical;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:38: retryOfCashoutId: number | null; // ✅ ADDED
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:41: export type CashoutListResponse = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:42: items: CashoutDto[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:43: meta: { count: number; status: CashoutStatusCanonical | 'ALL' };
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:52: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:53: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:73: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:87: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:105: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:191: const cashoutAvail = Number(wallet.cashoutAvailableCents ?? 0);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:193: // Anything not in spendable/cashoutAvailable is considered "locked"
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:194: const locked = balance - spendable - cashoutAvail;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:288: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:293: ownerWallet.cashoutAvailableCents += payoutCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:384: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:410: // CASHOUT FLOW
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:412: async cashout(userId: number, amountCents: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:414: throw new BadRequestException('Cashout amount must be positive');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:418: throw new BadRequestException('Bank info required before cashout.');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:422: const savedCashout = await this.dataSource.transaction(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:424: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:430: if (Number(wallet.cashoutAvailableCents) < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:431: throw new BadRequestException('Insufficient cashout balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:433: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:436: const cashout = cashoutRepo.create({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:444: const result = await cashoutRepo.save(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:449: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:452: cashoutId: result.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:454: reason: 'cashout_request',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:455: via: 'wallet_cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:465: this.websocketGateway.emitCashoutCreated(savedCashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:467: return savedCashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:470: async getCashoutsForUser(userId: number): Promise<CashoutRequest[]> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:474: return this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:482: // M6 / FV-12: Get single cashout by id (user-scoped)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:483: // GET /wallet/cashouts/:id
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:485: async getCashoutForUserById(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:487: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:488: ): Promise<CashoutDto> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:494: const cashout = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:496: id: cashoutId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:502: if (!cashout) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:503: throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:506: return this.toCashoutDto(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:510: // M6: Cashouts — canonical listing (status filter + normalized output)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:512: private normalizeCashoutStatus(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:514: ): CashoutStatusCanonical | 'ALL' {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:523: private toCashoutDto(c: CashoutRequest): CashoutDto {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:525: (String(c?.status || '').toUpperCase() as CashoutStatusCanonical) ||
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:540: retryOfCashoutId: (c as any).retryOfCashoutId ?? null, //
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:544: async listCashoutsCanonical(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:547: ): Promise<CashoutListResponse> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:549: const normalized = this.normalizeCashoutStatus(statusQuery);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:559: const rows = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:565: const items = (rows || []).map((r) => this.toCashoutDto(r));
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:573: // DEV: Add cashout-ready balance directly (enum-safe)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:575: async devAddCashoutBalance(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:584: wallet.cashoutAvailableCents += amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:593: metadata: { dev: true, reason: 'dev_add_cashout_balance' },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:604: async adminCompleteCashout(cashoutId: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:605: const cashout = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:606: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:610: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:611: if (cashout.status === 'COMPLETED') return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:613: cashout.status = 'COMPLETED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:614: cashout.failureReason = null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:616: const saved = await this.cashoutRepo.save(cashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:617: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:623: async adminFailCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:624: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:626: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:636: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:640: // Load minimal cashout first
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:641: const cashout = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:642: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:645: if (cashout.status === 'COMPLETED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:646: throw new BadRequestException('Cannot fail a completed cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:650: if (cashout.status === 'FAILED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:653: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:657: const reason = failureReason || 'Cashout failed';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:659: const res = await cashoutRepo.update(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:660: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:665: const fresh = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:666: if (!fresh) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:674: throw new BadRequestException('Cannot fail a completed cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:677: throw new BadRequestException('Only pending cashouts can be failed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:682: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:686: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:688: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:695: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:698: reason: 'cashout_fail_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:699: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:706: const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:707: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:718: this.websocketGateway.emitCashoutUpdated(updated);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:735: // ADMIN/DEV: Repair FAILED cashout that is debit-only (FV-10)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:737: async adminRepairFailedCashoutRefund(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:738: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:739: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:741: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:745: const cashout = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:746: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:748: if (cashout.status !== 'FAILED') {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:749: throw new BadRequestException('Only FAILED cashouts can be repaired');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:752: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:754: throw new BadRequestException('Invalid cashout amount');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:759: walletId: cashout.walletId as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:760: type: 'cashout' as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:767: return m && Number(m.cashoutId) === Number(cashout.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:771: throw new BadRequestException('No ledger rows found for this cashout');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:780: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:785: `Not a debit-only FAILED cashout (sum=${sum}, amount=${amount})`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:790: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:794: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:800: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:803: reason: 'cashout_repair_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:804: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:806: failureReason: cashout.failureReason ?? 'repaired',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:811: const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:812: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:822: this.websocketGateway.emitCashoutUpdated(saved);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:827: // OWNER: Cancel own cashout (PENDING → FAILED + refund)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:829: async cancelCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:831: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:832: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:833: const savedCashout = await this.dataSource.transaction(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:834: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:838: const cashout = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:839: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:843: if (!cashout) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:844: if (!cashout.wallet || cashout.wallet.userId !== userId)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:845: throw new BadRequestException('Cashout does not belong to this user');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:847: const res = await cashoutRepo.update(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:848: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:853: throw new BadRequestException('Only pending cashouts can be cancelled');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:857: where: { id: cashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:861: const amount = Number(cashout.amountCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:863: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:869: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:872: reason: 'cashout_cancel_refund',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:873: cashoutId: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:879: const updated = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:880: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:883: if (!updated) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:889: where: { id: savedCashout.walletId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:893: this.websocketGateway.emitCashoutUpdated(savedCashout);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:894: return savedCashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:898: // OWNER: Retry failed cashout (creates new PENDING)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:900: async retryCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:902: cashoutId: number,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:903: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:904: // ✅ ADDED: generic return type to stop TS inferring CashoutRequest | CashoutRequest[]
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:905: return this.dataSource.transaction<CashoutRequest>(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:906: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:910: const original = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:911: where: { id: cashoutId },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:915: if (!original) throw new NotFoundException('Cashout not found');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:917: throw new BadRequestException('Cashout does not belong to this user');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:920: throw new BadRequestException('Only failed cashouts can be retried');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:925: throw new BadRequestException('Invalid cashout amount on original');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:928: const existingPending = await cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:930: retryOfCashoutId: original.id as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:942: if (Number(wallet.cashoutAvailableCents) < amount) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:943: throw new BadRequestException('Insufficient cashout balance');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:946: wallet.cashoutAvailableCents =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:947: Number(wallet.cashoutAvailableCents) - amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:951: const retryPartial: DeepPartial<CashoutRequest> = {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:957: retryOfCashoutId: original.id as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:960: const retry = await cashoutRepo.save(cashoutRepo.create(retryPartial));
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:965: type: 'cashout',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:968: cashoutId: retry.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:969: reason: 'cashout_request',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:970: via: 'wallet_cashout_retry',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:971: retryOfCashoutId: original.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:999: async getCashoutMetrics(userId: number) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1003: totalCashouts: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1013: latestCompletedCashout: null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1017: const all = await this.cashoutRepo.find({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1027: const completedCashouts = all.filter((c) => c.status === 'COMPLETED');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1028: const totalPaidOutCents = completedCashouts.reduce(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1042: completedCashouts.length ? completedCashouts[0] : null;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1044: const latestCompletedCashout = latestCompleted
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1056: totalCashouts: total,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1069: latestCompletedCashout,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1080: const next = await this.cashoutRepo.findOne({
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1099: async getCashoutsByStatus(status: CashoutStatus) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1100: return this.cashoutRepo.find({
+
+----- MATCHES FOR: CashoutRequest -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:3: export class AddDestinationLast4ToCashoutRequests1733290000000
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:6: name = 'AddDestinationLast4ToCashoutRequests1733290000000';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:13: export class CashoutRequest {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:5: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:35: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:36: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:79: private async processSingleCashout(cashout: CashoutRequest) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:99: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:158: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:17: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:160: const cashout: CashoutRequest = await this.walletService.cashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:10: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:35: @OneToMany(() => CashoutRequest, (c) => c.wallet)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:36: cashouts: CashoutRequest[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:6: import { CashoutRequest } from '../wallet/cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:31: CashoutRequest,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:11: import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:52: @InjectRepository(CashoutRequest)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:53: private readonly cashoutRepo: Repository<CashoutRequest>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:412: async cashout(userId: number, amountCents: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:424: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:470: async getCashoutsForUser(userId: number): Promise<CashoutRequest[]> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:523: private toCashoutDto(c: CashoutRequest): CashoutDto {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:604: async adminCompleteCashout(cashoutId: number): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:626: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:636: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:739: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:741: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:832: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:834: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:903: ): Promise<CashoutRequest> {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:904: // ✅ ADDED: generic return type to stop TS inferring CashoutRequest | CashoutRequest[]
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:905: return this.dataSource.transaction<CashoutRequest>(async (manager) => {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:906: const cashoutRepo = manager.getRepository(CashoutRequest);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:951: const retryPartial: DeepPartial<CashoutRequest> = {
+
+----- MATCHES FOR: cashout_request -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:10: `ALTER TABLE "cashout_requests" ADD "destinationLast4" character varying(4)`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\migrations\3045-AddDestinationLast4ToCashoutRequests.ts:16: `ALTER TABLE "cashout_requests" DROP COLUMN "destinationLast4"`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:12: @Entity('cashout_requests')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:454: reason: 'cashout_request',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:969: reason: 'cashout_request',
+
+----- MATCHES FOR: cashoutAvailableCents -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:32: if (wallet.cashoutAvailableCents < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:35: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:74: wallet.cashoutAvailableCents += payout.amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:121: wallet.cashoutAvailableCents += amt;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:24: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:148: const available = Number(summary.cashoutAvailableCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.entity.ts:32: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:21: cashoutAvailableCents: number;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:73: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:87: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:105: cashoutAvailableCents: Number(wallet.cashoutAvailableCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:191: const cashoutAvail = Number(wallet.cashoutAvailableCents ?? 0);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:288: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:293: ownerWallet.cashoutAvailableCents += payoutCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:384: cashoutAvailableCents: 0,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:430: if (Number(wallet.cashoutAvailableCents) < amountCents)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:433: wallet.cashoutAvailableCents -= amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:584: wallet.cashoutAvailableCents += amountCents;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:688: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:794: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:863: wallet.cashoutAvailableCents += amount;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:942: if (Number(wallet.cashoutAvailableCents) < amount) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:946: wallet.cashoutAvailableCents =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:947: Number(wallet.cashoutAvailableCents) - amount;
+
+----- MATCHES FOR: status: 'COMPLETED' -----
+(none)
+
+----- MATCHES FOR: status = 'COMPLETED' -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:145: payout.status = 'COMPLETED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:186: fresh.status = 'COMPLETED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:613: cashout.status = 'COMPLETED';
+
+----- MATCHES FOR: status: 'PENDING' -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.service.ts:133: status: 'pending',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payout.entity.ts:27: status: 'PENDING' | 'COMPLETED' | 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:41: status: 'PENDING',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:100: status: 'PENDING',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:58: where: { status: 'PENDING' },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:439: status: 'PENDING',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:660: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:848: { id: cashoutId, status: 'PENDING' as any },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:931: status: 'PENDING' as any,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:954: status: 'PENDING',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:1081: where: { wallet: { id: wallet.id }, status: 'PENDING' },
+
+----- MATCHES FOR: status = 'PENDING' -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.service.ts:144: record.status = 'pending';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-request.entity.ts:10: export type CashoutStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
+----- MATCHES FOR: status: 'FAILED' -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:661: { status: 'FAILED' as any, failureReason: reason },
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:849: { status: 'FAILED' as any, failureReason: 'Cancelled by owner' },
+
+----- MATCHES FOR: status = 'FAILED' -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:70: payout.status = 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:141: payout.status = 'FAILED';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:138: fresh.status = 'FAILED';
+
+----- MATCHES FOR: credits_ledger -----
+(none)
+
+----- MATCHES FOR: creditsLedger -----
+(none)
+
+----- MATCHES FOR: ledger -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:123: // No status transition that affects money is allowed without a ledger row
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:124: // in the same transaction. Payouts have no ledger, so this engine is disabled.
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:126: 'Payout engine disabled: payouts cannot change status without ledger entries. Use /wallet/cashout.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:25: * - NEVER mark FAILED unless refund + refund-ledger row were written successfully.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:28: * - NEVER mark COMPLETED unless completion-ledger row is written in the same transaction.
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:172: // ✅ COMPLETION LEDGER ROW (balances the original -amt)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:691: // ✅ ADDED: ledger refund entry (this is what your test proved was missing)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:771: throw new BadRequestException('No ledger rows found for this cashout');
+
+----- MATCHES FOR: WalletTransaction -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:8: import { WalletTransaction } from './wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:41: @InjectRepository(WalletTransaction)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:42: private readonly txRepo: Repository<WalletTransaction>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:101: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:159: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:12: export type VenueWalletTransactionType =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:21: export class VenueWalletTransaction {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:34: type: VenueWalletTransactionType;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:10: import { VenueWalletTransaction } from './venue-wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:27: () => VenueWalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:30: transactions: VenueWalletTransaction[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:13: export type WalletTransactionType =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:25: export class WalletTransaction {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:42: type: WalletTransactionType;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:7: import { WalletTransaction } from '../wallet/wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:11: import { VenueWalletTransaction } from '../wallet/venue-wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:32: WalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:34: VenueWalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:12: import { WalletTransaction } from './wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:55: @InjectRepository(WalletTransaction)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:56: private readonly txRepo: Repository<WalletTransaction>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:184: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:250: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:352: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:425: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:638: const txRepo = manager.getRepository(WalletTransaction); // ✅ ADDED (THIS WAS MISSING)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:743: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:836: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:908: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:984: async getTransactionsForUser(userId: number): Promise<WalletTransaction[]> {
+
+----- MATCHES FOR: walletTransaction -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:8: import { WalletTransaction } from './wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:41: @InjectRepository(WalletTransaction)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:42: private readonly txRepo: Repository<WalletTransaction>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:101: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\cashout-scheduler.service.ts:159: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:12: export type VenueWalletTransactionType =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:21: export class VenueWalletTransaction {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet-transaction.entity.ts:34: type: VenueWalletTransactionType;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:10: import { VenueWalletTransaction } from './venue-wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:27: () => VenueWalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\venue-wallet.entity.ts:30: transactions: VenueWalletTransaction[];
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:13: export type WalletTransactionType =
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:25: export class WalletTransaction {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet-transaction.entity.ts:42: type: WalletTransactionType;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:7: import { WalletTransaction } from '../wallet/wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:11: import { VenueWalletTransaction } from '../wallet/venue-wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:32: WalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.module.ts:34: VenueWalletTransaction,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:12: import { WalletTransaction } from './wallet-transaction.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:55: @InjectRepository(WalletTransaction)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:56: private readonly txRepo: Repository<WalletTransaction>,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:184: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:250: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:352: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:425: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:638: const txRepo = manager.getRepository(WalletTransaction); // ✅ ADDED (THIS WAS MISSING)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:743: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:836: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:908: const txRepo = manager.getRepository(WalletTransaction);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.service.ts:984: async getTransactionsForUser(userId: number): Promise<WalletTransaction[]> {
+
+----- MATCHES FOR: runMockPayoutEngine -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:48: await this.runMockPayoutEngine(saved.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:107: await this.runMockPayoutEngine(saved.id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:121: private async runMockPayoutEngine(id: number) {
+
+----- MATCHES FOR: Payouts are deprecated -----
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:23: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:55: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.service.ts:82: 'Payouts are deprecated. Use /wallet/cashout (ledger-safe).',
+
+=== ROUTE INVENTORY (Controllers) ===
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\app\app.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\app\app.controller.ts:4: @Controller()
+D:\TABZ\tabz-backend-full\tabz-backend\src\app\app.controller.ts:8: @Get('health')
+D:\TABZ\tabz-backend-full\tabz-backend\src\app\app.controller.ts:17: @Get('dev/m31-2-status-sync')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:25: @Controller('dev-seed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:166: @Post('buyer')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:190: @Post('owner')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:222: @Post('owner2')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:254: @Post('staff')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:312: @Post('owner-item')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:355: @Post('venues/backfill-owner-profile-id')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:431: @Post('venues')
+D:\TABZ\tabz-backend-full\tabz-backend\src\dev-seed\dev-seed.controller.ts:442: @Post('all')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\health\health.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\health\health.controller.ts:4: @Controller('health')
+D:\TABZ\tabz-backend-full\tabz-backend\src\health\health.controller.ts:6: @Get()
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts:7: @Controller("identity")
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts:11: @Post("start")
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts:17: @Get("status")
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts:27: @Post("dev-set-status")
+D:\TABZ\tabz-backend-full\tabz-backend\src\identity\identity.controller.ts:59: @Post("dev-complete")
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:23: @Controller('auth')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:30: @Post('login')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:35: @Post('login-buyer')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:40: @Post('login-owner')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:45: @Post('login-staff')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\auth\auth.controller.ts:51: @Get('me')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts:23: @Controller('drinks')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts:29: @Post('orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts:57: @Get('my')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts:65: @Get('venue-orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\drinks\controllers\drinks.controller.ts:73: @Post('redeem')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\foods\controllers\foods.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\foods\controllers\foods.controller.ts:47: @Controller('foods')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\foods\controllers\foods.controller.ts:53: @Post('orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\foods\controllers\foods.controller.ts:70: @Get('my')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\foods\controllers\foods.controller.ts:78: @Post('redeem')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:32: @Controller('freeboard')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:38: @Post('drops')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:57: @Post('claim')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:68: @Get('venue/:venueId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:76: @Get('my')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\owner-orders\owner-orders.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\owner-orders\owner-orders.controller.ts:45: @Controller('owner/orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\owner-orders\owner-orders.controller.ts:49: @Get()
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\owner-orders\owner-orders.controller.ts:68: @Post(':id/cancel')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff-auth.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff-auth.controller.ts:9: @Controller('staff')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff-auth.controller.ts:13: @Post('login')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.admin.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.admin.controller.ts:11: @Controller('staff-admin')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.admin.controller.ts:15: @Post('create')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.controller.ts:20: @Controller('staff')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.controller.ts:28: @Post('login')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\staff\staff.controller.ts:41: @Get('me')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.admin.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.admin.controller.ts:11: @Controller('admin/store-items')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.admin.controller.ts:17: @Post()
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:16: @Controller('store-items')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:23: @Get()
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:29: @Get('venue/:venueId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:40: @Post('order')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:54: @Get('my-orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:67: @Get('orders/:orderId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:81: @Post('my-orders/:orderId/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:98: @Get('owner/orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:111: @Get('owner/orders/:orderId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:125: @Get('owner/stats')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:139: @Get('staff/orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:154: @Get('staff/orders/:orderId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:172: @Post('staff/orders/:orderId/mark')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:197: @Post('staff/orders/:orderId/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.controller.ts:218: @Get(':id(\\d+)')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:19: @Controller('store-items')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:29: @Post('order')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:43: @Get('my-orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:58: @Get('owner/orders')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:73: @Get('owner/orders/:orderId')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:98: @Post('owner/orders/:orderId/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:117: @Post('owner/orders/:orderId/mark')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:140: @Get('venue/:venueId/items')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\store-items\store-items.owner.controller.ts:155: @Get('owner/dashboard')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\users\users.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\users\users.controller.ts:11: @Controller('users')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\users\users.controller.ts:15: @Get('me')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:21: @Controller('venues')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:29: @Get('public')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:35: @Get(':slug/public')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:41: @Post()
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:59: @Get('mine')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:72: @Get()
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:86: @Post(':id/avatar')
+D:\TABZ\tabz-backend-full\tabz-backend\src\modules\venues\venues.controller.ts:127: @Post(':id/cover')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:24: @Controller('owner')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:44: @Get('profile')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:50: @Post('profile/update')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:61: @Get('bank')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:67: @Post('bank/update')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:75: @Get('verification')
+D:\TABZ\tabz-backend-full\tabz-backend\src\owner\owner-info.controller.ts:81: @Post('verification/start')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:3: import { PayoutsService } from './payouts.service';
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:5: @Controller('owner/payouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:7: export class PayoutsController {
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:8: constructor(private readonly payoutsService: PayoutsService) {}
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:10: @Get()
+D:\TABZ\tabz-backend-full\tabz-backend\src\payouts\payouts.controller.ts:14: return this.payoutsService.getPayoutsForUser(userId);
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:32: @Controller('profiles')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:82: @Get('me')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:105: @Patch('me')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:162: @Post('me/avatar')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:209: @Post('me/cover')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:256: @Get('public')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:263: @Get(':slug/owner-page/public')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:271: @Get(':slug/public')
+D:\TABZ\tabz-backend-full\tabz-backend\src\profile\profile.controller.ts:295: @Get(':slug')
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.controller.ts:15: @Controller('wallet/bank-info')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.controller.ts:39: @Get()
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\bank-info.controller.ts:46: @Post()
+
+--- D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:17: import { CashoutRequest } from './cashout-request.entity';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:23: @Controller('wallet')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:56: @Get('summary')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:66: @Post('deposit')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:82: @Post('transfer')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:104: // CREATE CASHOUT REQUEST (CUSTOM AMOUNT)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:107: @Post('cashout')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:108: async cashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:117: 'Identity verification is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:125: 'Bank information is required before cashouts.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:134: 'Cashout amount must be a positive number of cents.',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:141: `Minimum cashout is ${minAmountCents} cents ($${(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:148: const available = Number(summary.cashoutAvailableCents);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:151: throw new BadRequestException('No cashout-ready balance available.');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:156: `Cashout amount exceeds available cashout balance (${available} cents).`,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:160: const cashout: CashoutRequest = await this.walletService.cashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:166: id: cashout.id,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:167: walletId: cashout.walletId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:168: amountCents: Number(cashout.amountCents),
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:169: status: cashout.status,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:170: failureReason: cashout.failureReason,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:171: destinationLast4: cashout.destinationLast4 ?? null,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:172: createdAt: cashout.createdAt,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:177: console.error('[wallet.cashout] error', e);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:179: const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:189: message: 'cashout_failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:200: // M6: UNIFIED CASHOUT HISTORY (canonical)
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:202: @Get('cashouts')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:203: async getCashouts(@Req() req, @Query('status') status?: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:206: return this.walletService.listCashoutsCanonical(userId, status ?? null);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:209: @Get('cashouts/:id')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:210: async getCashoutById(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:213: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:214: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:215: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:217: return this.walletService.getCashoutForUserById(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:220: @Get('cashouts/failed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:221: async getFailedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:224: return this.walletService.listCashoutsCanonical(userId, 'failed');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:227: @Post('cashouts/:id/complete')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:228: async completeCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:230: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:231: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:232: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:234: const cashout = await this.walletService.adminCompleteCashout(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:235: return cashout;
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:238: @Post('cashouts/:id/fail')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:239: async failCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:245: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:246: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:247: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:249: return this.walletService.adminFailCashout(
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:250: cashoutId,
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:251: body.failureReason ?? 'Cashout failed',
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:255: @Post('cashouts/:id/repair-refund')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:256: async repairFailedCashoutRefund(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:258: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:259: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:260: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:262: return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:265: @Post('cashouts/:id/cancel')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:266: async cancelOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:269: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:270: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:271: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:273: return this.walletService.cancelCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:276: @Post('cashouts/:id/retry')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:277: async retryOwnCashout(@Req() req, @Param('id') id: string) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:280: const cashoutId = Number(id);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:281: if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:282: throw new BadRequestException('Invalid cashout id');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:284: return this.walletService.retryCashout(userId, cashoutId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:288: @Post('dev/add-cashout-balance')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:289: async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:296: return this.walletService.devAddCashoutBalance(userId, amount);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:300: @Post('unlock-spendable')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:314: @Get('metrics')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:318: return this.walletService.getCashoutMetrics(userId);
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:321: @Get('next-payout')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:322: async getNextPayout(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:325: return { next: (await this.walletService.getNextPayout(userId)) ?? null };
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:328: @Get('transactions')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:335: @Get('cashouts/pending')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:336: async getPendingCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:339: return this.walletService.listCashoutsCanonical(userId, 'pending');
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:342: @Get('cashouts/completed')
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:343: async getCompletedCashouts(@Req() req) {
+D:\TABZ\tabz-backend-full\tabz-backend\src\wallet\wallet.controller.ts:346: return this.walletService.listCashoutsCanonical(userId, 'completed');
+
+=== ENV EXAMPLES / CONFIG FILES (if present) ===
+
+=== DONE: OUTPUT FILE ===
+WROTE: D:\TABZ\tabz-backend-full\tabz-backend\proofs\PROOF-STRIPE-CONNECT-SEAM-20260203-223119.txt
