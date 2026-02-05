@@ -1,0 +1,189 @@
+﻿=== TABZ PROOF: F) MOBILE SHIP-LOCK (PROOF ONLY) ===
+DATE: 2026-02-03T22:46:14
+PWD:  D:\TABZ\tabz-backend-full\tabz-backend
+
+=== GIT STATE ===
+BRANCH: fix/build-integrity-wallet-venue
+HEAD:   ead782f98b0fc10c063a6d120957726245139b52
+STATUS:
+?? proofs/PROOF-F-MOBILE-SHIPLOCK-20260203-224614.txt
+?? proofs/PROOF-STRIPE-CONNECT-CODE.txt
+?? proofs/PROOF-STRIPE-CONNECT-SEAM-20260203-223119.txt
+
+=== PROJECT FILE PRESENCE ===
+app.json => (missing)
+app.config.js => (missing)
+app.config.ts => (missing)
+eas.json => (missing)
+package.json => FOUND
+expo-env.d.ts => (missing)
+tsconfig.json => FOUND
+babel.config.js => (missing)
+.env => FOUND
+.env.production => (missing)
+.env.prod => (missing)
+.env.example => (missing)
+
+=== EXPO / EAS VERSIONS (if installed) ===
+node: v20.20.0
+npm:  10.8.2
+expo: 54.0.20
+eas:  npm error code ENOENT npm error syscall lstat npm error path C:\Users\troyl\AppData\Roaming\npm npm error errno -4058 npm error enoent ENOENT: no such file or directory, lstat 'C:\Users\troyl\AppData\Roaming\npm' npm error enoent This is related to npm not being able to find a file. npm error enoent npm error A complete log of this run can be found in: C:\Users\troyl\AppData\Local\npm-cache\_logs\2026-02-04T03_46_16_177Z-debug-0.log
+
+=== F1) PROD BASE URL HARD-LOCK (release builds) ===
+
+----- MATCHES FOR: API_URL -----
+(error searching 'API_URL'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: BASE_URL -----
+(error searching 'BASE_URL'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: EXPO_PUBLIC -----
+(error searching 'EXPO_PUBLIC'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: PUBLIC_API -----
+(error searching 'PUBLIC_API'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: tabz-backend -----
+(error searching 'tabz-backend'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: ondigitalocean -----
+(error searching 'ondigitalocean'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: 8tabz -----
+(error searching '8tabz'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: api.tabz -----
+(error searching 'api.tabz'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: tabz.app -----
+(error searching 'tabz.app'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: localhost -----
+(error searching 'localhost'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: 127.0.0.1 -----
+(error searching '127.0.0.1'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+=== F3) RELEASE BUILD CONFIG (EAS profiles, build variants) ===
+(no eas.json found)
+
+=== F2) FINAL WORDING SWEEP (quick markers) ===
+
+----- MATCHES FOR: TODO -----
+(error searching 'TODO'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: FIXME -----
+(error searching 'FIXME'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: WIP -----
+(error searching 'WIP'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: placeholder -----
+(error searching 'placeholder'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: lorem -----
+(error searching 'lorem'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: temp -----
+(error searching 'temp'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: dummy -----
+(error searching 'dummy'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: test@example.com -----
+(error searching 'test@example.com'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: http:// -----
+(error searching 'http://'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+=== F4) PERMISSION AUDIT (app.json/app.config + plugins) ===
+
+----- MATCHES FOR: permissions -----
+(error searching 'permissions'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: android.permissions -----
+(error searching 'android.permissions'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: NSCameraUsageDescription -----
+(error searching 'NSCameraUsageDescription'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: NSPhotoLibraryUsageDescription -----
+(error searching 'NSPhotoLibraryUsageDescription'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: NSMicrophoneUsageDescription -----
+(error searching 'NSMicrophoneUsageDescription'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: NSLocationWhenInUseUsageDescription -----
+(error searching 'NSLocationWhenInUseUsageDescription'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: NSLocationAlwaysAndWhenInUseUsageDescription -----
+(error searching 'NSLocationAlwaysAndWhenInUseUsageDescription'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: uses-permission -----
+(error searching 'uses-permission'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-camera -----
+(error searching 'expo-camera'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-image-picker -----
+(error searching 'expo-image-picker'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-location -----
+(error searching 'expo-location'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-notifications -----
+(error searching 'expo-notifications'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-media-library -----
+(error searching 'expo-media-library'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-av -----
+(error searching 'expo-av'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-file-system -----
+(error searching 'expo-file-system'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: expo-document-picker -----
+(error searching 'expo-document-picker'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+=== F5) RELEASE SEAL CHECKS (common debug flags) ===
+
+----- MATCHES FOR: console.log -----
+(error searching 'console.log'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: logger. -----
+(error searching 'logger.'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: debug -----
+(error searching 'debug'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: __DEV__ -----
+(error searching '__DEV__'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: development -----
+(error searching 'development'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: staging -----
+(error searching 'staging'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: EXPO_DEBUG -----
+(error searching 'EXPO_DEBUG'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: EXPO_USE_DEV_SERVER -----
+(error searching 'EXPO_USE_DEV_SERVER'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: packagerOpts -----
+(error searching 'packagerOpts'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: metro.config -----
+(error searching 'metro.config'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: sourceMap -----
+(error searching 'sourceMap'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+----- MATCHES FOR: sourcemap -----
+(error searching 'sourcemap'): A parameter cannot be found that matches parameter name 'Recurse'.
+
+=== DONE ===
+WROTE: D:\TABZ\tabz-backend-full\tabz-backend\proofs\PROOF-F-MOBILE-SHIPLOCK-20260203-224614.txt

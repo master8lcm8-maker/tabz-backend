@@ -1,11 +1,12 @@
-// src/modules/venues/venue.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Staff } from '../staff/staff.entity';
 
 @Entity('venues')
 export class Venue {
@@ -45,6 +46,10 @@ export class Venue {
   // ✅ FV-25 — Optional venue cover/banner
   @Column({ type: 'varchar', length: 255, nullable: true })
   coverUrl: string | null;
+
+  // ✅ REQUIRED inverse side for Staff → Venue
+  @OneToMany(() => Staff, (staff) => staff.venue)
+  staff: Staff[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -31,3 +31,18 @@ ledger-*.js
 tmp-*.js
 wallet-row.js
 _quarantine/
+# --- TABZ local audit/proof artifacts (do not commit) ---
+TABZ-DEPLOY-AUDIT-*.txt
+TABZ-*-PROD-PROOF-*.log
+truth-run-*.log
+do-runlogs-*.log
+_tsconfig_build_resolved.json
+
+# local payloads / scratch
+*.json
+
+# local notes / secrets (NEVER COMMIT)
+_prod_db_url.txt
+
+# local infra scratch
+_do_spec.yaml

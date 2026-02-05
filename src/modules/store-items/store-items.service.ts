@@ -7,7 +7,7 @@ import { StoreItem } from './store-item.entity';
 import { StoreItemOrder } from './store-item-order.entity';
 import { WalletService } from '../../wallet/wallet.service';
 
-// âœ… websocket gateway for realtime events
+// ✅ websocket gateway for realtime events
 import { WebsocketGateway } from '../websocket/websocket.gateway';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class StoreItemsService {
 
     private readonly walletService: WalletService,
 
-    // âœ… 5th dependency â€“ this is what Nest error is about (fixed via module providers)
+    // ✅ 5th dependency – this is what Nest error is about (fixed via module providers)
     private readonly websocketGateway: WebsocketGateway,
   ) {}
 
@@ -222,7 +222,7 @@ export class StoreItemsService {
   }
 
   // ==============================================================
-  // MILESTONE 8 â€” OWNER ORDERS (LIVE)
+  // MILESTONE 8 — OWNER ORDERS (LIVE)
   // ==============================================================
   async findOrdersByOwnerLive(ownerId: number): Promise<
     Array<{
@@ -295,7 +295,7 @@ export class StoreItemsService {
   }
 
   // ==============================================================
-  // MILESTONE 9A â€” OWNER ORDER DETAIL (LIVE)
+  // MILESTONE 9A — OWNER ORDER DETAIL (LIVE)
   // ==============================================================
   async findOwnerOrderByIdLive(
     ownerId: number,
@@ -640,7 +640,7 @@ export class StoreItemsService {
 
     await this.walletService.chargeStoreItemPurchase(
       buyerId,
-      venueOwnerId,
+      venueOwnerId as any,
       amountCents,
       platformFeePercent,
       {
@@ -707,13 +707,13 @@ export class StoreItemsService {
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
+
+    // If already completed, allow idempotent "completed" but block changes away from it
+    if (String(order.status).toLowerCase() === 'completed' && next !== 'completed') {
+      throw new BadRequestException('Cannot change a completed order.');
     }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-order.status = next as any;
+
+    order.status = next as any;
     const saved = await this.storeItemOrderRepo.save(order);
 
     (this.websocketGateway as any)?.emitOrderUpdated?.(saved);
@@ -740,13 +740,8 @@ order.status = next as any;
 
     const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
     if (!order) throw new BadRequestException('Order not found');
-    if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (String(order.status).toLowerCase() === 'completed') {
+
+    if (String(order.status).toLowerCase() === 'completed') {
       throw new BadRequestException('Cannot cancel a completed order.');
     }
 
@@ -759,7 +754,7 @@ if (String(order.status).toLowerCase() === 'completed') {
   }
 
   // ==============================================================
-  // STAFF FLOW (venue-scoped) â€” THESE TWO MUST EXIST (your controller uses them)
+  // STAFF FLOW (venue-scoped) — THESE TWO MUST EXIST (your controller uses them)
   // ==============================================================
   async findOrdersForStaff(venueId: number): Promise<
     Array<{
@@ -900,7 +895,7 @@ if (String(order.status).toLowerCase() === 'completed') {
   }
 
   // ==============================================================
-  // STAFF ACTIONS â€” these power your POST /mark and /cancel
+  // STAFF ACTIONS — these power your POST /mark and /cancel
   // ==============================================================
   async staffMarkOrder(staffVenueId: number, orderId: number, status: string): Promise<StoreItemOrder> {
     if (!staffVenueId || staffVenueId <= 0) throw new BadRequestException('staff venueId is required.');
@@ -914,12 +909,6 @@ if (String(order.status).toLowerCase() === 'completed') {
     if (!order) throw new BadRequestException('Order not found');
     if (Number(order.venueId) !== Number(staffVenueId)) {
       throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue');
     }
 
     // If already completed, allow idempotent "completed" but block changes away from it
@@ -944,12 +933,6 @@ if (Number(order.venueId) !== Number(staffVenueId)) {
     if (Number(order.venueId) !== Number(staffVenueId)) {
       throw new BadRequestException('Order not found for this venue.');
     }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue.');
-    }
-if (Number(order.venueId) !== Number(staffVenueId)) {
-      throw new BadRequestException('Order not found for this venue');
-    }
 
     if (String(order.status).toLowerCase() === 'completed') {
       throw new BadRequestException('Cannot cancel a completed order.');
@@ -963,4 +946,3 @@ if (Number(order.venueId) !== Number(staffVenueId)) {
     return saved;
   }
 }
-
