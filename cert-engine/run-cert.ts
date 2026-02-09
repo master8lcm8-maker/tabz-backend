@@ -10,21 +10,20 @@ async function run() {
   const pillar = process.argv[2];
 
   if (!pillar) {
-    console.error("Usage: ts-node cert-engine/run-cert.ts pillar3|pillar4|pillar5");
+    console.error("Usage: node dist/cert-engine/run-cert.js pillar3|pillar4|pillar5");
     process.exit(1);
   }
 
   const contract = loadContract(pillar);
 
   let evidence: any;
-
   if (pillar === "pillar3") evidence = detectPillar3(process.cwd());
-  if (pillar === "pillar4") evidence = detectPillar4(process.cwd());
-  if (pillar === "pillar5") evidence = detectPillar5(process.cwd());
+  else if (pillar === "pillar4") evidence = detectPillar4(process.cwd());
+  else if (pillar === "pillar5") evidence = detectPillar5(process.cwd());
+  else throw new Error("Unknown pillar " + pillar);
 
   const results = evaluate(contract, evidence);
-
-  const failed = results.filter(r => !r.passed);
+  const failed = results.filter((r) => !r.passed);
 
   if (failed.length) {
     console.log("\nFAILED:\n");
@@ -32,7 +31,7 @@ async function run() {
     process.exit(1);
   }
 
-  const file = writeLock(pillar, results);
+  const file = writeLock(pillar, results, "BLUEPRINT_LOCK");
 
   console.log("\nALL GREEN");
   console.log("Lock:", file);

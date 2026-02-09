@@ -2,13 +2,18 @@
 import path from "path";
 import { CertPass } from "./types";
 
-export function writeLock(pillar: string, results: CertPass[]) {
+export type LockType = "BLUEPRINT_LOCK" | "FEATURE_LOCK";
+
+export function writeLock(
+  pillar: string,
+  results: CertPass[],
+  lockType: LockType = "BLUEPRINT_LOCK",
+) {
   const dir = path.join(process.cwd(), "locks", pillar);
 
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-
   const file = path.join(dir, `LOCK-${stamp}.json`);
 
   fs.writeFileSync(
@@ -16,6 +21,8 @@ export function writeLock(pillar: string, results: CertPass[]) {
     JSON.stringify(
       {
         createdAt: new Date().toISOString(),
+        pillar,
+        lockType,
         results,
       },
       null,
