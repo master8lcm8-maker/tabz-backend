@@ -46,3 +46,7 @@ _prod_db_url.txt
 
 # local infra scratch
 _do_spec.yaml
+
+# Local quarantine (do not commit)
+quarantine/
+
