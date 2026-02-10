@@ -1,0 +1,26 @@
+﻿=== RUN pillar3.sliceB ===
+FILE: .\blueprint-impl\pillar3\sim\pillar3.sliceB.sim.ts
+DATE: 2026-02-09T22:02:04
+-----
+D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: â¨¯ Unable to compile TypeScript:
+blueprint-impl/runtime-harness/core/runner.ts(6,82): error TS2339: Property 'error' does not exist on type 'Result<T>'.
+  Property 'error' does not exist on type '{ ok: true; value: T; }'.
+
+    at createTSError (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:859:12)
+    at reportTSError (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:863:19)
+    at getOutput (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:1077:36)
+    at Object.compile (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:1433:41)
+    at Module.m._compile (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Object.require.extensions.<computed> [as .ts] (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Module.require (node:internal/modules/cjs/loader:1289:19) {
+  diagnosticCodes: [ 2339 ]
+}
+
+-----
+EXITCODE: 1

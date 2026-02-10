@@ -1,0 +1,43 @@
+﻿=== RUN pillar3.sliceB ===
+FILE: .\blueprint-impl\pillar3\sim\pillar3.sliceB.sim.ts
+DATE: 2026-02-09T22:28:30
+-----
+{
+  "name": "pillar3.sliceB",
+  "ok": true,
+  "value": {
+    "at": "2026-02-10T03:28:32.525Z",
+    "claim": {
+      "allowed": true,
+      "reason": "SLICE_B_DEFAULT_ALLOW"
+    },
+    "abuse": {
+      "blocked": false,
+      "reason": "SLICE_B_DEFAULT_PASS"
+    },
+    "trace": {
+      "name": "pillar3-sliceB",
+      "steps": [
+        {
+          "name": "claim",
+          "at": "2026-02-10T03:28:32.525Z",
+          "data": {
+            "allowed": true,
+            "reason": "SLICE_B_DEFAULT_ALLOW"
+          }
+        },
+        {
+          "name": "abuse",
+          "at": "2026-02-10T03:28:32.525Z",
+          "data": {
+            "blocked": false,
+            "reason": "SLICE_B_DEFAULT_PASS"
+          }
+        }
+      ]
+    }
+  }
+}
+
+-----
+EXITCODE: 0
