@@ -1,25 +1,34 @@
 ﻿# TABZ — SLICE B INDEX (P3–P5)
 
-Date: 2026-02-09T21:12:57
+Date: 2026-02-09T21:39:05
 
 ## Golden Rules (LOCKED)
 - Add-only work lives under: blueprint-impl/**
-- NO wiring into src/** unless you explicitly say: AUTHORIZED TO WIRE
-- Slice B is a deterministic lab layer (runtime harness + sims + tests) that does NOT touch prod code
-- DO NOT overwrite Slice A files; Slice B adds new runtime engines under pillar*/runtime/**
+- NO wiring into src/** until you explicitly say: AUTHORIZED TO WIRE
+- cert-engine is the ONLY lock generator for locks/**
 
-## Slice B Goals
-- Provide deterministic harness + simulation runners
-- Exercise Slice A decision surfaces WITHOUT wiring to Nest modules
-- Generate proof artifacts (repeatable)
+## Slice B Runtime Harness (blueprint-impl)
+- blueprint-impl/runtime-harness/**
 
-## Layout
-- blueprint-impl/runtime-harness/**  (shared deterministic lab)
-- blueprint-impl/pillar3/runtime/**  (P3 lab engines)
-- blueprint-impl/pillar3/sim/**      (P3 simulations)
-- blueprint-impl/pillar3/tests/**    (P3 unit tests later)
-- Same pattern for pillar4/pillar5
+## Slice B Implementation (blueprint-impl)
+### Pillar 3
+- Slice B proof: blueprint-impl/pillar3/proofs/pillar3.sliceB.sanity.proof.ts
+- Slice B runtime: blueprint-impl/pillar3/runtime/**
+- Slice B sim: blueprint-impl/pillar3/sim/pillar3.sliceB.sim.ts
 
-## Current Status
-- You are pinned at: SLICE-A-RESTORE-RECIPE-20260209 (commit 413fa4b)
-- Slice B starts from here as add-only commits.
+### Pillar 4
+- Slice B proof: blueprint-impl/pillar4/proofs/pillar4.sliceB.sanity.proof.ts
+- Slice B runtime: blueprint-impl/pillar4/runtime/**
+- Slice B sim: blueprint-impl/pillar4/sim/pillar4.sliceB.sim.ts
+
+### Pillar 5
+- Slice B proof: blueprint-impl/pillar5/proofs/pillar5.sliceB.sanity.proof.ts
+- Slice B runtime: blueprint-impl/pillar5/runtime/**
+- Slice B sim: blueprint-impl/pillar5/sim/pillar5.sliceB.sim.ts
+
+## Commit Map (authoritative)
+- Runtime Harness: 2007dce
+- Slice B Index (lab map): e10133f
+- P3 Slice B: 503b9a9
+- P4 Slice B: 0e781d8
+- P5 Slice B: d9d5644
