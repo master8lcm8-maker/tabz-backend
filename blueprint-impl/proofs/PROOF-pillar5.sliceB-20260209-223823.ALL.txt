@@ -1,0 +1,91 @@
+﻿=== RUN pillar5.sliceB ===
+FILE: .\blueprint-impl\pillar5\sim\pillar5.sliceB.sim.ts
+DATE: 2026-02-09T22:38:23
+-----
+{
+  "name": "pillar5.sliceB",
+  "ok": true,
+  "value": {
+    "at": "2026-02-10T03:38:24.899Z",
+    "manifest": {
+      "ok": true,
+      "reason": "SLICE_B_MANIFEST_OK",
+      "manifest": {
+        "semver": "0.0.1",
+        "buildNumber": 1,
+        "gitTag": "SLICE-B-DEMO",
+        "builtAt": "2026-02-10T03:38:24.898Z"
+      }
+    },
+    "signing": {
+      "iosSigningReady": true,
+      "androidSigningReady": false,
+      "reason": "SLICE_B_SIGNING_EVAL"
+    },
+    "repro": {
+      "reproducible": true,
+      "reason": "SLICE_B_REPRO_OK"
+    },
+    "obs": {
+      "type": "DIAGNOSTIC",
+      "at": "2026-02-10T03:38:24.899Z",
+      "traceId": "trace-demo",
+      "message": "sliceB smoke",
+      "meta": {
+        "slice": "B"
+      }
+    },
+    "trace": {
+      "name": "pillar5-sliceB",
+      "steps": [
+        {
+          "name": "manifest",
+          "at": "2026-02-10T03:38:24.899Z",
+          "data": {
+            "ok": true,
+            "reason": "SLICE_B_MANIFEST_OK",
+            "manifest": {
+              "semver": "0.0.1",
+              "buildNumber": 1,
+              "gitTag": "SLICE-B-DEMO",
+              "builtAt": "2026-02-10T03:38:24.898Z"
+            }
+          }
+        },
+        {
+          "name": "signing",
+          "at": "2026-02-10T03:38:24.899Z",
+          "data": {
+            "iosSigningReady": true,
+            "androidSigningReady": false,
+            "reason": "SLICE_B_SIGNING_EVAL"
+          }
+        },
+        {
+          "name": "repro",
+          "at": "2026-02-10T03:38:24.899Z",
+          "data": {
+            "reproducible": true,
+            "reason": "SLICE_B_REPRO_OK"
+          }
+        },
+        {
+          "name": "obs",
+          "at": "2026-02-10T03:38:24.899Z",
+          "data": {
+            "type": "DIAGNOSTIC",
+            "at": "2026-02-10T03:38:24.899Z",
+            "traceId": "trace-demo",
+            "message": "sliceB smoke",
+            "meta": {
+              "slice": "B"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+-----
+EXITCODE: 0

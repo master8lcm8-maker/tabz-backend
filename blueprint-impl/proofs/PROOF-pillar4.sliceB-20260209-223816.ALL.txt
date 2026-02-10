@@ -1,0 +1,59 @@
+﻿=== RUN pillar4.sliceB ===
+FILE: .\blueprint-impl\pillar4\sim\pillar4.sliceB.sim.ts
+DATE: 2026-02-09T22:38:16
+-----
+{
+  "name": "pillar4.sliceB",
+  "ok": true,
+  "value": {
+    "at": "2026-02-10T03:38:17.963Z",
+    "attribution": {
+      "attributed": true,
+      "inviterUserId": "inviter-demo",
+      "reason": "SLICE_B_DEFAULT_ATTRIBUTED"
+    },
+    "binding": {
+      "bound": true,
+      "reason": "SLICE_B_DEFAULT_BIND"
+    },
+    "reward": {
+      "eligible": true,
+      "blockedByFraud": false,
+      "reason": "SLICE_B_DEFAULT_ELIGIBLE"
+    },
+    "trace": {
+      "name": "pillar4-sliceB",
+      "steps": [
+        {
+          "name": "attribution",
+          "at": "2026-02-10T03:38:17.963Z",
+          "data": {
+            "attributed": true,
+            "inviterUserId": "inviter-demo",
+            "reason": "SLICE_B_DEFAULT_ATTRIBUTED"
+          }
+        },
+        {
+          "name": "binding",
+          "at": "2026-02-10T03:38:17.963Z",
+          "data": {
+            "bound": true,
+            "reason": "SLICE_B_DEFAULT_BIND"
+          }
+        },
+        {
+          "name": "reward",
+          "at": "2026-02-10T03:38:17.963Z",
+          "data": {
+            "eligible": true,
+            "blockedByFraud": false,
+            "reason": "SLICE_B_DEFAULT_ELIGIBLE"
+          }
+        }
+      ]
+    }
+  }
+}
+
+-----
+EXITCODE: 0
