@@ -1,4 +1,4 @@
-// src/dev-seed/dev-seed.controller.ts
+﻿// src/dev-seed/dev-seed.controller.ts
 import {
   Controller,
   Post,
@@ -7,11 +7,13 @@ import {
   UnauthorizedException,
   BadRequestException,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import { DevEndpointGuard } from '../app/dev-endpoint.guard';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../modules/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ReferralAttribution } from '../modules/referrals/referral-attribution.entity';
 import { Staff } from '../modules/staff/staff.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -19,7 +21,7 @@ import { ProfileService } from '../profile/profile.service';
 import { ProfileType } from '../profile/profile.types';
 import { Venue } from '../modules/venues/venue.entity';
 
-// ✅ ADD
+// âœ… ADD
 import { StoreItemsService } from '../modules/store-items/store-items.service';
 @UseGuards(DevEndpointGuard)
 @Controller('dev-seed')
@@ -28,6 +30,9 @@ export class DevSeedController {
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
 
+
+    @InjectRepository(ReferralAttribution)
+    private readonly refAttrRepo: Repository<ReferralAttribution>,
     @InjectRepository(Staff)
     private readonly staffRepo: Repository<Staff>,
 
@@ -36,12 +41,12 @@ export class DevSeedController {
 
     private readonly profileService: ProfileService,
 
-    // ✅ ADD (comes from StoreItemsModule)
+    // âœ… ADD (comes from StoreItemsModule)
     private readonly storeItemsService: StoreItemsService,
   ) {}
 
   // ------------------------------------------------------------
-  // 🔒 Dev-seed access gate (minimal + explicit)
+  // ðŸ”’ Dev-seed access gate (minimal + explicit)
   // ------------------------------------------------------------
   private assertDevSeedAllowed(req: any) {
     if (String(process.env.NODE_ENV || '').toLowerCase() === 'production') {
@@ -256,7 +261,7 @@ export class DevSeedController {
     this.assertDevSeedAllowed(req);
 
     const email = 'staff@tabz.app';
-    const password = 'password'; // ✅ match proofs
+    const password = 'password'; // âœ… match proofs
     const name = 'Demo Staff';
     const venueId = 4;
 
@@ -303,7 +308,7 @@ export class DevSeedController {
   }
 
   // ------------------------------------------------------------
-  // ✅ MILESTONE 8 helper: ensure owner venue + a store item exists
+  // âœ… MILESTONE 8 helper: ensure owner venue + a store item exists
   // POST /dev-seed/owner-item
   //
   // Returns: { ok, venueId, venue, item }
@@ -450,5 +455,21 @@ export class DevSeedController {
 
     return { ok: true, buyer, owner, owner2, staff };
   }
-}
 
+  // P4 PROOF (dev-seed gated): fetch referral attribution by invited user id
+  @Post('referrals/attributions/:invitedUserId')
+  async p4AttributionByInvited(@Req() req: any, @Param('invitedUserId') invitedUserIdStr: string) {
+    this.assertDevSeedAllowed(req);
+
+    const invitedUserId = Number(invitedUserIdStr);
+    const bad = !invitedUserId || Number.isNaN(invitedUserId);
+
+    return bad
+      ? { ok: false, error: 'BAD_INVITED_USER_ID' }
+      : {
+          ok: true,
+          invitedUserId,
+          row: await this.refAttrRepo.findOne({ where: { invitedUserId } }),
+        };
+  }
+}

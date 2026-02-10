@@ -1,4 +1,4 @@
-// src/modules/auth/auth.controller.ts
+﻿// src/modules/auth/auth.controller.ts
 import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -8,7 +8,8 @@ import { LoginDto } from './dtos/login.dto';
 
 import { ProfileService } from '../../profile/profile.service';
 import { ProfileType } from '../../profile/profile.types';
-
+import { SignupBuyerDto } from './dtos/signup-buyer.dto';
+import { UsersService } from '../users/users.service';
 interface AuthRequest extends Request {
   user?: {
     sub: number;
@@ -23,8 +24,9 @@ interface AuthRequest extends Request {
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
+private readonly authService: AuthService,
     private readonly profileService: ProfileService,
+    private readonly usersService: UsersService
   ) {}
 
   @Post('login')
@@ -45,6 +47,29 @@ export class AuthController {
   @Post('login-staff')
   async loginStaff(@Body() dto: LoginDto) {
     return this.authService.loginStaff(dto);
+  }
+  @Post('signup-buyer')
+  async signupBuyer(@Body() dto: SignupBuyerDto) {
+    const email = String(dto.email || '').trim().toLowerCase();
+    const password = String(dto.password || '');
+    const displayName = dto.displayName ? String(dto.displayName) : undefined;
+    const referralCode = dto.referralCode ? String(dto.referralCode) : undefined;
+
+    const user = await this.usersService.createUser(
+      email,
+      password,
+      displayName,
+      referralCode,
+    );
+
+    // Create buyer profile (keeps the account usable)
+    const profile = await this.profileService.createForUser(user.id, {
+      type: ProfileType.BUYER,
+      displayName: displayName ?? 'Buyer',
+      slug: `buyer-${user.id}`,
+    });
+
+    return { ok: true, userId: user.id, email: user.email, profileId: profile?.id ?? null };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -71,7 +96,7 @@ export class AuthController {
 
     const profiles = await this.profileService.listForUser(userId);
 
-    // 1) Map role → desired ProfileType (NOW includes staff)
+    // 1) Map role â†’ desired ProfileType (NOW includes staff)
     let desiredType: ProfileType | null = null;
     if (role === 'owner') desiredType = ProfileType.OWNER;
     if (role === 'buyer') desiredType = ProfileType.BUYER;

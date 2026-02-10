@@ -15,6 +15,7 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
+import { ReferralsModule } from '../modules/referrals/referrals.module';
 // ✅ ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
@@ -60,6 +61,7 @@ import { HealthModule } from '../health/health.module';
     // Dev tools
     DevSeedModule,
     FreeboardModule,
+    ReferralsModule,
 ],
 })
 export class AppModule {}
