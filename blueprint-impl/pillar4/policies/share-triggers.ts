@@ -1,0 +1,6 @@
+﻿export const SHARE_TRIGGER_TYPES = [
+  "USER_SIGNUP",
+  "FIRST_PURCHASE",
+  "VENUE_VISIT",
+  "PROMO_EVENT"
+] as const;
