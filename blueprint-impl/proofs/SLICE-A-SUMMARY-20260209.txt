@@ -1,0 +1,18 @@
+﻿TABZ — SLICE A COMPLETE (P3–P5)
+Date: 2026-02-09T20:14:05
+
+COMMITS
+- P3 Slice A: 5c48979
+- P4 Slice A: 5407d95
+- P5 Slice A: 72671f0
+
+RULES (LOCKED)
+- Add-only under blueprint-impl/**
+- No wiring into src/** until explicitly authorized
+- cert-engine is the ONLY lock generator (locks/**)
+- Blueprint packs (pillar-work/**) are spec authority only
+
+PROOF
+- src untouched: git diff --name-only was empty during all Slice A commits
+- Working tree clean after commits
+
