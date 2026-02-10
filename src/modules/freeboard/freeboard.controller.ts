@@ -39,8 +39,7 @@ export class FreeboardController {
   async createDrop(@Req() req: Request, @Body() body: CreateFreeboardDropDto) {
     const creatorId = getUserIdFromRequest(req);
 
-    const { venueId, title, description, rewardCents, expiresInMinutes } =
-      body;
+    const { venueId, title, description, rewardCents, expiresInMinutes } = body;
 
     return this.freeboardService.createDrop({
       creatorId,

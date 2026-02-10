@@ -1,4 +1,4 @@
-﻿// src/app/app.module.ts
+// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 
@@ -14,14 +14,14 @@ import { AuthModule } from '../modules/auth/auth.module';
 import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
-
-// âœ… ADD
+import { FreeboardModule } from '../modules/freeboard/freeboard.module';
+// ✅ ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// âœ… ADD
+// ✅ ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// âœ… ADD (HEALTH)
+// ✅ ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
 @Module({
@@ -48,7 +48,7 @@ import { HealthModule } from '../health/health.module';
     StoreItemsModule,
     ProfileModule,
 
-    // âœ… FV-17 â€” venues endpoints
+    // ✅ FV-17 — venues endpoints
     VenuesModule,
 
     // Identity
@@ -59,7 +59,8 @@ import { HealthModule } from '../health/health.module';
 
     // Dev tools
     DevSeedModule,
-  ],
+    FreeboardModule,
+],
 })
 export class AppModule {}
 

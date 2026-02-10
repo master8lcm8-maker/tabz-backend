@@ -13,7 +13,6 @@
     "src/modules/OwnerOrdersModule/**",
 
     "src/modules/drinks/**",
-    "src/modules/freeboard/**",
     "src/modules/staff/**",
     "src/modules/store-items/**",
     "src/owner/**"
