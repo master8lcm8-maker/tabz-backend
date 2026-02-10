@@ -1,0 +1,328 @@
+﻿=== SLICE C P3 CONTEXT CAPTURE ===
+DATE: 2026-02-09T23:42:41
+HEAD: 0fb3be18c6066fc73fad4be9ad31fccd5c585fa5
+TAG_EXACT: SLICE-B-GREENRUN-RESTORE-RECIPE-20260209
+-----
+=== FILE: .\src\modules\freeboard\freeboard.service.ts ===
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:16:    private readonly dropsRepo: Repository<FreeboardDrop>,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:17:  ) {}
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:18:
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:19:  async createDrop(
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:20:    creatorId: number,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:21:    venueId: number,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:22:    message: string,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:23:    expiresInMinutes = 60,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:24:  ): Promise<FreeboardDrop> {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:25:    if (!message || !message.trim()) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:26:      throw new BadRequestException('Message is required for a drop.');
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:27:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:28:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:29:    const now = new Date();
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:30:    const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:31:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:32:    const drop = this.dropsRepo.create({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:33:      creatorId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:34:      venueId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:35:      message,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:36:      status: 'ACTIVE' as FreeboardDropStatus,
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:37:      claimCode: this.generateClaimCode(),
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:38:      expiresAt,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:39:      claimedAt: null,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:40:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:41:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:42:    return this.dropsRepo.save(drop);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:43:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:44:
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:45:  async claimDrop(
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:46:    claimCode: string,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:47:    claimerId: number,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:48:  ): Promise<FreeboardDrop> {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:49:    if (!claimCode) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:50:      throw new BadRequestException('Claim code is required.');
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:51:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:52:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:53:    const drop = await this.dropsRepo.findOne({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:54:      where: { claimCode },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:55:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:56:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:57:    if (!drop) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:58:      throw new NotFoundException('Drop not found for that claim code.');
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:59:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:60:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:61:    if (drop.status !== 'ACTIVE') {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:62:      throw new BadRequestException('Drop is not active.');
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:63:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:64:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:65:    if (drop.expiresAt && drop.expiresAt < new Date()) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:66:      drop.status = 'EXPIRED';
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:67:      await this.dropsRepo.save(drop);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:68:      throw new BadRequestException('Drop has expired.');
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:69:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:70:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:71:    drop.status = 'CLAIMED';
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:72:    drop.claimedAt = new Date();
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:73:    drop.claimerId = claimerId;
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:74:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:75:    return this.dropsRepo.save(drop);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:76:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:77:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:78:  async getDropsForVenue(venueId: number): Promise<FreeboardDrop[]> {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:79:    return this.dropsRepo.find({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:80:      where: {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:81:        venueId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:82:        status: 'ACTIVE',
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:83:      },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:84:      order: { createdAt: 'DESC' },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:85:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:86:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:87:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:88:  async getDropsForCreator(creatorId: number): Promise<FreeboardDrop[]> {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:89:    return this.dropsRepo.find({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:90:      where: {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:91:        creatorId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:92:      },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:93:      order: { createdAt: 'DESC' },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:94:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:95:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:96:
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:97:  async cleanupExpiredDrops(): Promise<void> {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:98:    const now = new Date();
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:99:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:100:    const expired = await this.dropsRepo.find({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:101:      where: {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:102:        status: 'ACTIVE',
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:103:        expiresAt: LessThan(now),
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:104:      },
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:105:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:106:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:107:    if (!expired.length) return;
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:108:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:109:    for (const drop of expired) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:110:      drop.status = 'EXPIRED';
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:111:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:112:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:113:    await this.dropsRepo.save(expired);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:114:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:115:
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:116:  private generateClaimCode(): string {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:117:    // short code, uppercased hex, e.g. "007A6250"
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:118:    return randomBytes(4).toString('hex').toUpperCase();
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:119:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.service.ts:120:}
+
+=== FILE: .\src\modules\freeboard\freeboard.controller.ts ===
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:35:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:36:  // Create a new FreeBoard drop at a venue
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:37:  @UseGuards(JwtAuthGuard)
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:38:  @Post('drops')
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:39:  async createDrop(@Req() req: Request, @Body() body: CreateFreeboardDropDto) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:40:    const creatorId = getUserIdFromRequest(req);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:41:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:42:    const { venueId, title, description, rewardCents, expiresInMinutes } =
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:43:      body;
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:44:
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:45:    return this.freeboardService.createDrop({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:46:      creatorId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:47:      venueId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:48:      title,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:49:      description,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:50:      rewardCents,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:51:      expiresInMinutes,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:52:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:53:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:54:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:55:  // Claim a drop by code
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:56:  @UseGuards(JwtAuthGuard)
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:57:  @Post('claim')
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:58:  async claim(@Req() req: Request, @Body('code') code: string) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:59:    const userId = getUserIdFromRequest(req);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:60:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:61:    return this.freeboardService.claimDrop({
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:62:      userId,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:63:      code,
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:64:    });
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:65:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:66:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:67:  // List ACTIVE drops for a venue (public)
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:68:  @Get('venue/:venueId')
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:69:  async getVenueDrops(@Param('venueId') venueIdParam: string) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:70:    const venueId = Number(venueIdParam);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:71:    return this.freeboardService.getDropsForVenue(venueId);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:72:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:73:
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:74:  // (Optional) List drops I created – useful later
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:75:  @UseGuards(JwtAuthGuard)
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:76:  @Get('my')
+> D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:77:  async getMyDrops(@Req() req: Request) {
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:78:    const creatorId = getUserIdFromRequest(req);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:79:    return this.freeboardService.getDropsForCreator(creatorId);
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:80:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\src\modules\freeboard\freeboard.controller.ts:81:}
+
+=== FILE: .\cert-engine\detectors\pillar3.detector.ts ===
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:3:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:4:type Pillar3Evidence = {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:5:  pillar: "pillar3";
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:6:  freeBoard: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:7:    dropCreationExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:8:    inventoryTrackingExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:9:    expiryHandlingExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:10:    concurrencyProtectionExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:11:  };
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:12:  claimRules: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:13:    perUserLimits: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:14:    perVenueLimits: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:15:    timeWindows: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:16:    eligibilityValidation: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:17:  };
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:18:  spotlight: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:19:    boostTriggerExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:20:    durationMathExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:21:    priorityResolutionExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:22:  };
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:23:  liveFeedback: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:24:    successEvents: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:25:    rejectionReasons: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:26:    acknowledgements: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:27:  };
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:28:  history: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:29:    claimHistoryReadable: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:30:    dropHistoryReadable: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:31:    boostHistoryReadable: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:32:  };
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:33:  abusePrevention: {
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:34:    rateLimitingExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:35:    farmingDetectionExists: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:36:    anomalyFlagsExist: boolean;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:37:  };
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:38:};
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:39:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:40:function walkFiles(root: string, exts = new Set([".ts", ".tsx", ".js", ".jsx", ".json", ".md"])): string[] {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:41:  if (!root || !fs.existsSync(root)) return [];
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:42:  const out: string[] = [];
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:43:  const stack = [root];
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:44:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:45:  while (stack.length) {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:46:    const cur = stack.pop()!;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:47:    let entries: fs.Dirent[];
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:48:    try {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:49:      entries = fs.readdirSync(cur, { withFileTypes: true });
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:50:    } catch {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:51:      continue;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:52:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:53:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:54:    for (const e of entries) {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:55:      const full = path.join(cur, e.name);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:56:      if (e.isDirectory()) stack.push(full);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:57:      else if (exts.has(path.extname(full))) out.push(full);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:58:    }
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:59:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:60:  return out;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:61:}
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:62:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:63:function fileContains(filePath: string, needles: RegExp[]): boolean {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:64:  let txt: string;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:65:  try {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:66:    txt = fs.readFileSync(filePath, "utf8");
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:67:  } catch {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:68:    return false;
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:69:  }
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:70:  return needles.every((r) => r.test(txt));
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:71:}
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:72:
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:73:function anyFileContains(files: string[], needles: RegExp[]): boolean {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:74:  return files.some((f) => fileContains(f, needles));
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:75:}
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:76:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:77:/**
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:78: * Pillar 3 detector:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:79: * ONLY scans evidence/pillar3 (prevents false greens from unrelated repo code).
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:80: */
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:81:export function detectPillar3(repoRoot: string): Pillar3Evidence {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:82:  const evidenceRoot = path.join(repoRoot, "evidence", "pillar3");
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:83:  const files = walkFiles(evidenceRoot);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:84:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:85:  const hasDropEntity =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:86:    anyFileContains(files, [/class\s+\w*Drop\w*\s+/i, /@Entity\(/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:87:    anyFileContains(files, [/name:\s*["']drop["']/i, /@Entity\(/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:88:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:89:  const hasExpiry =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:90:    anyFileContains(files, [/expiresAt/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:91:    anyFileContains(files, [/expiry/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:92:    anyFileContains(files, [/cron/i, /expiry/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:93:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:94:  const hasConcurrency =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:95:    anyFileContains(files, [/transaction/i, /pessimistic/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:96:    anyFileContains(files, [/FOR\s+UPDATE/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:97:    anyFileContains(files, [/QueryRunner/i, /startTransaction/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:98:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:99:  const hasRulesEngine =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:100:    anyFileContains(files, [/eligibility/i, /rules/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:101:    anyFileContains(files, [/perUser/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:102:    anyFileContains(files, [/perVenue/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:103:    anyFileContains(files, [/cooldown/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:104:
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:105:  const hasSpotlight =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:106:    anyFileContains(files, [/spotlight/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:107:    anyFileContains(files, [/boost/i, /duration/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:108:    anyFileContains(files, [/priority/i, /queue/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:109:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:110:  const hasLiveFeedback =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:111:    anyFileContains(files, [/websocket/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:112:    anyFileContains(files, [/emit\(/i, /event/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:113:    anyFileContains(files, [/ack/i, /event/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:114:    anyFileContains(files, [/toast/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:115:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:116:  const hasHistory =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:117:    anyFileContains(files, [/history/i, /timeline/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:118:    anyFileContains(files, [/activity/i, /feed/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:119:    anyFileContains(files, [/immutable/i, /log/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:120:
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:121:  const hasRateLimit =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:122:    anyFileContains(files, [/rate[-_ ]?limit/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:123:    anyFileContains(files, [/throttle/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:124:    anyFileContains(files, [/nestjs\/throttler/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:125:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:126:  const hasFarming =
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:127:    anyFileContains(files, [/farm/i, /detect/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:128:    anyFileContains(files, [/abuse/i, /score/i]) ||
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:129:    anyFileContains(files, [/anomaly/i]);
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:130:
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:131:  return {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:132:    pillar: "pillar3",
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:133:    freeBoard: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:134:      dropCreationExists: hasDropEntity,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:135:      inventoryTrackingExists: hasDropEntity,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:136:      expiryHandlingExists: hasExpiry,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:137:      concurrencyProtectionExists: hasConcurrency,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:138:    },
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:139:    claimRules: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:140:      perUserLimits: hasRulesEngine,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:141:      perVenueLimits: hasRulesEngine,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:142:      timeWindows: hasRulesEngine,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:143:      eligibilityValidation: hasRulesEngine,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:144:    },
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:145:    spotlight: {
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:146:      boostTriggerExists: hasSpotlight,
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:147:      durationMathExists: hasSpotlight,
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:148:      priorityResolutionExists: hasSpotlight,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:149:    },
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:150:    liveFeedback: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:151:      successEvents: hasLiveFeedback,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:152:      rejectionReasons: hasLiveFeedback,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:153:      acknowledgements: hasLiveFeedback,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:154:    },
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:155:    history: {
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:156:      claimHistoryReadable: hasHistory,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:157:      dropHistoryReadable: hasHistory,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:158:      boostHistoryReadable: hasHistory,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:159:    },
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:160:    abusePrevention: {
+> D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:161:      rateLimitingExists: hasRateLimit,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:162:      farmingDetectionExists: hasFarming,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:163:      anomalyFlagsExist: hasFarming,
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:164:    },
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:165:  };
+  D:\TABZ\tabz-backend-full\tabz-backend\cert-engine\detectors\pillar3.detector.ts:166:}
+-----
+=== DONE ===
