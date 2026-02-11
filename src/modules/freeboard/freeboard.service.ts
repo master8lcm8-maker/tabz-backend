@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/modules/freeboard/freeboard.service.ts
 import {
   Injectable,
@@ -9,6 +10,20 @@ import { Repository, LessThan } from 'typeorm';
 import { FreeboardDrop, FreeboardDropStatus } from './freeboard-drop.entity';
 import { randomBytes } from 'crypto';
 
+type CreateDropArgs = {
+  creatorId: number;
+  venueId: number;
+  title: string;
+  description?: string;
+  rewardCents?: number;
+  expiresInMinutes?: number;
+};
+
+type ClaimDropArgs = {
+  userId: number;
+  code: string;
+};
+
 @Injectable()
 export class FreeboardService {
   constructor(
@@ -16,24 +31,43 @@ export class FreeboardService {
     private readonly dropsRepo: Repository<FreeboardDrop>,
   ) {}
 
-  async createDrop(
-    creatorId: number,
-    venueId: number,
-    message: string,
-    expiresInMinutes = 60,
-  ): Promise<FreeboardDrop> {
-    if (!message || !message.trim()) {
-      throw new BadRequestException('Message is required for a drop.');
-    }
-
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
-
-    const drop = this.dropsRepo.create({
+  async createDrop(args: CreateDropArgs): Promise<FreeboardDrop> {
+    const {
       creatorId,
       venueId,
-      message,
+      title,
+      description,
+      rewardCents,
+      expiresInMinutes,
+    } = args;
+
+    if (!creatorId || Number.isNaN(Number(creatorId))) {
+      throw new BadRequestException('creatorId is required.');
+    }
+    if (!venueId || Number.isNaN(Number(venueId))) {
+      throw new BadRequestException('venueId is required.');
+    }
+    if (!title || !title.trim()) {
+      throw new BadRequestException('Title is required for a drop.');
+    }
+
+    const ttl = Number(expiresInMinutes ?? 60);
+    const ttlSafe = Number.isFinite(ttl) && ttl > 0 ? ttl : 60;
+
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + ttlSafe * 60 * 1000);
+
+    const rewardNum = Number(rewardCents ?? 0);
+    const rewardSafe = Number.isFinite(rewardNum) && rewardNum >= 0 ? rewardNum : 0;
+
+    const drop = this.dropsRepo.create({
+      creatorId: Number(creatorId),
+      venueId: Number(venueId),
+      title: title.trim(),
+      description: (description ?? null) as any,
+      rewardCents: String(Math.trunc(rewardSafe)),
       status: 'ACTIVE' as FreeboardDropStatus,
+      claimedByUserId: null,
       claimCode: this.generateClaimCode(),
       expiresAt,
       claimedAt: null,
@@ -42,16 +76,18 @@ export class FreeboardService {
     return this.dropsRepo.save(drop);
   }
 
-  async claimDrop(
-    claimCode: string,
-    claimerId: number,
-  ): Promise<FreeboardDrop> {
-    if (!claimCode) {
+  async claimDrop(args: ClaimDropArgs): Promise<FreeboardDrop> {
+    const { userId, code } = args;
+
+    if (!userId || Number.isNaN(Number(userId))) {
+      throw new BadRequestException('userId is required.');
+    }
+    if (!code || !code.trim()) {
       throw new BadRequestException('Claim code is required.');
     }
 
     const drop = await this.dropsRepo.findOne({
-      where: { claimCode },
+      where: { claimCode: code.trim() },
     });
 
     if (!drop) {
@@ -70,7 +106,7 @@ export class FreeboardService {
 
     drop.status = 'CLAIMED';
     drop.claimedAt = new Date();
-    drop.claimerId = claimerId;
+    drop.claimedByUserId = Number(userId);
 
     return this.dropsRepo.save(drop);
   }

@@ -1,4 +1,4 @@
-﻿// src/modules/users/users.service.ts
+// src/modules/users/users.service.ts
 import { Injectable } from '@nestjs/common';
 import { ReferralsService } from '../referrals/referrals.service';
 import { Repository } from 'typeorm';
@@ -11,22 +11,21 @@ export type UserRole = 'owner' | 'buyer';
 @Injectable()
 export class UsersService {
   constructor(
-@InjectRepository(User)
+    @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    private readonly referralsService: ReferralsService
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-  // âœ… added: used by dev-seed to fetch by id
+  // ✅ added: used by dev-seed to fetch by id
   async findOneById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
 
   /**
-   * Strict create â€“ will fail if email already exists (because of UNIQUE).
+   * Strict create – will fail if email already exists (because of UNIQUE).
    */
   async createUser(
     email: string,
@@ -100,7 +99,7 @@ return saved;}
       role,
     } as any);
 
-    // âœ… force single-entity overload
+    // ✅ force single-entity overload
     return this.usersRepository.save(newUser as any);
   }
 }

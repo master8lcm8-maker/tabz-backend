@@ -1,0 +1,26 @@
+﻿import { Controller, Get, Req } from '@nestjs/common';
+import { ReferralsService } from './referrals.service';
+
+@Controller('referrals')
+export class ReferralsController {
+  constructor(private readonly referrals: ReferralsService) {}
+
+  @Get('health')
+  health() {
+    return { ok: true, pillar: 4, module: 'referrals' };
+  }
+
+  // If auth middleware sets req.user, this works immediately.
+  @Get('me/code')
+  async myCode(@Req() req: any) {
+    const userId = Number(req?.user?.id);
+    if (!userId || Number.isNaN(userId)) {
+      // intentionally not throwing Nest Unauthorized here to keep dependencies minimal;
+      // if you hit this without auth you still get a clear response.
+      return { ok: false, error: 'UNAUTHORIZED' };
+    }
+
+    const code = await this.referrals.getOrCreateCode(userId);
+    return { ok: true, code, deepLink: `tabz://invite?code=${encodeURIComponent(code)}` };
+  }
+}

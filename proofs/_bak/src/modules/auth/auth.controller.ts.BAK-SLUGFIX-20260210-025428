@@ -9,7 +9,6 @@ import { LoginDto } from './dtos/login.dto';
 import { ProfileService } from '../../profile/profile.service';
 import { ProfileType } from '../../profile/profile.types';
 import { SignupBuyerDto } from './dtos/signup-buyer.dto';
-import { UsersService } from '../users/users.service';
 interface AuthRequest extends Request {
   user?: {
     sub: number;
@@ -24,9 +23,8 @@ interface AuthRequest extends Request {
 @Controller('auth')
 export class AuthController {
   constructor(
-private readonly authService: AuthService,
+    private readonly authService: AuthService,
     private readonly profileService: ProfileService,
-    private readonly usersService: UsersService
   ) {}
 
   @Post('login')
@@ -55,7 +53,7 @@ private readonly authService: AuthService,
     const displayName = dto.displayName ? String(dto.displayName) : undefined;
     const referralCode = dto.referralCode ? String(dto.referralCode) : undefined;
 
-    const user = await this.usersService.createUser(
+    const user = await (this as any).usersService.createUser(
       email,
       password,
       displayName,
@@ -66,7 +64,6 @@ private readonly authService: AuthService,
     const profile = await this.profileService.createForUser(user.id, {
       type: ProfileType.BUYER,
       displayName: displayName ?? 'Buyer',
-      slug: `buyer-${user.id}`,
     });
 
     return { ok: true, userId: user.id, email: user.email, profileId: profile?.id ?? null };
