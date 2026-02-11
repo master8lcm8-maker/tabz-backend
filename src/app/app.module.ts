@@ -22,14 +22,12 @@ import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
 
 // ⭐ from P3
-import { EngagementModule } from '../modules/engagement/engagement.module';
 
 @Module({
   providers: [AppService],
   controllers: [AppController],
   imports: [
     // ⭐ from P3
-    EngagementModule,
 
     // Global config
     ConfigModule.forRoot({
