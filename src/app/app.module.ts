@@ -1,4 +1,4 @@
-﻿// src/app/app.module.ts
+﻿﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -16,18 +16,22 @@ import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
 // ✅ ADD
 import { VenuesModule } from '../modules/venues/venues.module';
+
+// ✅ ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// health
+// ✅ ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
-// ⭐ from P3
+// ✅ P3: Engagement runtime
+import { EngagementModule } from '../modules/engagement/engagement.module';
 
 @Module({
   providers: [AppService],
   controllers: [AppController],
   imports: [
-    // ⭐ from P3
+    // P3: Engagement
+    EngagementModule,
 
     // Global config
     ConfigModule.forRoot({
