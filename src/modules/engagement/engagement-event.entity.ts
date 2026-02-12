@@ -11,6 +11,14 @@ export class EngagementEvent {
   @Column()
   eventType: string;
 
+  // Optional: what this event is "about" (e.g., freeboardItemId, referralCode, venueId, etc.)
+  @Column({ nullable: true })
+  targetId?: string;
+
+  // Optional structured details (stored as text in sqlite via TypeORM simple-json)
+  @Column({ type: 'simple-json', nullable: true })
+  metadata?: any;
+
   @CreateDateColumn()
   createdAt: Date;
 }

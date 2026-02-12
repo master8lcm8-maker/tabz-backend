@@ -10,8 +10,13 @@ export class EngagementService {
     private repo: Repository<EngagementEvent>,
   ) {}
 
-  async record(userId: number, eventType: string) {
-    const e = this.repo.create({ userId, eventType });
+  async record(
+    userId: number,
+    eventType: string,
+    targetId?: string,
+    metadata?: any,
+  ) {
+    const e = this.repo.create({ userId, eventType, targetId, metadata });
     return this.repo.save(e);
   }
 
