@@ -1,5 +1,5 @@
-// src/modules/auth/auth.module.ts
-import { Module } from '@nestjs/common';
+﻿// src/modules/auth/auth.module.ts
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,21 +13,23 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsersModule } from '../users/users.module';
 import { Staff } from '../staff/staff.entity';
 
-// ✅ allows /auth/me to resolve profile context
+// âœ… allows /auth/me to resolve profile context
 import { ProfileModule } from '../../profile/profile.module';
+import { VenuesModule } from '../venues/venues.module';
 
 @Module({
   imports: [
-    // ✅ ensure ConfigService is available
+    // âœ… ensure ConfigService is available
     ConfigModule,
 
     UsersModule,
+    forwardRef(() => VenuesModule),
     TypeOrmModule.forFeature([Staff]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
-    // ✅ SINGLE SOURCE OF TRUTH: same secret used by JwtStrategy
+    // âœ… SINGLE SOURCE OF TRUTH: same secret used by JwtStrategy
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule, VenuesModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const secret =
@@ -53,3 +55,5 @@ import { ProfileModule } from '../../profile/profile.module';
   exports: [AuthService],
 })
 export class AuthModule {}
+
+
