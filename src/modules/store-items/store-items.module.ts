@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StoreItemsController } from './store-items.controller';
+import { StoreItemsAdminController } from './store-items.admin.controller';
+import { StoreItemsOwnerController } from './store-items.owner.controller';
 import { StoreItemsService } from './store-items.service';
 import { StoreItem } from './store-item.entity';
 import { StoreItemOrder } from './store-item-order.entity';
@@ -14,8 +16,9 @@ import { WebsocketGateway } from '../websocket/websocket.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([StoreItem, StoreItemOrder]), WalletModule],
-  controllers: [StoreItemsController],
+  controllers: [StoreItemsController, StoreItemsAdminController, StoreItemsOwnerController],
   providers: [StoreItemsService, WebsocketGateway],
   exports: [StoreItemsService],
 })
 export class StoreItemsModule {}
+

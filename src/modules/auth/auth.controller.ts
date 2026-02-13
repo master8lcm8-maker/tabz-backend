@@ -8,6 +8,7 @@ import { LoginDto } from './dtos/login.dto';
 
 import { ProfileService } from '../../profile/profile.service';
 import { ProfileType } from '../../profile/profile.types';
+import { VenuesService } from '../venues/venues.service';
 
 interface AuthRequest extends Request {
   user?: {
@@ -25,6 +26,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly profileService: ProfileService,
+    private readonly venuesService: VenuesService,
   ) {}
 
   @Post('login')
@@ -55,7 +57,12 @@ export class AuthController {
 
     const email = req.user?.email ?? null;
     const role = req.user?.role ?? null;
-    const venueId = req.user?.venueId ?? null;
+    let venueId = req.user?.venueId ?? null;
+
+    if (!venueId && role === 'owner' && userId) {
+      const venues = await this.venuesService.findByOwner(userId);
+      venueId = venues?.[0]?.id ?? null;
+    }
 
     if (!userId) {
       return {
