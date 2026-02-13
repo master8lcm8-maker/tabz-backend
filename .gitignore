@@ -50,3 +50,13 @@ _do_spec.yaml
 # Local quarantine (do not commit)
 quarantine/
 
+
+# --- TABZ local artifacts (do not commit) ---
+proofs/PROOF-*.log
+proofs/PROOF-*.txt
+
+# editor/patch backups created by scripts
+**/*.BAK.*
+**/*.BACKUP.*
+**/*.bak
+**/*.tmp
