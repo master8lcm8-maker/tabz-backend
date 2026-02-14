@@ -1,4 +1,4 @@
-node_modules/
+﻿node_modules/
 dist/
 .env
 
@@ -60,3 +60,6 @@ proofs/PROOF-*.txt
 **/*.BACKUP.*
 **/*.bak
 **/*.tmp
+### TABZ PROOFS (track selected)
+!proofs/PROOF-P5-VENUES-OWNER-ONLY-*.log
+
