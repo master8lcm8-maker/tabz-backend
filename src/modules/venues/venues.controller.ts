@@ -1,4 +1,4 @@
-// src/modules/venues/venues.controller.ts
+﻿// src/modules/venues/venues.controller.ts
 import {
   Body,
   Controller,
@@ -25,6 +25,15 @@ export class VenuesController {
     private readonly spaces: SpacesUploadService,
   ) {}
 
+  // --------------------------------------------------
+  // Auth/role gate: Venues owner-only for private routes
+  // --------------------------------------------------
+  private assertOwnerOnly(req: any) {
+    const role = String(req?.user?.role || '').toLowerCase();
+    if (!role) throw new ForbiddenException('forbidden_role');
+    if (role !== 'owner') throw new ForbiddenException('owner_only');
+  }
+
   // ✅ FV-20.1.A — GET /venues/public (PUBLIC DIRECTORY, NO AUTH)
   @Get('public')
   async publicList() {
@@ -41,6 +50,7 @@ export class VenuesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Req() req: any, @Body() body: any) {
+    this.assertOwnerOnly(req);
     const ownerId = req.user?.sub;
 
     const venue = await this.venuesService.create({
@@ -59,6 +69,7 @@ export class VenuesController {
   @Get('mine')
   @UseGuards(JwtAuthGuard)
   async mine(@Req() req: any) {
+    this.assertOwnerOnly(req);
     const ownerId = req.user?.sub;
     const venues = await this.venuesService.findByOwner(ownerId);
 
@@ -68,11 +79,13 @@ export class VenuesController {
     };
   }
 
-  // GET /venues -> optional, all venues
+  // GET /venues -> OWNER-ONLY (avoid cross-role bleed)
   @Get()
-  async all() {
-    const venues = await this.venuesService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async all(@Req() req: any) {
+    this.assertOwnerOnly(req);
 
+    const venues = await this.venuesService.findAll();
     return {
       value: venues,
       Count: venues.length,
@@ -91,6 +104,8 @@ export class VenuesController {
     @Param('id') id: string,
     @UploadedFile() file?: any,
   ) {
+    this.assertOwnerOnly(req);
+
     const venueId = Number(id);
     const ownerId = req.user?.sub;
 
@@ -132,6 +147,8 @@ export class VenuesController {
     @Param('id') id: string,
     @UploadedFile() file?: any,
   ) {
+    this.assertOwnerOnly(req);
+
     const venueId = Number(id);
     const ownerId = req.user?.sub;
 

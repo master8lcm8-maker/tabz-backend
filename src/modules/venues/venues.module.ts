@@ -1,6 +1,7 @@
 ﻿import { Module } from '@nestjs/common';
 
 import { VenuesService } from './venues.service';
+import { VenuesController } from './venues.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from '../../profile/profile.module';
 import { Venue } from './venue.entity';
@@ -9,7 +10,7 @@ import { Venue } from './venue.entity';
     ProfileModule,
     TypeOrmModule.forFeature([Venue]),
   ],
-  controllers: [],
+  controllers: [VenuesController],
   providers: [
     VenuesService
   ],
@@ -18,5 +19,6 @@ import { Venue } from './venue.entity';
   ],
 })
 export class VenuesModule {}
+
 
 
