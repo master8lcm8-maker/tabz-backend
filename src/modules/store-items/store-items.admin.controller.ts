@@ -23,11 +23,6 @@ export class StoreItemsAdminController {
     // If no venueId passed, you can default to 1 or null; here we keep null
     const venueId = dto.venueId ?? 1;
 
-    return this.storeItemsService.createItem({
-      name: dto.name,
-      priceCents: dto.priceCents,
-      venueId,
-      metadata: dto.metadata,
-    });
+    return this.storeItemsService.createItemForVenue(venueId, dto.name, dto.priceCents);
   }
 }
