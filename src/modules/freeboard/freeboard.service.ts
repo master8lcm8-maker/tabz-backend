@@ -1,4 +1,3 @@
-// src/modules/freeboard/freeboard.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -16,6 +15,8 @@ export class FreeboardService {
     private readonly dropsRepo: Repository<FreeboardDrop>,
   ) {}
 
+  // NOTE: Controller sends "message" but DB/entity requires NOT NULL "title".
+  // We map message -> title at insert time to satisfy SQLITE schema.
   async createDrop(
     creatorId: number,
     venueId: number,
@@ -32,8 +33,15 @@ export class FreeboardService {
     const drop = this.dropsRepo.create({
       creatorId,
       venueId,
-      message,
+
+      // DB column is "title" (NOT NULL)
+      title: message,
+
       status: 'ACTIVE' as FreeboardDropStatus,
+
+      // DB column is claimedByUserId
+      claimedByUserId: null,
+
       claimCode: this.generateClaimCode(),
       expiresAt,
       claimedAt: null,
@@ -70,7 +78,7 @@ export class FreeboardService {
 
     drop.status = 'CLAIMED';
     drop.claimedAt = new Date();
-    drop.claimerId = claimerId;
+    drop.claimedByUserId = claimerId;
 
     return this.dropsRepo.save(drop);
   }
