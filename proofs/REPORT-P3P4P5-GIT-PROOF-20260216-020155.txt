@@ -1,0 +1,332 @@
+﻿WHEN: 2026-02-16T02:01:56
+PWD : D:\TABZ\tabz-backend-full\tabz-backend
+BR  : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]            [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]            [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]            [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]            [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]            <command> [<args>]  These are common Git commands used in various situations:  start a working area (see also: git help tutorial)    clone      Clone a repository into a new directory    init       Create an empty Git repository or reinitialize an existing one  work on the current change (see also: git help everyday)    add        Add file contents to the index    mv         Move or rename a file, a directory, or a symlink    restore    Restore working tree files    rm         Remove files from the working tree and from the index  examine the history and state (see also: git help revisions)    bisect     Use binary search to find the commit that introduced a bug    diff       Show changes between commits, commit and working tree, etc    grep       Print lines matching a pattern    log        Show commit logs    show       Show various types of objects    status     Show the working tree status  grow, mark and tweak your common history    backfill   Download missing objects in a partial clone    branch     List, create, or delete branches    commit     Record changes to the repository    merge      Join two or more development histories together    rebase     Reapply commits on top of another base tip    reset      Reset current HEAD to the specified state    switch     Switch branches    tag        Create, list, delete or verify tags  collaborate (see also: git help workflows)    fetch      Download objects and refs from another repository    pull       Fetch from and integrate with another repository or a local branch    push       Update remote refs along with associated objects  'git help -a' and 'git help -g' list available subcommands and some concept guides. See 'git help <command>' or 'git help <concept>' to read about a specific subcommand or concept. See 'git help git' for an overview of the system.
+SHA : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]            [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]            [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]            [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]            [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]            <command> [<args>]  These are common Git commands used in various situations:  start a working area (see also: git help tutorial)    clone      Clone a repository into a new directory    init       Create an empty Git repository or reinitialize an existing one  work on the current change (see also: git help everyday)    add        Add file contents to the index    mv         Move or rename a file, a directory, or a symlink    restore    Restore working tree files    rm         Remove files from the working tree and from the index  examine the history and state (see also: git help revisions)    bisect     Use binary search to find the commit that introduced a bug    diff       Show changes between commits, commit and working tree, etc    grep       Print lines matching a pattern    log        Show commit logs    show       Show various types of objects    status     Show the working tree status  grow, mark and tweak your common history    backfill   Download missing objects in a partial clone    branch     List, create, or delete branches    commit     Record changes to the repository    merge      Join two or more development histories together    rebase     Reapply commits on top of another base tip    reset      Reset current HEAD to the specified state    switch     Switch branches    tag        Create, list, delete or verify tags  collaborate (see also: git help workflows)    fetch      Download objects and refs from another repository    pull       Fetch from and integrate with another repository or a local branch    push       Update remote refs along with associated objects  'git help -a' and 'git help -g' list available subcommands and some concept guides. See 'git help <command>' or 'git help <concept>' to read about a specific subcommand or concept. See 'git help git' for an overview of the system.
+
+TAG:            [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:            [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:            [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:            [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:            <command> [<args>]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    add        Add file contents to the index
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    backfill   Download missing objects in a partial clone
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    bisect     Use binary search to find the commit that introduced a bug
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    branch     List, create, or delete branches
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    clone      Clone a repository into a new directory
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    commit     Record changes to the repository
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    diff       Show changes between commits, commit and working tree, etc
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    fetch      Download objects and refs from another repository
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    grep       Print lines matching a pattern
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    init       Create an empty Git repository or reinitialize an existing one
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    log        Show commit logs
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    merge      Join two or more development histories together
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    mv         Move or rename a file, a directory, or a symlink
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    pull       Fetch from and integrate with another repository or a local branch
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    push       Update remote refs along with associated objects
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    rebase     Reapply commits on top of another base tip
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    reset      Reset current HEAD to the specified state
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    restore    Restore working tree files
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    rm         Remove files from the working tree and from the index
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    show       Show various types of objects
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    status     Show the working tree status
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    switch     Switch branches
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG:    tag        Create, list, delete or verify tags
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: collaborate (see also: git help workflows)
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: concept guides. See 'git help <command>' or 'git help <concept>'
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: examine the history and state (see also: git help revisions)
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: 'git help -a' and 'git help -g' list available subcommands and some
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: grow, mark and tweak your common history
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: See 'git help git' for an overview of the system.
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: start a working area (see also: git help tutorial)
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: These are common Git commands used in various situations:
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: to read about a specific subcommand or concept.
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+TAG: work on the current change (see also: git help everyday)
+  local : usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+  origin: (no remote peeled ref found)
+
+LastWriteTime         Name                                                                       Length
+-------------         ----                                                                       ------
+1/4/2026 10:33:56 PM  proof-auth-20251231-070545.log                                               6316
+1/4/2026 10:33:56 PM  proof-health-20251231-075535.log                                              506
+1/4/2026 10:33:56 PM  proof-run-20251231-090443.log                                                6820
+1/4/2026 10:33:56 PM  proof-profiles-20251231-095219.log                                            136
+1/4/2026 10:33:57 PM  proof-auth-me-20251231-101653.log                                             162
+2/5/2026 3:13:21 AM   PROOF-F-MOBILE-SHIPLOCK-20260203-224614.txt                                  8629
+2/5/2026 3:13:21 AM   PROOF-STRIPE-CONNECT-CODE.txt                                               13682
+2/5/2026 3:13:21 AM   PROOF-STRIPE-CONNECT-SEAM-20260203-223119.txt                              159642
+2/5/2026 3:13:21 AM   PROOFS.md                                                                     672
+2/9/2026 11:16:50 PM  SLICE-C-DISCOVERY-P3-20260209-231636.txt                                    33750
+2/9/2026 11:42:41 PM  SLICE-C-P3-CONTEXT-20260209-234240.txt                                      36703
+2/11/2026 3:04:53 AM  P1-ME-CODE-20260210-051835.log                                                362
+2/11/2026 3:04:53 AM  P2-ATTRIBUTION-20260210-051844.log                                            296
+2/11/2026 3:04:53 AM  P3-SLICE1-20260210-212915.log                                                 718
+2/11/2026 3:04:53 AM  P3-REFERRAL-API-20260210-051852.log                                           322
+2/11/2026 3:30:12 AM  PROOF-P3-ENGAGEMENT-RUNTIME-20260211-033012.log                              4878
+2/11/2026 5:01:45 AM  PROOF-P3-ENGAGEMENT-EVENTS-20260211-050144.log                               8352
+2/11/2026 10:13:30 PM PROOF-P3-ENGAGEMENT-EVENTS-DIST-20260211-221329.log                          4170
+2/11/2026 11:41:37 PM PROOF-P4-ROUTES-DISCOVERY-20260211-234135.log                               85592
+2/11/2026 11:41:43 PM PROOF-P5-ROUTES-DISCOVERY-20260211-234143.log                              261736
+2/11/2026 11:45:07 PM PROOF-P4P5-ENDPOINT-SHAPES-20260211-234507.log                             133768
+2/11/2026 11:57:12 PM PROOF-P4-ORDER-CREATE-AND-MYORDERS-20260211-235711.log                       6606
+2/11/2026 11:57:20 PM PROOF-P5-WALLET-CASHOUT-GATES-20260211-235719.log                            3886
+2/12/2026 12:01:39 AM PROOF-P4-ORDER-BODY-CONTRACT-20260212-000139.log                           250526
+2/12/2026 12:04:52 AM PROOF-P4-ENDPOINT-DISCOVERY-20260212-000451.log                             27922
+2/12/2026 12:18:37 AM PROOF-P4-FULL-GREEN-ORDER-FLOW-20260212-001836.log                           5086
+2/12/2026 12:21:16 AM PROOF-P4-VENUE-CONTRACT-20260212-002116.log                                 93086
+2/12/2026 12:21:23 AM PROOF-P4-ADMIN-STOREITEMS-WIRING-20260212-002122.log                        13906
+2/12/2026 12:24:59 AM PROOF-P4-FULL-GREEN-ORDER-FLOW-RETRY-20260212-002459.log                     1760
+2/12/2026 12:36:13 AM PROOF-P4-AUTH-ENDPOINT-DISCOVERY-20260212-003612.log                         6702
+2/12/2026 12:36:19 AM PROOF-P4-STOREITEMS-MODULE-CONTROLLERS-20260212-003619.log                   1628
+2/12/2026 12:39:21 AM PROOF-P4-OWNER-CREDS-DISCOVERY-20260212-003905.log                          18012
+2/12/2026 12:41:52 AM PROOF-P4-OWNER-LOGIN-20260212-004152.log                                     3068
+2/12/2026 12:42:01 AM PROOF-P4-PATCH-STOREITEMS-MODULE-20260212-004200.log                         2728
+2/12/2026 12:49:28 AM PROOF-P4-OWNER-PASSWORD-SOURCE-20260212-004928.log                          34042
+2/12/2026 12:49:42 AM PROOF-P4-RESTART-BACKEND-20260212-004934.log                                 1640
+2/12/2026 1:13:27 AM  PROOF-P4-OWNER-PASSWORD-SOURCE-20260212-011327.log                          42012
+2/12/2026 1:25:39 AM  PROOF-P4-OWNER-SEED-LOGIN-ASSERT-20260212-012528.log                         5488
+2/12/2026 1:30:19 AM  PROOF-P4-PORT-HEALTH-PROBE-20260212-012951.log                               5406
+2/12/2026 1:45:28 AM  PROOF-P4-OWNER-LOGIN-ASSERT-20260212-014527.log                              3188
+2/12/2026 1:49:35 AM  PROOF-P4-OWNER-SEED-LOGIN-CLEAN-20260212-014934.log                          6348
+2/12/2026 1:49:47 AM  PROOF-P4-LOGIN-OWNER-WIRING-20260212-014945.log                             11302
+2/12/2026 7:37:07 PM  PROOF-P4-OWNER-VENUE-LINK-20260212-193706.log                                5434
+2/12/2026 7:40:07 PM  PROOF-P4-AUTH-ME-VENUEID-SOURCE-20260212-193958.log                        340378
+2/12/2026 7:43:26 PM  PROOF-P4-AUTH-ME-EXACT-CODE-20260212-194326.log                              6096
+2/12/2026 7:46:15 PM  PROOF-P4-AUTH-ME-CONTROLLER-DUMP-20260212-194615.log                         6412
+2/12/2026 7:55:50 PM  PROOF-P4-PATCH-AUTH-ME-VENUEID-20260212-195530.log                           1490
+2/12/2026 8:02:04 PM  PROOF-P4-BACKEND-DOWN-PROBE-20260212-200155.log                               650
+2/12/2026 8:04:57 PM  PROOF-P4-BACKEND-DOWN-PROBE-20260212-200448.log                               650
+2/12/2026 8:08:10 PM  PROOF-P4-START-BACKEND-AND-HEALTH-20260212-200736.log                         908
+2/12/2026 8:13:52 PM  PROOF-P4-FIX-AUTH-VENUES-DI-20260212-201351.log                              2810
+2/12/2026 8:19:20 PM  PROOF-P4-FIX-AUTH-FORFEATURE-20260212-201920.log                             4276
+2/12/2026 8:24:59 PM  PROOF-P4-BACKEND-UP-20260212-202456.log                                       368
+2/12/2026 8:33:21 PM  PROOF-P4-FIX-VENUES-DI-FINAL-20260212-203320.log                             1160
+2/12/2026 8:38:32 PM  PROOF-P4-FIX-AUTH-TOPLEVEL-IMPORTS-VENUESMODULE-20260212-203832.log           690
+2/12/2026 8:46:33 PM  PROOF-P4-RESTORE-AND-PATCH-AUTHMODULE-VENUESMODULE-20260212-204633.log       1060
+2/12/2026 8:51:49 PM  PROOF-P4-FIND-GOOD-AUTHMODULE-BACKUP-20260212-205149.log                     6064
+2/12/2026 8:53:41 PM  PROOF-P4-INSERT-VENUESMODULE-TOPLEVEL-20260212-205341.log                    3992
+2/12/2026 8:59:22 PM  PROOF-P4-HEALTH-FAIL-PORT-3000-20260212-205912.log                            770
+2/12/2026 9:03:48 PM  PROOF-P4-BACKEND-START-LOG-20260212-210334.log                               5670
+2/12/2026 9:12:16 PM  PROOF-P4-FIX-AUTH-VENUES-CIRCULAR-20260212-211215.log                        7778
+2/12/2026 9:18:19 PM  PROOF-P4-SCAN-IMPORTS-BLOCKS-20260212-211819.log                            14984
+2/12/2026 9:26:07 PM  PROOF-P4-VENUESMODULE-FILE-20260212-212607.log                                322
+2/12/2026 9:27:42 PM  PROOF-P4-RECREATE-VENUESMODULE-20260212-212742.log                            886
+2/12/2026 9:37:03 PM  PROOF-P4-FIX-VENUESMODULE-PROVIDE-EXPORT-VENUESSERVICE-20260212-213702.log   5122
+2/12/2026 9:53:05 PM  PROOF-P4-FIX-VENUESMODULE-ADD-VENUE-REPO-20260212-215304.log                 3770
+2/12/2026 10:04:36 PM PROOF-P4-FIX-VENUESMODULE-CLEAN-AND-IMPORT-VENUE-20260212-220433.log         2390
+2/12/2026 10:23:31 PM PROOF-P4-AUTH-ME-AND-VENUESMODULE-GREEN-20260212-222330.log                  9334
+2/12/2026 10:39:10 PM PROOF-P4-CLEAN-ENCODING-AUTH-STOREITEMS-20260212-223910.log                  1314
+2/12/2026 10:48:56 PM PROOF-P4-AUTH-OWNER-ROLE-VENUEID-20260212-224856.log                         5798
+2/13/2026 9:04:45 PM  PROOF-P5-VENUES-OWNER-ONLY-20260213-210444.log                               2713
+2/16/2026 1:41:53 AM  PROOF-P3-SWEEP-20260216-014150.log                                         195875
+2/16/2026 2:01:58 AM  REPORT-P3P4P5-GIT-PROOF-20260216-020155.txt                                 11857
+
+
+
+
+LastWriteTime         Name                                                                       Length
+-------------         ----                                                                       ------
+1/4/2026 10:33:56 PM  proof-auth-20251231-070545.log                                               6316
+1/4/2026 10:33:56 PM  proof-health-20251231-075535.log                                              506
+1/4/2026 10:33:56 PM  proof-run-20251231-090443.log                                                6820
+1/4/2026 10:33:56 PM  proof-profiles-20251231-095219.log                                            136
+1/4/2026 10:33:57 PM  proof-auth-me-20251231-101653.log                                             162
+2/9/2026 11:16:50 PM  SLICE-C-DISCOVERY-P3-20260209-231636.txt                                    33750
+2/9/2026 11:42:41 PM  SLICE-C-P3-CONTEXT-20260209-234240.txt                                      36703
+2/11/2026 3:04:53 AM  P1-ME-CODE-20260210-051835.log                                                362
+2/11/2026 3:04:53 AM  P3-SLICE1-20260210-212915.log                                                 718
+2/11/2026 3:04:53 AM  P3-REFERRAL-API-20260210-051852.log                                           322
+2/11/2026 3:04:53 AM  P2-ATTRIBUTION-20260210-051844.log                                            296
+2/11/2026 3:30:12 AM  PROOF-P3-ENGAGEMENT-RUNTIME-20260211-033012.log                              4878
+2/11/2026 5:01:45 AM  PROOF-P3-ENGAGEMENT-EVENTS-20260211-050144.log                               8352
+2/11/2026 10:13:30 PM PROOF-P3-ENGAGEMENT-EVENTS-DIST-20260211-221329.log                          4170
+2/11/2026 11:41:37 PM PROOF-P4-ROUTES-DISCOVERY-20260211-234135.log                               85592
+2/11/2026 11:41:43 PM PROOF-P5-ROUTES-DISCOVERY-20260211-234143.log                              261736
+2/11/2026 11:45:07 PM PROOF-P4P5-ENDPOINT-SHAPES-20260211-234507.log                             133768
+2/11/2026 11:57:12 PM PROOF-P4-ORDER-CREATE-AND-MYORDERS-20260211-235711.log                       6606
+2/11/2026 11:57:20 PM PROOF-P5-WALLET-CASHOUT-GATES-20260211-235719.log                            3886
+2/12/2026 12:01:39 AM PROOF-P4-ORDER-BODY-CONTRACT-20260212-000139.log                           250526
+2/12/2026 12:04:52 AM PROOF-P4-ENDPOINT-DISCOVERY-20260212-000451.log                             27922
+2/12/2026 12:18:37 AM PROOF-P4-FULL-GREEN-ORDER-FLOW-20260212-001836.log                           5086
+2/12/2026 12:21:16 AM PROOF-P4-VENUE-CONTRACT-20260212-002116.log                                 93086
+2/12/2026 12:21:23 AM PROOF-P4-ADMIN-STOREITEMS-WIRING-20260212-002122.log                        13906
+2/12/2026 12:24:59 AM PROOF-P4-FULL-GREEN-ORDER-FLOW-RETRY-20260212-002459.log                     1760
+2/12/2026 12:36:13 AM PROOF-P4-AUTH-ENDPOINT-DISCOVERY-20260212-003612.log                         6702
+2/12/2026 12:36:19 AM PROOF-P4-STOREITEMS-MODULE-CONTROLLERS-20260212-003619.log                   1628
+2/12/2026 12:39:21 AM PROOF-P4-OWNER-CREDS-DISCOVERY-20260212-003905.log                          18012
+2/12/2026 12:41:52 AM PROOF-P4-OWNER-LOGIN-20260212-004152.log                                     3068
+2/12/2026 12:42:01 AM PROOF-P4-PATCH-STOREITEMS-MODULE-20260212-004200.log                         2728
+2/12/2026 12:49:28 AM PROOF-P4-OWNER-PASSWORD-SOURCE-20260212-004928.log                          34042
+2/12/2026 12:49:42 AM PROOF-P4-RESTART-BACKEND-20260212-004934.log                                 1640
+2/12/2026 1:13:27 AM  PROOF-P4-OWNER-PASSWORD-SOURCE-20260212-011327.log                          42012
+2/12/2026 1:25:39 AM  PROOF-P4-OWNER-SEED-LOGIN-ASSERT-20260212-012528.log                         5488
+2/12/2026 1:30:19 AM  PROOF-P4-PORT-HEALTH-PROBE-20260212-012951.log                               5406
+2/12/2026 1:45:28 AM  PROOF-P4-OWNER-LOGIN-ASSERT-20260212-014527.log                              3188
+2/12/2026 1:49:35 AM  PROOF-P4-OWNER-SEED-LOGIN-CLEAN-20260212-014934.log                          6348
+2/12/2026 1:49:47 AM  PROOF-P4-LOGIN-OWNER-WIRING-20260212-014945.log                             11302
+2/12/2026 7:37:07 PM  PROOF-P4-OWNER-VENUE-LINK-20260212-193706.log                                5434
+2/12/2026 7:40:07 PM  PROOF-P4-AUTH-ME-VENUEID-SOURCE-20260212-193958.log                        340378
+2/12/2026 7:43:26 PM  PROOF-P4-AUTH-ME-EXACT-CODE-20260212-194326.log                              6096
+2/12/2026 7:46:15 PM  PROOF-P4-AUTH-ME-CONTROLLER-DUMP-20260212-194615.log                         6412
+2/12/2026 7:55:50 PM  PROOF-P4-PATCH-AUTH-ME-VENUEID-20260212-195530.log                           1490
+2/12/2026 8:02:04 PM  PROOF-P4-BACKEND-DOWN-PROBE-20260212-200155.log                               650
+2/12/2026 8:04:57 PM  PROOF-P4-BACKEND-DOWN-PROBE-20260212-200448.log                               650
+2/12/2026 8:08:10 PM  PROOF-P4-START-BACKEND-AND-HEALTH-20260212-200736.log                         908
+2/12/2026 8:13:52 PM  PROOF-P4-FIX-AUTH-VENUES-DI-20260212-201351.log                              2810
+2/12/2026 8:19:20 PM  PROOF-P4-FIX-AUTH-FORFEATURE-20260212-201920.log                             4276
+2/12/2026 8:24:59 PM  PROOF-P4-BACKEND-UP-20260212-202456.log                                       368
+2/12/2026 8:33:21 PM  PROOF-P4-FIX-VENUES-DI-FINAL-20260212-203320.log                             1160
+2/12/2026 8:38:32 PM  PROOF-P4-FIX-AUTH-TOPLEVEL-IMPORTS-VENUESMODULE-20260212-203832.log           690
+2/12/2026 8:46:33 PM  PROOF-P4-RESTORE-AND-PATCH-AUTHMODULE-VENUESMODULE-20260212-204633.log       1060
+2/12/2026 8:51:49 PM  PROOF-P4-FIND-GOOD-AUTHMODULE-BACKUP-20260212-205149.log                     6064
+2/12/2026 8:53:41 PM  PROOF-P4-INSERT-VENUESMODULE-TOPLEVEL-20260212-205341.log                    3992
+2/12/2026 8:59:22 PM  PROOF-P4-HEALTH-FAIL-PORT-3000-20260212-205912.log                            770
+2/12/2026 9:03:48 PM  PROOF-P4-BACKEND-START-LOG-20260212-210334.log                               5670
+2/12/2026 9:12:16 PM  PROOF-P4-FIX-AUTH-VENUES-CIRCULAR-20260212-211215.log                        7778
+2/12/2026 9:18:19 PM  PROOF-P4-SCAN-IMPORTS-BLOCKS-20260212-211819.log                            14984
+2/12/2026 9:26:07 PM  PROOF-P4-VENUESMODULE-FILE-20260212-212607.log                                322
+2/12/2026 9:27:42 PM  PROOF-P4-RECREATE-VENUESMODULE-20260212-212742.log                            886
+2/12/2026 9:37:03 PM  PROOF-P4-FIX-VENUESMODULE-PROVIDE-EXPORT-VENUESSERVICE-20260212-213702.log   5122
+2/12/2026 9:53:05 PM  PROOF-P4-FIX-VENUESMODULE-ADD-VENUE-REPO-20260212-215304.log                 3770
+2/12/2026 10:04:36 PM PROOF-P4-FIX-VENUESMODULE-CLEAN-AND-IMPORT-VENUE-20260212-220433.log         2390
+2/12/2026 10:23:31 PM PROOF-P4-AUTH-ME-AND-VENUESMODULE-GREEN-20260212-222330.log                  9334
+2/12/2026 10:39:10 PM PROOF-P4-CLEAN-ENCODING-AUTH-STOREITEMS-20260212-223910.log                  1314
+2/12/2026 10:48:56 PM PROOF-P4-AUTH-OWNER-ROLE-VENUEID-20260212-224856.log                         5798
+2/13/2026 9:04:45 PM  PROOF-P5-VENUES-OWNER-ONLY-20260213-210444.log                               2713
+2/16/2026 1:41:53 AM  PROOF-P3-SWEEP-20260216-014150.log                                         195875
+2/16/2026 2:01:58 AM  REPORT-P3P4P5-GIT-PROOF-20260216-020155.txt                                 19740
+
+
+
+FOUND: .\src\modules\freeboard
+FOUND: .\src\modules\engagement
+MISSING: .\src\modules\referrals
+MISSING: .\src\modules\affiliate
+MISSING: .\src\modules\attribution
+MISSING: .\src\modules\growth
+MISSING: .\src\modules\appstore
+MISSING: .\src\modules\compliance
+MISSING: .\src\modules\observability
+usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]
+           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]
+           [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]
+           <command> [<args>]
+
+These are common Git commands used in various situations:
+
+start a working area (see also: git help tutorial)
+   clone      Clone a repository into a new directory
+   init       Create an empty Git repository or reinitialize an existing one
+
+work on the current change (see also: git help everyday)
+   add        Add file contents to the index
+   mv         Move or rename a file, a directory, or a symlink
+   restore    Restore working tree files
+   rm         Remove files from the working tree and from the index
+
+examine the history and state (see also: git help revisions)
+   bisect     Use binary search to find the commit that introduced a bug
+   diff       Show changes between commits, commit and working tree, etc
+   grep       Print lines matching a pattern
+   log        Show commit logs
+   show       Show various types of objects
+   status     Show the working tree status
+
+grow, mark and tweak your common history
+   backfill   Download missing objects in a partial clone
+   branch     List, create, or delete branches
+   commit     Record changes to the repository
+   merge      Join two or more development histories together
+   rebase     Reapply commits on top of another base tip
+   reset      Reset current HEAD to the specified state
+   switch     Switch branches
+   tag        Create, list, delete or verify tags
+
+collaborate (see also: git help workflows)
+   fetch      Download objects and refs from another repository
+   pull       Fetch from and integrate with another repository or a local branch
+   push       Update remote refs along with associated objects
+
+'git help -a' and 'git help -g' list available subcommands and some
+concept guides. See 'git help <command>' or 'git help <concept>'
+to read about a specific subcommand or concept.
+See 'git help git' for an overview of the system.
+REPORT: .\proofs\REPORT-P3P4P5-GIT-PROOF-20260216-020155.txt
