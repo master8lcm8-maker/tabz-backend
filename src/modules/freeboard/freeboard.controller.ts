@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { FreeboardService } from './freeboard.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -23,9 +15,7 @@ function getUserIdFromRequest(req: Request): number {
 
 class CreateFreeboardDropDto {
   venueId: number;
-  title: string;
-  description?: string;
-  rewardCents?: number;
+  message: string;
   expiresInMinutes?: number;
 }
 
@@ -38,18 +28,14 @@ export class FreeboardController {
   @Post('drops')
   async createDrop(@Req() req: Request, @Body() body: CreateFreeboardDropDto) {
     const creatorId = getUserIdFromRequest(req);
+    const { venueId, message, expiresInMinutes } = body;
 
-    const { venueId, title, description, rewardCents, expiresInMinutes } =
-      body;
-
-    return this.freeboardService.createDrop({
+    return this.freeboardService.createDrop(
       creatorId,
       venueId,
-      title,
-      description,
-      rewardCents,
-      expiresInMinutes,
-    });
+      message,
+      expiresInMinutes ?? 60,
+    );
   }
 
   // Claim a drop by code
@@ -57,11 +43,7 @@ export class FreeboardController {
   @Post('claim')
   async claim(@Req() req: Request, @Body('code') code: string) {
     const userId = getUserIdFromRequest(req);
-
-    return this.freeboardService.claimDrop({
-      userId,
-      code,
-    });
+    return this.freeboardService.claimDrop(code, userId);
   }
 
   // List ACTIVE drops for a venue (public)
@@ -71,7 +53,7 @@ export class FreeboardController {
     return this.freeboardService.getDropsForVenue(venueId);
   }
 
-  // (Optional) List drops I created – useful later
+  // List drops I created
   @UseGuards(JwtAuthGuard)
   @Get('my')
   async getMyDrops(@Req() req: Request) {

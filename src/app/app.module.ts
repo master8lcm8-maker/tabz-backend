@@ -26,12 +26,17 @@ import { HealthModule } from '../health/health.module';
 // ✅ P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
 
+// P3: FreeBoard
+import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 @Module({
   providers: [AppService],
   controllers: [AppController],
   imports: [
     // P3: Engagement
     EngagementModule,
+
+    // P3: FreeBoard
+    FreeboardModule,
 
     // Global config
     ConfigModule.forRoot({
