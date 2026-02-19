@@ -1,4 +1,4 @@
-﻿﻿// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -25,6 +25,9 @@ import { HealthModule } from '../health/health.module';
 
 // ✅ P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
+
+// P3: Freeboard
+import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 
 @Module({
   providers: [AppService],
