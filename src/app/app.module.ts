@@ -1,75 +1,168 @@
-﻿// src/app/app.module.ts
-import { Module } from '@nestjs/common';
+﻿import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, LessThan, MoreThan } from 'typeorm';
+import { FreeboardDrop, FreeboardDropStatus } from './freeboard-drop.entity';
+import { randomBytes } from 'crypto';
 
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+@Injectable()
+export class FreeboardService {
+  constructor(
+    @InjectRepository(FreeboardDrop)
+    private readonly dropsRepo: Repository<FreeboardDrop>,
+  ) {}
 
-import { WalletModule } from '../wallet/wallet.module';
-import { ProfileModule } from '../profile/profile.module';
+  // NOTE: Controller sends "message" but DB/entity requires NOT NULL "title".
+  // We map message -> title at insert time to satisfy SQLITE schema.
+  async createDrop(
+    creatorIdOrDto: number | { creatorId?: number; dropperId?: number; venueId: number; message?: string; title?: string; description?: string; rewardCents?: number; expiresInMinutes?: number },
+    venueId?: number,
+    message?: string,
+    expiresInMinutes = 60,
+  ): Promise<FreeboardDrop> {
+    // accept either positional args OR object dto from controller (supports creatorId/dropperId)
+    let creatorId: number;
+    let vId: number;
+    let msg: string;
+    let exp: number;
 
-import { AuthModule } from '../modules/auth/auth.module';
-import { UsersModule } from '../modules/users/users.module';
-import { StoreItemsModule } from '../modules/store-items/store-items.module';
-import { DevSeedModule } from '../dev-seed/dev-seed.module';
+    if (typeof creatorIdOrDto === 'object') {
+      const dto: any = creatorIdOrDto as any;
+      creatorId = Number(dto.creatorId ?? dto.dropperId);
+      vId = Number(dto.venueId);
+      msg = String((dto.message ?? dto.title ?? dto.description) ?? '');
+      exp = (dto.expiresInMinutes === null || dto.expiresInMinutes === undefined) ? 60 : Number(dto.expiresInMinutes);
+    } else {
+      creatorId = Number(creatorIdOrDto);
+      vId = Number(venueId);
+      msg = String(message ?? '');
+      exp = (expiresInMinutes === null || expiresInMinutes === undefined) ? 60 : Number(expiresInMinutes);
+    }
 
-// âœ… ADD
-import { VenuesModule } from '../modules/venues/venues.module';
+    // rebind to the variable names the existing implementation below expects
+    venueId = vId;
+    message = msg;
+    expiresInMinutes = exp;
 
-// âœ… ADD
-import { IdentityModule } from '../identity/identity.module';
+    if (!message || !message.trim()) {
+      throw new BadRequestException('Message is required for a drop.');
+    }
 
-// âœ… ADD (HEALTH)
-import { HealthModule } from '../health/health.module';
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
 
-// âœ… P3: Engagement runtime
-import { EngagementModule } from '../modules/engagement/engagement.module';
+    const drop = this.dropsRepo.create({
+      creatorId,
+      venueId,
 
-// P3: Freeboard
-import { FreeboardModule } from '../modules/freeboard/freeboard.module';
+      // DB column is "title" (NOT NULL)
+      title: message,
 
-@Module({
-  providers: [AppService],
-  controllers: [AppController],
-  imports: [
-    // P3: Engagement
-    EngagementModule,
+      status: 'ACTIVE' as FreeboardDropStatus,
 
-    
-    // P3: Freeboard
-    FreeboardModule,
-    // Global config
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+      // DB column is claimedByUserId
+      claimedByUserId: null,
 
-    // LOCAL DEV: SQLITE ONLY
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'tabz-dev.sqlite',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+      claimCode: this.generateClaimCode(),
+      expiresAt,
+      claimedAt: null,
+    });
 
-    // Core modules
-    UsersModule,
-    AuthModule,
-    WalletModule,
-    StoreItemsModule,
-    ProfileModule,
+    return this.dropsRepo.save(drop);
+  }
 
-    // âœ… FV-17 â€” venues endpoints
-    VenuesModule,
+  async claimDrop(
+    claimCodeOrDto: string | { code?: string; claimCode?: string; userId?: number; claimerId?: number },
+    claimerIdArg?: number,
+  ): Promise<FreeboardDrop> {
+    // accept either positional args OR object dto from controller (supports userId/claimerId, code/claimCode)
+    let claimerId: number;
+    let claimCode: string;
 
-    // Identity
-    IdentityModule,
+    if (typeof claimCodeOrDto === 'object') {
+      const dto: any = claimCodeOrDto as any;
+      claimerId = Number(dto.userId ?? dto.claimerId);
+      claimCode = String(dto.code ?? dto.claimCode ?? '');
+    } else {
+      claimCode = String(claimCodeOrDto ?? '');
+      claimerId = Number(claimerIdArg);
+    }
 
-    // Health (liveness / readiness)
-    HealthModule,
+    if (!claimCode) {
+      throw new BadRequestException('Claim code is required.');
+    }
 
-    // Dev tools
-    DevSeedModule,
-  ],
-})
-export class AppModule {}
+    const drop = await this.dropsRepo.findOne({
+      where: { claimCode },
+    });
+
+    if (!drop) {
+      throw new NotFoundException('Drop not found for that claim code.');
+    }
+
+    if (drop.status !== 'ACTIVE') {
+      throw new BadRequestException('Drop is not active.');
+    }
+
+    if (drop.expiresAt && drop.expiresAt < new Date()) {
+      drop.status = 'EXPIRED';
+      await this.dropsRepo.save(drop);
+      throw new BadRequestException('Drop has expired.');
+    }
+
+    drop.status = 'CLAIMED';
+    drop.claimedAt = new Date();
+    drop.claimedByUserId = claimerId;
+
+    return this.dropsRepo.save(drop);
+  }
+
+  async getDropsForVenue(venueId: number): Promise<FreeboardDrop[]> {
+    const now = new Date();
+
+    return this.dropsRepo.find({
+      where: {
+        venueId,
+        status: 'ACTIVE',
+        expiresAt: MoreThan(now),
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getDropsForCreator(creatorId: number): Promise<FreeboardDrop[]> {
+    return this.dropsRepo.find({
+      where: {
+        creatorId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async cleanupExpiredDrops(): Promise<void> {
+    const now = new Date();
+
+    const expired = await this.dropsRepo.find({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: LessThan(now),
+      },
+    });
+
+    if (!expired.length) return;
+
+    for (const drop of expired) {
+      drop.status = 'EXPIRED';
+    }
+
+    await this.dropsRepo.save(expired);
+  }
+
+  private generateClaimCode(): string {
+    // short code, uppercased hex, e.g. "007A6250"
+    return randomBytes(4).toString('hex').toUpperCase();
+  }
+}
