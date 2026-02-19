@@ -14,16 +14,16 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// ✅ ADD
+// âœ… ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// ✅ ADD
+// âœ… ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// ✅ ADD (HEALTH)
+// âœ… ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
-// ✅ P3: Engagement runtime
+// âœ… P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
 
 // P3: Freeboard
@@ -36,6 +36,9 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     // P3: Engagement
     EngagementModule,
 
+    
+    // P3: Freeboard
+    FreeboardModule,
     // Global config
     ConfigModule.forRoot({
       isGlobal: true,
@@ -56,7 +59,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     StoreItemsModule,
     ProfileModule,
 
-    // ✅ FV-17 — venues endpoints
+    // âœ… FV-17 â€” venues endpoints
     VenuesModule,
 
     // Identity
