@@ -63,3 +63,10 @@ proofs/PROOF-*.txt
 ### TABZ PROOFS (track selected)
 !proofs/PROOF-P5-VENUES-OWNER-ONLY-*.log
 
+
+# Local proof/run logs
+proofs/RUN-DIST-*.out.log
+proofs/RUN-DIST-*.err.log
+
+# Local backups
+*.bak-*
