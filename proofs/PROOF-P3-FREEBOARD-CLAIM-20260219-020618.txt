@@ -1,0 +1,10 @@
+﻿PROOF: P3 Freeboard claim flow (dist runtime)
+- Health OK
+- Owner create drop (ACTIVE)
+- Venue feed includes ACTIVE
+- Buyer claim (CLAIMED)
+- Venue feed excludes claimed
+- Owner /freeboard/my includes claimed
+Timestamp: 2026-02-19T02:06:18.6757768-05:00
+DropId: 8
+ClaimCode: 273063FD

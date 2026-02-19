@@ -70,3 +70,6 @@ proofs/RUN-DIST-*.err.log
 
 # Local backups
 *.bak-*
+
+!proofs/PROOF-P3-FREEBOARD-CLAIM-*.txt
+
