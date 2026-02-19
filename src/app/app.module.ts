@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
@@ -33,6 +34,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
   providers: [AppService],
   controllers: [AppController],
   imports: [
+    ScheduleModule.forRoot(),
     // P3: Engagement
     EngagementModule,
 
@@ -73,4 +75,8 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
   ],
 })
 export class AppModule {}
+
+
+
+
 
