@@ -1,0 +1,6 @@
+﻿PROOF: P3 Freeboard expiry scheduler (dist runtime)
+- Created drop id=10 status=ACTIVE expiresAt=2026-02-19T07:51:57.714Z
+- Waited 130s
+- /freeboard/my shows id=10 status=EXPIRED
+- updatedAt=2026-02-19T07:52:14.000Z (post-expiry tick)
+Timestamp: 2026-02-19T02:58:24.6437457-05:00

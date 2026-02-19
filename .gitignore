@@ -73,3 +73,6 @@ proofs/RUN-DIST-*.err.log
 
 !proofs/PROOF-P3-FREEBOARD-CLAIM-*.txt
 
+
+!proofs/PROOF-P3-FREEBOARD-EXPIRY-SCHED-*.log
+
