@@ -1,10 +1,13 @@
-import {
+﻿import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+
+export type UserRole = 'owner' | 'buyer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -21,7 +24,10 @@ export class User {
   @Column({ nullable: true })
   displayName?: string;
 
-  @Column({ default: true })
+  
+  @Column({ type: 'varchar', default: 'buyer' })
+  role: UserRole;
+@Column({ default: true })
   isActive: boolean;
 
   @CreateDateColumn()
@@ -30,3 +36,5 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+
