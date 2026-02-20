@@ -1,0 +1,17 @@
+﻿=== PROOF P3 ABUSE (THROTTLER GREEN) ===
+TIME: 2026-02-20T00:05:27.5500659-05:00
+--- /health (show rate headers) ---
+STATUS: 200
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 29
+X-RateLimit-Reset: 60
+--- burst /profiles/me (80 parallel) ---
+SUMMARY:
+
+Name Count
+---- -----
+200     30
+429     50
+
+
+
