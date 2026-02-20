@@ -1,6 +1,7 @@
 ﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
@@ -31,10 +32,11 @@ import { EngagementModule } from '../modules/engagement/engagement.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 
 @Module({
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
   controllers: [AppController],
   imports: [
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }]),
     // P3: Engagement
     EngagementModule,
 
@@ -75,6 +77,8 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
   ],
 })
 export class AppModule {}
+
+
 
 
 
