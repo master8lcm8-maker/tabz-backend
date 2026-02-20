@@ -1,40 +1,34 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+﻿import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
+  name = 'CreateOwnerBankInfo1733380000000';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.createTable(
-      new Table({
-        name: 'owner_bank_info',
-        columns: [
-          { name: 'id', type: 'int', isPrimary: true, isGenerated: true, generationStrategy: 'increment' },
+    // idempotent: if table exists, do nothing
+    const rows: Array<{ name: string }> = await queryRunner.query(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='owner_bank_info'"
+    );
+    if (Array.isArray(rows) && rows.length > 0) return;
 
-          { name: 'userId', type: 'int', isNullable: false },
-
-          // Encrypted fields
-          { name: 'accountHolderNameEnc', type: 'text', isNullable: false },
-          { name: 'routingNumberEnc', type: 'text', isNullable: false },
-          { name: 'accountNumberEnc', type: 'text', isNullable: false },
-          { name: 'bankNameEnc', type: 'text', isNullable: false },
-
-          // Last4 for UI display
-          { name: 'accountLast4', type: 'varchar', length: '4', isNullable: false },
-
-          { name: 'createdAt', type: 'timestamp', default: 'now()' },
-          { name: 'updatedAt', type: 'timestamp', default: 'now()' },
-        ],
-        foreignKeys: [
-          {
-            columnNames: ['userId'],
-            referencedTableName: 'users',
-            referencedColumnNames: ['id'],
-            onDelete: 'CASCADE',
-          },
-        ],
-      }),
+    // sqlite requires INTEGER PRIMARY KEY AUTOINCREMENT (not int)
+    await queryRunner.query(
+      CREATE TABLE "owner_bank_info" (
+        "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+        "userId" integer NOT NULL,
+        "accountHolderNameEnc" text NOT NULL,
+        "routingNumberEnc" text NOT NULL,
+        "accountNumberEnc" text NOT NULL,
+        "bankNameEnc" text NOT NULL,
+        "accountLast4" varchar(4) NOT NULL,
+        "createdAt" datetime NOT NULL DEFAULT (datetime('now')),
+        "updatedAt" datetime NOT NULL DEFAULT (datetime('now')),
+        CONSTRAINT "FK_860594f8113e6a1c27b54ad0d6e"
+          FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE
+      )
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('owner_bank_info');
+    await queryRunner.query(DROP TABLE IF EXISTS "owner_bank_info");
   }
 }
