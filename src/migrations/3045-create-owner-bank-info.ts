@@ -1,34 +1,81 @@
-﻿import { MigrationInterface, QueryRunner } from 'typeorm';
+﻿import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableColumn,
+  TableForeignKey,
+} from "typeorm";
 
 export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
-  name = 'CreateOwnerBankInfo1733380000000';
+  name = "CreateOwnerBankInfo1733380000000";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // idempotent: if table exists, do nothing
-    const rows: Array<{ name: string }> = await queryRunner.query(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='owner_bank_info'"
-    );
-    if (Array.isArray(rows) && rows.length > 0) return;
+    const has = await queryRunner.hasTable("owner_bank_info");
+    if (has) return;
 
-    // sqlite requires INTEGER PRIMARY KEY AUTOINCREMENT (not int)
-    await queryRunner.query(`
-      CREATE TABLE "owner_bank_info" (
-        "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-        "userId" integer NOT NULL,
-        "accountHolderNameEnc" text NOT NULL,
-        "routingNumberEnc" text NOT NULL,
-        "accountNumberEnc" text NOT NULL,
-        "bankNameEnc" text NOT NULL,
-        "accountLast4" varchar(4) NOT NULL,
-        "createdAt" datetime NOT NULL DEFAULT (datetime('now')),
-        "updatedAt" datetime NOT NULL DEFAULT (datetime('now')),
-        CONSTRAINT "FK_860594f8113e6a1c27b54ad0d6e"
-          FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE
-      )
-    `);
+    // Cross-DB safe table definition (works on sqlite + postgres)
+    await queryRunner.createTable(
+      new Table({
+        name: "owner_bank_info",
+        columns: [
+          {
+            name: "id",
+            type: "integer",
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: "increment",
+          },
+          { name: "userId", type: "integer", isNullable: false },
+
+          { name: "accountHolderNameEnc", type: "text", isNullable: false },
+          { name: "routingNumberEnc", type: "text", isNullable: false },
+          { name: "accountNumberEnc", type: "text", isNullable: false },
+          { name: "bankNameEnc", type: "text", isNullable: false },
+
+          // varchar works on both; sqlite ignores length enforcement but accepts it
+          { name: "accountLast4", type: "varchar", length: "4", isNullable: false },
+
+          // Use DB-specific defaults (sqlite vs postgres) without raw SQL blocks
+          {
+            name: "createdAt",
+            type: (queryRunner.connection.options as any).type === "sqlite" ? "datetime" : "timestamp",
+            isNullable: false,
+            default:
+              (queryRunner.connection.options as any).type === "sqlite"
+                ? "(datetime('now'))"
+                : "now()",
+          },
+          {
+            name: "updatedAt",
+            type: (queryRunner.connection.options as any).type === "sqlite" ? "datetime" : "timestamp",
+            isNullable: false,
+            default:
+              (queryRunner.connection.options as any).type === "sqlite"
+                ? "(datetime('now'))"
+                : "now()",
+          },
+        ],
+      }),
+      true,
+    );
+
+    await queryRunner.createForeignKey(
+      "owner_bank_info",
+      new TableForeignKey({
+        name: "FK_860594f8113e6a1c27b54ad0d6e",
+        columnNames: ["userId"],
+        referencedTableName: "users",
+        referencedColumnNames: ["id"],
+        onDelete: "CASCADE",
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE IF EXISTS "owner_bank_info"`);
+    const has = await queryRunner.hasTable("owner_bank_info");
+    if (!has) return;
+
+    // dropTable(true) drops FKs too (safe across DBs)
+    await queryRunner.dropTable("owner_bank_info", true);
   }
 }
