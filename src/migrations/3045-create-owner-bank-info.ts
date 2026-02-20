@@ -11,7 +11,7 @@ export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
     if (Array.isArray(rows) && rows.length > 0) return;
 
     // sqlite requires INTEGER PRIMARY KEY AUTOINCREMENT (not int)
-    await queryRunner.query(
+    await queryRunner.query(`
       CREATE TABLE "owner_bank_info" (
         "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
         "userId" integer NOT NULL,
@@ -25,10 +25,10 @@ export class CreateOwnerBankInfo1733380000000 implements MigrationInterface {
         CONSTRAINT "FK_860594f8113e6a1c27b54ad0d6e"
           FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE
       )
-    );
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(DROP TABLE IF EXISTS "owner_bank_info");
+    await queryRunner.query(`DROP TABLE IF EXISTS "owner_bank_info"`);
   }
 }
