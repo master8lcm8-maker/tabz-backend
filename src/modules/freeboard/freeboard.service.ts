@@ -102,9 +102,34 @@ status: 'ACTIVE' as FreeboardDropStatus,
       throw new BadRequestException('Claim code is required.');
     }
 
-    const drop = await this.dropsRepo.findOne({
-      where: { claimCode },
-    });
+    if (!Number.isFinite(claimerId) || claimerId <= 0) {
+      throw new BadRequestException('Valid claimer id is required.');
+    }
+
+    const now = new Date();
+
+    // Atomic claim: only one caller can flip ACTIVE -> CLAIMED
+    const result = await this.dropsRepo
+      .createQueryBuilder()
+      .update(FreeboardDrop)
+      .set({
+        status: 'CLAIMED' as FreeboardDropStatus,
+        claimedAt: now,
+        claimedByUserId: claimerId,
+      })
+      .where('claimCode = :claimCode', { claimCode })
+      .andWhere('status = :status', { status: 'ACTIVE' })
+      .andWhere('(expiresAt IS NULL OR expiresAt > :now)', { now })
+      .execute();
+
+    if (result.affected && result.affected > 0) {
+      // read back the claimed row
+      const claimed = await this.dropsRepo.findOne({ where: { claimCode } });
+      return claimed!;
+    }
+
+    // If atomic update didn't happen, figure out why (not found / not active / expired)
+    const drop = await this.dropsRepo.findOne({ where: { claimCode } });
 
     if (!drop) {
       throw new NotFoundException('Drop not found for that claim code.');
@@ -114,17 +139,13 @@ status: 'ACTIVE' as FreeboardDropStatus,
       throw new BadRequestException('Drop is not active.');
     }
 
-    if (drop.expiresAt && drop.expiresAt < new Date()) {
+    if (drop.expiresAt && drop.expiresAt < now) {
       drop.status = 'EXPIRED';
       await this.dropsRepo.save(drop);
       throw new BadRequestException('Drop has expired.');
     }
 
-    drop.status = 'CLAIMED';
-    drop.claimedAt = new Date();
-    drop.claimedByUserId = claimerId;
-
-    return this.dropsRepo.save(drop);
+    throw new BadRequestException('Unable to claim drop.');
   }
 
   async getDropsForVenue(venueId: number): Promise<FreeboardDrop[]> {
