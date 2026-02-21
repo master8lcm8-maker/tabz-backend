@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   BadRequestException,
   NotFoundException,
@@ -28,19 +28,22 @@ export class FreeboardService {
     let vId: number;
     let msg: string;
     let exp: number;
+    let rewardCents: number;
 
-    if (typeof creatorIdOrDto === 'object') {
+if (typeof creatorIdOrDto === 'object') {
       const dto: any = creatorIdOrDto as any;
       creatorId = Number(dto.creatorId ?? dto.dropperId);
       vId = Number(dto.venueId);
       msg = String((dto.message ?? dto.title ?? dto.description) ?? '');
       exp = (dto.expiresInMinutes === null || dto.expiresInMinutes === undefined) ? 60 : Number(dto.expiresInMinutes);
-    } else {
+      rewardCents = (dto.rewardCents === null || dto.rewardCents === undefined) ? 0 : Number(dto.rewardCents);
+} else {
       creatorId = Number(creatorIdOrDto);
       vId = Number(venueId);
       msg = String(message ?? '');
       exp = (expiresInMinutes === null || expiresInMinutes === undefined) ? 60 : Number(expiresInMinutes);
-    }
+      rewardCents = 0;
+}
 
     // rebind to the variable names the existing implementation below expects
     venueId = vId;
@@ -51,7 +54,10 @@ export class FreeboardService {
       throw new BadRequestException('Message is required for a drop.');
     }
 
-    const now = new Date();
+    if (rewardCents < 0) {
+      throw new BadRequestException('rewardCents must be >= 0');
+    }
+const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
 
     const drop = this.dropsRepo.create({
@@ -61,7 +67,8 @@ export class FreeboardService {
       // DB column is "title" (NOT NULL)
       title: message,
 
-      status: 'ACTIVE' as FreeboardDropStatus,
+      rewardCents: String(rewardCents),
+status: 'ACTIVE' as FreeboardDropStatus,
 
       // DB column is claimedByUserId
       claimedByUserId: null,
@@ -166,3 +173,4 @@ export class FreeboardService {
     return randomBytes(4).toString('hex').toUpperCase();
   }
 }
+
