@@ -1,0 +1,25 @@
+﻿=== TABZ PROOF: P3 FREEBOARD ATOMIC CLAIM ===
+When: 2026-02-21T06:25:39.4739733-05:00
+Env: local http://127.0.0.1:3000
+Buyer: buyer@tabz.app
+Goal: same claimCode cannot be claimed twice
+
+Health:
+{
+    "status":  "ok",
+    "service":  "tabz-backend",
+    "timestamp":  "2026-02-21T11:25:39.476Z"
+}
+
+Login:
+(token_len=192)
+
+CreateDrop:
+(see runtime output below)
+
+Runtime output (captured manually from PowerShell console):
+- claimCode=E7EE430E
+- CLAIM #1 => 200 with status=CLAIMED
+- CLAIM #2 => 400 {"message":"Drop is not active.","statusCode":400}
+- /freeboard/my shows id=4 status=CLAIMED
+=== END PROOF ===
