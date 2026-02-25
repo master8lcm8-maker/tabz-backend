@@ -1,9 +1,10 @@
-﻿import {
+import {
   Injectable,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WalletService } from '../../wallet/wallet.service';
 import { Repository, LessThan, MoreThan } from 'typeorm';
 import { FreeboardDrop, FreeboardDropStatus } from './freeboard-drop.entity';
 import { randomBytes } from 'crypto';
@@ -13,6 +14,7 @@ export class FreeboardService {
   constructor(
     @InjectRepository(FreeboardDrop)
     private readonly dropsRepo: Repository<FreeboardDrop>,
+    private readonly walletService: WalletService,
   ) {}
 
   // NOTE: Controller sends "message" but DB/entity requires NOT NULL "title".
@@ -125,6 +127,13 @@ status: 'ACTIVE' as FreeboardDropStatus,
     if (result.affected && result.affected > 0) {
       // read back the claimed row
       const claimed = await this.dropsRepo.findOne({ where: { claimCode } });
+
+      // freeboard_reward_deposit_patch
+      const reward = Number((claimed as any)?.rewardCents ?? 0);
+      if (Number.isFinite(reward) && reward > 0) {
+        await this.walletService.deposit(claimerId, reward);
+      }
+
       return claimed!;
     }
 
