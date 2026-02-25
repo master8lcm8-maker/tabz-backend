@@ -1,4 +1,4 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FreeboardDrop } from './freeboard-drop.entity';
@@ -8,8 +8,11 @@ import { FreeboardService } from './freeboard.service';
 import { FreeboardSchedulerService } from './freeboard.scheduler.service';
 import { FreeboardController } from './freeboard.controller';
 
+
+import { WalletModule } from '../../wallet/wallet.module';
 @Module({
   imports: [
+    WalletModule,
     TypeOrmModule.forFeature([FreeboardDrop, Venue]),
   ],
   providers: [
