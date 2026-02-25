@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { Venue } from '../venues/venue.entity';
 
+const DT_TYPE = (process.env.DATABASE_URL || process.env.DB_HOST) ? 'timestamptz' : 'datetime';
+
 export type FreeboardDropStatus = 'ACTIVE' | 'CLAIMED' | 'EXPIRED';
 
 @Entity('freeboard_drops')
@@ -51,16 +53,16 @@ export class FreeboardDrop {
   claimCode: string | null;
 
   // ⚠ FIXED FOR SQLITE — was timestamptz
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: DT_TYPE as any, nullable: true })
   expiresAt: Date | null;
 
   // ⚠ FIXED FOR SQLITE — was timestamptz
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: DT_TYPE as any, nullable: true })
   claimedAt: Date | null;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: DT_TYPE as any })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: DT_TYPE as any })
   updatedAt: Date;
 }

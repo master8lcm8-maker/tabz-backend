@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { Venue } from '../../venues/venue.entity';
 
+const DT_TYPE = (process.env.DATABASE_URL || process.env.DB_HOST) ? 'timestamptz' : 'datetime';
+
 export enum FoodOrderStatus {
   PENDING = 'PENDING',
   REDEEMED = 'REDEEMED',
@@ -89,14 +91,14 @@ export class FoodOrder {
    * When the food order was redeemed.
    * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: DT_TYPE as any, nullable: true })
   redeemedAt?: Date | null;
 
   /**
    * When the food order expires.
    * Use 'datetime' so it's supported by SQLite.
    */
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: DT_TYPE as any, nullable: true })
   expiresAt?: Date | null;
 
   /**
