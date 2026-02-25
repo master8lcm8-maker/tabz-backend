@@ -1,4 +1,4 @@
-﻿// src/app/app.module.ts
+// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import dataSource from '../data-source';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { WalletModule } from '../wallet/wallet.module';
@@ -16,16 +17,16 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// ✅ ADD
+// ? ADD
 import { VenuesModule } from '../modules/venues/venues.module';
 
-// ✅ ADD
+// ? ADD
 import { IdentityModule } from '../identity/identity.module';
 
-// ✅ ADD (HEALTH)
+// ? ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
 
-// ✅ P3: Engagement runtime
+// ? P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
 
 // P3: Freeboard
@@ -46,14 +47,15 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     // Global config
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-
-    // LOCAL DEV: SQLITE ONLY
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'tabz-dev.sqlite',
-      autoLoadEntities: true,
-      synchronize: true,
+    }),    // DB: use the same single source of truth as TypeORM CLI/runtime (src/data-source.ts)
+    // - If DATABASE_URL is set -> Postgres
+    // - else -> SQLite
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => ({
+        ...(dataSource.options as any),
+        autoLoadEntities: true,
+        synchronize: false,
+      }),
     }),
 
     // Core modules
@@ -63,7 +65,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     StoreItemsModule,
     ProfileModule,
 
-    // ✅ FV-17 — venues endpoints
+    // ? FV-17 � venues endpoints
     VenuesModule,
 
     // Identity
