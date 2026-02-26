@@ -1,4 +1,4 @@
-// src/modules/auth/auth.service.ts
+﻿// src/modules/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,6 +72,12 @@ export class AuthService {
 
     const ok = await this.checkUserPassword(password, user);
     if (!ok) throw new UnauthorizedException('Invalid credentials');
+
+    
+    // P5: block deleted users from login (avoid account enumeration)
+    if ((user as any).deletedAt) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     return this.stripSensitive(user);
   }
