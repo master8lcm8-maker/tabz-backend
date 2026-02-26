@@ -6,6 +6,8 @@
   UpdateDateColumn,
 } from 'typeorm';
 
+const DT_TYPE = (process.env.DATABASE_URL || process.env.DB_HOST) ? 'timestamptz' : 'datetime';
+
 
 export type UserRole = 'owner' | 'buyer';
 
@@ -35,6 +37,15 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ type: DT_TYPE as any, nullable: true })
+  deletedAt: Date | null;
+
+  @Column({ type: DT_TYPE as any, nullable: true })
+  anonymizedAt: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  deletionReason: string | null;
 }
 
 

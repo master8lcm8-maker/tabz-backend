@@ -1,12 +1,13 @@
 // src/app/app.module.ts
-import { Module } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { Module } from '@nestjs/common';
+import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import dataSource from '../data-source';
+import dataSource from '../data-source';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { WalletModule } from '../wallet/wallet.module';
@@ -28,7 +29,7 @@ import { HealthModule } from '../health/health.module';
 
 // ? P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
-
+
 // P3: Freeboard
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 
@@ -36,6 +37,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
   controllers: [AppController],
   imports: [
+    AccountDeletionModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }]),
     // P3: Engagement
@@ -65,7 +67,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     StoreItemsModule,
     ProfileModule,
 
-    // ? FV-17 — venues endpoints
+    // ? FV-17 ï¿½ venues endpoints
     VenuesModule,
 
     // Identity
