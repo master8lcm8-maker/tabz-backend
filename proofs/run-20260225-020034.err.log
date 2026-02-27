@@ -1,0 +1,109 @@
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:36 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (1)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:39 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (2)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:42 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (3)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:45 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (4)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:49 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (5)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:52 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (6)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:55 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (7)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:00:59 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (8)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:01:02 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (9)...[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)
+[31m[Nest] 18516  - [39m02/25/2026, 2:01:02 AM [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39m[31mData type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.[39m
+DataTypeNotSupportedError: Data type "datetime" in "FreeboardDrop.expiresAt" is not supported by "postgres" database.
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:89:27
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validate (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:86:18)
+    at D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:58
+    at Array.forEach (<anonymous>)
+    at EntityMetadataValidator.validateMany (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\metadata-builder\EntityMetadataValidator.js:38:25)
+    at DataSource.buildMetadatas (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:493:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:145:13)

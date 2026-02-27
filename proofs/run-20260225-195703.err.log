@@ -1,0 +1,8 @@
+[31m[Nest] 20664  - [39m02/25/2026, 7:57:31 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39m[31msyntax error at or near ","[39m
+QueryFailedError: syntax error at or near ","
+    at PostgresQueryRunner.query (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\driver\postgres\PostgresQueryRunner.js:216:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.query (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:353:20)
+    at async AccountDeletionService.requestDeletion (D:\TABZ\tabz-backend-full\tabz-backend\dist\modules\account-deletion\account-deletion.service.js:22:9)
+    at async D:\TABZ\tabz-backend-full\tabz-backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async D:\TABZ\tabz-backend-full\tabz-backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
