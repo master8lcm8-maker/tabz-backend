@@ -5,7 +5,8 @@ export class AddUserRole20260220005549 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // SQLite-only (kept for reference; breaks on Postgres):
-// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('users')");
+// SQLite-only (reference; do NOT execute on Postgres):
+// const cols = await queryRunner.query("PRAGMA table_info('users')");
     // const hasRole =
     //   Array.isArray(cols) &&
     //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
@@ -27,7 +28,8 @@ export class AddUserRole20260220005549 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // SQLite-only (kept for reference; breaks on Postgres):
-// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('users')");
+// SQLite-only (reference; do NOT execute on Postgres):
+// const cols = await queryRunner.query("PRAGMA table_info('users')");
     // const hasRole =
     //   Array.isArray(cols) &&
     //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
@@ -39,3 +41,4 @@ export class AddUserRole20260220005549 implements MigrationInterface {
     await queryRunner.dropColumn('users', 'role');
   }
 }
+

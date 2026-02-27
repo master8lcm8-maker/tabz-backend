@@ -5,7 +5,8 @@ export class AddDestinationLast4ToCashoutRequests1733290000000 implements Migrat
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // SQLite-only (kept for reference; breaks on Postgres):
-// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('cashout_requests')");
+// SQLite-only (reference; do NOT execute on Postgres):
+// const cols = await queryRunner.query("PRAGMA table_info('cashout_requests')");
     // const has =
     //   Array.isArray(cols) &&
     //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'destinationlast4');
@@ -28,7 +29,8 @@ export class AddDestinationLast4ToCashoutRequests1733290000000 implements Migrat
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // SQLite-only (kept for reference; breaks on Postgres):
-// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('cashout_requests')");
+// SQLite-only (reference; do NOT execute on Postgres):
+// const cols = await queryRunner.query("PRAGMA table_info('cashout_requests')");
     // const has =
     //   Array.isArray(cols) &&
     //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'destinationlast4');
@@ -41,3 +43,4 @@ export class AddDestinationLast4ToCashoutRequests1733290000000 implements Migrat
     await queryRunner.dropColumn('cashout_requests', 'destinationLast4');
   }
 }
+
