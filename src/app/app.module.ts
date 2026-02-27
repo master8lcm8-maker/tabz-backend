@@ -1,4 +1,4 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -29,6 +29,7 @@ import { HealthModule } from '../health/health.module';
 
 // ? P3: Engagement runtime
 import { EngagementModule } from '../modules/engagement/engagement.module';
+import { PasswordResetModule } from '../modules/password-reset/password-reset.module';
 
 // P3: Freeboard
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
@@ -42,6 +43,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }]),
     // P3: Engagement
     EngagementModule,
+    PasswordResetModule,
 
     // P3: Freeboard
     FreeboardModule,

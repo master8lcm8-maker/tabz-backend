@@ -4,10 +4,14 @@ export class AddUserRole20260220005549 implements MigrationInterface {
   name = 'AddUserRole20260220005549';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const cols: Array<{ name: string }> = await queryRunner.query("PRAGMA table_info('users')");
-    const hasRole =
-      Array.isArray(cols) &&
-      cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
+    // SQLite-only (kept for reference; breaks on Postgres):
+// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('users')");
+    // const hasRole =
+    //   Array.isArray(cols) &&
+    //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
+
+    // Cross-db check (works on Postgres + SQLite in TypeORM):
+    const hasRole = await queryRunner.hasColumn('users', 'role');
     if (hasRole) return;
 
     await queryRunner.addColumn(
@@ -22,10 +26,14 @@ export class AddUserRole20260220005549 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const cols: Array<{ name: string }> = await queryRunner.query("PRAGMA table_info('users')");
-    const hasRole =
-      Array.isArray(cols) &&
-      cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
+    // SQLite-only (kept for reference; breaks on Postgres):
+// const cols: (sqlite-only) = await`r`n// queryRunner.query("PRAGMA table_info('users')");
+    // const hasRole =
+    //   Array.isArray(cols) &&
+    //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'role');
+
+    // Cross-db check:
+    const hasRole = await queryRunner.hasColumn('users', 'role');
     if (!hasRole) return;
 
     await queryRunner.dropColumn('users', 'role');

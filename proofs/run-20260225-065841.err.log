@@ -1,0 +1,70 @@
+[31m[Nest] 22408  - [39m02/25/2026, 6:58:44 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (1)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:58:47 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (2)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:58:51 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (3)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:58:54 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (4)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:58:57 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (5)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:59:01 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (6)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:59:04 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (7)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:59:08 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (8)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:59:11 AM [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (9)...[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
+[31m[Nest] 22408  - [39m02/25/2026, 6:59:11 AM [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39m[31mALTER is not defined[39m
+ReferenceError: ALTER is not defined
+    at P5AccountDeletion20260225065637.up (D:\TABZ\tabz-backend-full\tabz-backend\dist\migrations\20260225065637-P5AccountDeletion.js:12:37)
+    at MigrationExecutor.executePendingMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\migration\MigrationExecutor.js:226:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DataSource.runMigrations (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:266:35)
+    at async DataSource.initialize (D:\TABZ\tabz-backend-full\tabz-backend\node_modules\typeorm\data-source\DataSource.js:152:17)
