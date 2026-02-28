@@ -1,0 +1,19 @@
+﻿DATE_UTC: 2026-02-28
+TAG: P5-ACCOUNT-DELETE-E2E-GREEN-20260227
+COMMIT: 3cfad938dacf8e2c02b7ae46611470a2b94c50eb
+
+REMOTE TAG RESOLUTION:
+3cfad938dacf8e2c02b7ae46611470a2b94c50eb	refs/tags/P5-ACCOUNT-DELETE-E2E-GREEN-20260227
+
+LOCAL RESOLUTION:
+origin/main = 3cfad938dacf8e2c02b7ae46611470a2b94c50eb
+tag        = 3cfad938dacf8e2c02b7ae46611470a2b94c50eb
+
+E2E OUTPUT (from _tmp_p5_account_deletion_e2e.js):
+- user picked id=5 email=staff@tabz.app deletedAt=null
+- token issued
+- after confirm: email becomes deleted+<id>+<suffix>@tabz.app, displayName null, isActive false, deletionReason=P5_PROOF_CONFIRM, deletedAt/anonymizedAt set
+- account_deletion_requests row status CONFIRMED, confirmedAt set
+
+FILES IN COMMIT:
+3cfad93 (HEAD -> main, tag: P5-ACCOUNT-DELETE-E2E-GREEN-20260227, origin/main, origin/HEAD) proof(p5): account deletion e2e + pii scrub green (DO Postgres) _tmp_list_deletion_reqs.js _tmp_p5_account_deletion_e2e.js _tmp_pgcrypto_check.js _tmp_user_pii_check.js _tmp_user_pii_full_check.js src/modules/account-deletion/account-deletion.controller.ts src/modules/account-deletion/account-deletion.dto.ts src/modules/account-deletion/account-deletion.service.ts
