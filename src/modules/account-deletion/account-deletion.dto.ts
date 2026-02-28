@@ -3,5 +3,7 @@
 }
 
 export class AccountDeletionConfirmDto {
-  token!: string;
+    reason?: string;
+token!: string;
 }
+
