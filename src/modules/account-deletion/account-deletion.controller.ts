@@ -18,6 +18,7 @@ export class AccountDeletionController {
   @Post('confirm')
   async confirm(@Req() req: any, @Body() body: AccountDeletionConfirmDto) {
     const userId = Number(req.user?.id ?? req.user?.userId);
-    return this.svc.confirmDeletion(userId, String(body?.token ?? ''));
+    return this.svc.confirmDeletion(userId, String(body?.token ?? ''), body?.reason);
   }
 }
+
