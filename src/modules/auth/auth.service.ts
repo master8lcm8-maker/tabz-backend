@@ -1,4 +1,4 @@
-﻿// src/modules/auth/auth.service.ts
+// src/modules/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,9 +9,8 @@ import { UsersService } from '../users/users.service';
 import { LoginDto } from './dtos/login.dto';
 import { Staff } from '../staff/staff.entity';
 
-
 import { Venue } from '../venues/venue.entity';
-// âœ… NEW: derive role from Profiles (not from "try buyer first")
+// ✅ derive role from Profiles (not from "try buyer first")
 import { ProfileService } from '../../profile/profile.service';
 
 // Roles we support in TABZ
@@ -21,7 +20,7 @@ interface JwtPayload {
   sub: number;
   email: string;
   role?: UserRole;
-  venueId?: number; // âœ… for staff
+  venueId?: number; // ✅ for staff
 }
 
 @Injectable()
@@ -30,16 +29,16 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
 
-    // âœ… profile role resolution
+    // ✅ profile role resolution
     private readonly profileService: ProfileService,
 
-    // âœ… staff auth must come from Staff table
+    // ✅ staff auth must come from Staff table
     @InjectRepository(Staff)
     private readonly staffRepo: Repository<Staff>,
-  
+
     @InjectRepository(Venue)
     private readonly venueRepo: Repository<Venue>,
-) {}
+  ) {}
 
   // -------------------------
   // Users (buyer/owner) auth
@@ -78,10 +77,18 @@ export class AuthService {
   }
 
   private async validateUser(email: string, password: string): Promise<any> {
-    
-    // M37: LocalStrategy expects validateLocal(email,password)
-    // Wrapper around existing validateUser (buyer/owner)
-const user = await this.usersService.findByEmail?.(email);
+    const user = await this.usersService.findByEmail?.(email);
+
+    // P5: hard-block deleted/anonymized/inactive users (must not be able to authenticate)
+    if (
+      user &&
+      ((user as any).deletedAt ||
+        (user as any).anonymizedAt ||
+        (user as any).isActive === false)
+    ) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const ok = await this.checkUserPassword(password, user);
@@ -90,8 +97,9 @@ const user = await this.usersService.findByEmail?.(email);
     return this.stripSensitive(user);
   }
 
-  // âœ… Deterministic: role derived from user's profiles
-    async validateLocal(email: string, password: string): Promise<any> {
+  // ✅ M37: LocalStrategy expects validateLocal(email,password)
+  // Wrapper around existing validateUser (buyer/owner)
+  async validateLocal(email: string, password: string): Promise<any> {
     return this.validateUser(email, password);
   }
 
@@ -121,7 +129,7 @@ const user = await this.usersService.findByEmail?.(email);
       throw new UnauthorizedException('Staff user missing venueId');
     }
 
-    // âœ… CRITICAL FIX:
+    // ✅ CRITICAL FIX:
     // Staff tokens must use the USERS table id as JWT "sub"
     const user = await this.usersService.findByEmail?.(email);
     if (!user?.id) {
@@ -129,7 +137,7 @@ const user = await this.usersService.findByEmail?.(email);
     }
 
     return {
-      id: user.id, // âœ… MUST be Users.id (NOT staff.id)
+      id: user.id, // ✅ MUST be Users.id (NOT staff.id)
       email: staff.email,
       role: 'staff' as const,
       venueId: staff.venueId,
@@ -164,12 +172,13 @@ const user = await this.usersService.findByEmail?.(email);
 
   // ----------- PUBLIC API ------------
 
-  // âœ… FIXED: login() no longer guesses buyer/owner by trying buyer first.
+  // ✅ FIXED: login() no longer guesses buyer/owner by trying buyer first.
   // It validates credentials, then derives role from Profiles.
   async login(dto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.validateUser(dto.email, dto.password);
     const role = await this.resolveUserRoleFromProfiles(Number(user.id));
-        if (role === 'owner') {
+
+    if (role === 'owner') {
       const venue = await this.venueRepo.findOne({
         where: { ownerId: Number(user.id) },
         order: { createdAt: 'DESC' },
@@ -177,7 +186,8 @@ const user = await this.usersService.findByEmail?.(email);
       return this.signTokenFromUser(user, role, { venueId: venue?.id });
     }
 
-    return this.signTokenFromUser(user, role);}
+    return this.signTokenFromUser(user, role);
+  }
 
   // Keep these explicit endpoints as-is (deterministic by endpoint)
   async loginBuyer(dto: LoginDto): Promise<{ access_token: string }> {
@@ -187,19 +197,18 @@ const user = await this.usersService.findByEmail?.(email);
 
   async loginOwner(dto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.validateUser(dto.email, dto.password);
-        const venue = await this.venueRepo.findOne({
+
+    const venue = await this.venueRepo.findOne({
       where: { ownerId: Number(user.id) },
       order: { createdAt: 'DESC' },
     });
 
-    return this.signTokenFromUser(user, 'owner', { venueId: venue?.id });}
+    return this.signTokenFromUser(user, 'owner', { venueId: venue?.id });
+  }
 
-  // âœ… staff login uses Staff table, but JWT sub = Users.id
+  // ✅ staff login uses Staff table, but JWT sub = Users.id
   async loginStaff(dto: LoginDto): Promise<{ access_token: string }> {
     const staff = await this.validateStaff(dto.email, dto.password);
     return this.signTokenFromUser(staff, 'staff', { venueId: staff.venueId });
   }
 }
-
-
-
