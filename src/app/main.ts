@@ -25,10 +25,13 @@ async function bootstrap() {
     // --- LOCAL DEV ---
     'http://localhost:19006',        // Expo web default
     'http://localhost:8081',         // sometimes used by RN tooling
+    'http://localhost:8082',         // Expo web alt port (when 8081 is busy)
     'http://127.0.0.1:19006',
     'http://127.0.0.1:8081',
+    'http://127.0.0.1:8082',
     'http://10.0.0.239:19006',       // your LAN host if you open web from another device
-    'http://10.0.0.239:8081'
+    'http://10.0.0.239:8081',
+    'http://10.0.0.239:8082',
   ]);
 
   const allowedHeaders = [
