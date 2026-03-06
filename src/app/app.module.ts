@@ -1,6 +1,7 @@
 ﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
+import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
@@ -19,6 +20,7 @@ import { VenuesModule } from '../modules/venues/venues.module';
 import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
+
 @Module({
   providers: [AppService],
   controllers: [AppController],
@@ -26,69 +28,78 @@ import { DrinksModule } from '../modules/drinks/drinks.module';
     ConfigModule.forRoot({ isGlobal: true }),
 
     TypeOrmModule.forRoot((() => {
-      const env = String(process.env.NODE_ENV || '').toLowerCase();
-      const isProd = env === 'production';
+      // 🔒 OATH1-H: backend runtime must be Postgres-only.
+      // Allowed config sources:
+      //   1) DATABASE_URL / TYPEORM_URL
+      //   2) DB_HOST + DB_PORT + DB_USERNAME + DB_PASSWORD + DB_NAME
+      const rawUrl = String(process.env.DATABASE_URL || process.env.TYPEORM_URL || '').trim();
+      const hasPgUrl = rawUrl.length > 0;
+      const hasPgHost = String(process.env.DB_HOST || '').trim().length > 0;
 
-      if (isProd) {
-        // 1) Prefer DATABASE_URL if provided
-        let url = process.env.DATABASE_URL;
-
-        // 2) If missing, build it from DB_* parts
-        if (!url) {
-          const u = process.env.DB_USERNAME;
-          const p = process.env.DB_PASSWORD;
-          const h = process.env.DB_HOST;
-          const port = process.env.DB_PORT;
-          const db = process.env.DB_NAME;
-
-          const sslRaw = String(process.env.DB_SSL || 'true').toLowerCase();
-          const sslMode =
-            (sslRaw === 'true' || sslRaw === '1' || sslRaw === 'require')
-              ? '?sslmode=require'
-              : '';
-
-          if (u && p && h && port && db) {
-            url =
-              `postgresql://${encodeURIComponent(u)}:${encodeURIComponent(p)}` +
-              `@${h}:${port}/${db}${sslMode}`;
-            process.env.DATABASE_URL = url; // keep for anything else that reads it
-          } else {
-            throw new Error(
-              'DATABASE_URL or DB_HOST/DB_PORT/DB_USERNAME/DB_PASSWORD/DB_NAME is required in production',
-            );
-          }
-        }
-
-        // Optional debug (NO passwords)
-        if (process.env.DEBUG_DB === '1') {
-          try {
-            const safe = new URL(url);
-            console.log('[DEBUG_DB] using postgres', {
-              host: safe.hostname,
-              port: safe.port,
-              db: safe.pathname?.replace('/', ''),
-              sslmode: safe.searchParams.get('sslmode'),
-            });
-          } catch {
-            console.log('[DEBUG_DB] using postgres (unable to parse url)');
-          }
-        }
-
-        return {
-          type: 'postgres',
-          url,
-          autoLoadEntities: true,
-          synchronize: false,
-          ssl: { rejectUnauthorized: false },
-        } as any;
+      if (!hasPgUrl && !hasPgHost) {
+        throw new Error(
+          'TABZ boot blocked: Postgres config required (DATABASE_URL/TYPEORM_URL or DB_HOST). SQLite is forbidden.',
+        );
       }
 
-      // DEV default: sqlite
+      let url = rawUrl;
+
+      if (!url) {
+        const u = String(process.env.DB_USERNAME || '').trim();
+        const p = String(process.env.DB_PASSWORD || '').trim();
+        const h = String(process.env.DB_HOST || '').trim();
+        const port = String(process.env.DB_PORT || '').trim();
+        const db = String(process.env.DB_NAME || '').trim();
+
+        const sslRaw = String(process.env.DB_SSL || 'true').toLowerCase();
+        const sslMode =
+          sslRaw === 'true' || sslRaw === '1' || sslRaw === 'require'
+            ? '?sslmode=require'
+            : '';
+
+        if (!u || !p || !h || !port || !db) {
+          throw new Error(
+            'TABZ boot blocked: incomplete Postgres DB_* config. Required: DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME.',
+          );
+        }
+
+        url =
+          `postgresql://${encodeURIComponent(u)}:${encodeURIComponent(p)}` +
+          `@${h}:${port}/${db}${sslMode}`;
+
+        process.env.DATABASE_URL = url;
+      }
+
+      const normalizedUrl = url.toLowerCase();
+      if (
+        normalizedUrl.startsWith('sqlite:') ||
+        normalizedUrl.startsWith('file:') ||
+        normalizedUrl.includes('sqlite')
+      ) {
+        throw new Error('TABZ boot blocked: SQLite connection strings are forbidden by OATH1-H.');
+      }
+
+      // Optional debug (NO passwords)
+      if (process.env.DEBUG_DB === '1') {
+        try {
+          const safe = new URL(url);
+          console.log('[DEBUG_DB] using postgres', {
+            host: safe.hostname,
+            port: safe.port,
+            db: safe.pathname?.replace('/', ''),
+            sslmode: safe.searchParams.get('sslmode'),
+          });
+        } catch {
+          console.log('[DEBUG_DB] using postgres (unable to parse url)');
+        }
+      }
+
       return {
-        type: 'sqlite',
-        database: process.env.SQLITE_PATH || 'tabz-dev.sqlite',
+        type: 'postgres',
+        url,
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
+        ssl: { rejectUnauthorized: false },
       } as any;
     })()),
 
@@ -103,7 +114,7 @@ import { DrinksModule } from '../modules/drinks/drinks.module';
     HealthModule,
     DrinksModule,
     DevSeedModule,
+    AccountDeletionModule,
   ],
 })
 export class AppModule {}
-
