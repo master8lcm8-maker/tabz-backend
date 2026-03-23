@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OwnerOrdersService } from './owner-orders.service';
-import { OwnerOrdersController } from './owner-orders.controller';
-import { StoreItemOrder } from '../store-items/entities/store-item-order.entity';
-import { Wallet } from '../wallet/entities/wallet.entity';
-import { Venue } from '../venues/entities/venue.entity';
-import { User } from '../users/entities/user.entity';
+import { OwnerOrdersService } from '../owner-orders/owner-orders.service';
+import { OwnerOrdersController } from '../owner-orders/owner-orders.controller';
+import { StoreItemOrder } from '../store-items/store-item-order.entity';
+import { Wallet } from '../../wallet/wallet.entity';
+import { Venue } from '../venues/venue.entity';
+import { User } from '../users/user.entity';
 
 @Module({
   imports: [

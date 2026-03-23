@@ -77,12 +77,12 @@ export class ProfileController {
   }
 
   // ✅ GET /profiles/me (auth read)
-  // M27.1 requirement: buyer/owner only (staff forbidden)
+  // Allow buyer/owner/staff to read their own profile (write endpoints remain buyer/owner only).
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@Req() req: any) {
     const role = String(req?.user?.role || '').toLowerCase();
-    if (role !== 'buyer' && role !== 'owner') {
+    if (role !== 'buyer' && role !== 'owner' && role !== 'staff') {
       throw new ForbiddenException('forbidden');
     }
 
@@ -128,7 +128,8 @@ export class ProfileController {
     const safe: PatchMeBody = {};
 
     if (body && typeof body === 'object') {
-      if (typeof body.displayName === 'string') safe.displayName = body.displayName;
+      if (typeof body.displayName === 'string')
+        safe.displayName = body.displayName;
       if (body.bio === null || typeof body.bio === 'string') safe.bio = body.bio;
     }
 

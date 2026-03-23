@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+
 import { Staff } from '../staff/staff.entity';
 
 @Entity('venues')
@@ -13,14 +14,12 @@ export class Venue {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // 🔑 very important: this must exist so TypeORM sends ownerId to the DB
   @Column({ type: 'int' })
   ownerId: number;
 
   @Column({ type: 'int', nullable: true })
   ownerProfileId: number | null;
 
-  // ✅ FV-17.1.A — venue slug
   @Column({ type: 'varchar', length: 120, nullable: true })
   slug: string | null;
 
@@ -39,17 +38,32 @@ export class Venue {
   @Column({ type: 'varchar', length: 100, nullable: true })
   country: string | null;
 
-  // ✅ FV-25 — Optional venue avatar
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatarUrl: string | null;
 
-  // ✅ FV-25 — Optional venue cover/banner
   @Column({ type: 'varchar', length: 255, nullable: true })
   coverUrl: string | null;
 
-  // ✅ REQUIRED inverse side for Staff → Venue
-  @OneToMany(() => Staff, (staff) => staff.venue)
-  staff: Staff[];
+  @Column({ type: 'boolean', default: true })
+  acceptingDrinks: boolean;
+
+  @Column({ type: 'boolean', default: true })
+  acceptingRequests: boolean;
+
+  @Column({ type: 'boolean', default: true })
+  acceptingFreeboard: boolean;
+
+  @Column({ type: 'boolean', default: true })
+  acceptingRedemptions: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isPrivate: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isPaused: boolean;
+
+  @OneToMany(() => Staff, (s) => s.venue)
+  staffMembers: Staff[];
 
   @CreateDateColumn()
   createdAt: Date;

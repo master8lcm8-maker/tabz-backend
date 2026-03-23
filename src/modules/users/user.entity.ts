@@ -6,11 +6,6 @@
   UpdateDateColumn,
 } from 'typeorm';
 
-const DT_TYPE = (process.env.DATABASE_URL || process.env.DB_HOST) ? 'timestamptz' : 'datetime';
-
-
-export type UserRole = 'owner' | 'buyer';
-
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -20,32 +15,42 @@ export class User {
   email: string;
 
   // Store hashed password, NEVER plain text
-  @Column()
+  @Column({ nullable: true })
   passwordHash: string;
 
   @Column({ nullable: true })
   displayName?: string;
 
-  
-  @Column({ type: 'varchar', default: 'buyer' })
-  role: UserRole;
-@Column({ default: true })
+  @Column({ default: true })
   isActive: boolean;
+
+  // Email verification status (P5 security)
+  @Column({ default: false })
+  emailVerified: boolean;
+
+  // --- P5 / Prod schema alignment ---
+  // NOTE: prod uses bigint ids; we keep TS number for practicality.
+  @Column({ type: 'varchar', length: 20, default: 'buyer' })
+  role: string;
+
+  @Column({ type: 'bigint', nullable: true })
+  venueId?: number | null;
+
+  @Column({ type: 'bigint', nullable: true })
+  profileId?: number | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  deletedAt?: Date | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  anonymizedAt?: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  deletionReason?: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Column({ type: DT_TYPE as any, nullable: true })
-  deletedAt: Date | null;
-
-  @Column({ type: DT_TYPE as any, nullable: true })
-  anonymizedAt: Date | null;
-
-  @Column({ type: 'text', nullable: true })
-  deletionReason: string | null;
 }
-
-

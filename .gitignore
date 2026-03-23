@@ -1,78 +1,16 @@
-﻿node_modules/
-dist/
 .env
-
-.env.local
-
-# Local dev artifacts
-dev.sqlite
-
-
-# Local dev artifacts (DO NOT COMMIT)
-dev.sqlite
-
-
-# Local convenience scripts
-scripts/start-backend-dev.ps1
-
-# local dev DBs / artifacts (never commit)
-tabz-dev.sqlite
-tabz.sqlite
-dev.sqlite
-*.localblock
-*.bak_*
-server.log
-fail_body.json
-failed-cashouts.js
-cashouts-by-status.js
-debug-cancel-ledger.js
-inspect-db.js
-ledger-*.js
-tmp-*.js
-wallet-row.js
-_quarantine/
-# --- TABZ local audit/proof artifacts (do not commit) ---
-TABZ-DEPLOY-AUDIT-*.txt
-TABZ-*-PROD-PROOF-*.log
-truth-run-*.log
-do-runlogs-*.log
-_tsconfig_build_resolved.json
-
-# local payloads / scratch
-*.json
-
-# local notes / secrets (NEVER COMMIT)
-_prod_db_url.txt
-
-# local infra scratch
-_do_spec.yaml
-
-# Local quarantine (do not commit)
+.env.*
+*.bak
+*.tmp
+DOCKS LEDGER PROOF/
+proofs/
 quarantine/
-
-
-# --- TABZ local artifacts (do not commit) ---
-proofs/PROOF-*.log
-proofs/PROOF-*.txt
-
-# editor/patch backups created by scripts
-**/*.BAK.*
-**/*.BACKUP.*
-**/*.bak
-**/*.tmp
-### TABZ PROOFS (track selected)
-!proofs/PROOF-P5-VENUES-OWNER-ONLY-*.log
-
-
-# Local proof/run logs
-proofs/RUN-DIST-*.out.log
-proofs/RUN-DIST-*.err.log
-
-# Local backups
-*.bak-*
-
-!proofs/PROOF-P3-FREEBOARD-CLAIM-*.txt
-
-
-!proofs/PROOF-P3-FREEBOARD-EXPIRY-SCHED-*.log
-
+payload*.json
+_tmp_*
+find_*.sql
+inspect_*.sql
+list_*.sql
+verify_*.sql
+test_*.sql
+proof_*.sql
+app-spec.tmp.json

@@ -7,3 +7,7 @@ export * from './venue-wallet-transaction.entity';
 export * from './wallet.module';
 export * from './wallet.service';
 export * from './wallet.controller';
+
+export * from './payout-source.entity';
+export * from './payout-allocation.service';
+

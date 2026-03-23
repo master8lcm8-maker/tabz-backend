@@ -1,29 +1,27 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module, forwardRef } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { FreeboardItem } from "./entities/freeboard-item.entity";
+import { FreeboardClaim } from "./entities/freeboard-claim.entity";
+import { FreeboardService } from "./freeboard.service";
+import { FreeboardController } from "./freeboard.controller";
+import { CatalogModule } from "../catalog/catalog.module";
+import { VenuesModule } from "../venues/venues.module";
+import { NotificationsModule } from "../notifications/notifications.module";
+import { RedemptionsModule } from "../redemptions/redemptions.module";
+import { VenuePresenceModule } from "../venue-presence/venue-presence.module";
+import { Redemption } from "../redemptions/entities/redemption.entity";
 
-import { FreeboardDrop } from './freeboard-drop.entity';
-import { Venue } from '../venues/venue.entity';
-
-import { FreeboardService } from './freeboard.service';
-import { FreeboardSchedulerService } from './freeboard.scheduler.service';
-import { FreeboardController } from './freeboard.controller';
-
-
-import { WalletModule } from '../../wallet/wallet.module';
 @Module({
   imports: [
-    WalletModule,
-    TypeOrmModule.forFeature([FreeboardDrop, Venue]),
+    TypeOrmModule.forFeature([FreeboardItem, FreeboardClaim, Redemption]),
+    CatalogModule,
+    VenuePresenceModule,
+    forwardRef(() => VenuesModule),
+    NotificationsModule,
+    RedemptionsModule,
   ],
-  providers: [
-    FreeboardService,
-    FreeboardSchedulerService,
-  ],
-  controllers: [
-    FreeboardController,
-  ],
-  exports: [
-    FreeboardService,
-  ],
+  controllers: [FreeboardController],
+  providers: [FreeboardService],
+  exports: [FreeboardService],
 })
 export class FreeboardModule {}

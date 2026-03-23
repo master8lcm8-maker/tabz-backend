@@ -6,76 +6,88 @@ import {
   Post,
   Req,
   UseGuards,
-} from '@nestjs/common';
-import { Request } from 'express';
-import { FreeboardService } from './freeboard.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+} from "@nestjs/common";
+import { FreeboardService } from "./freeboard.service";
+import { CreateDropDto } from "./dto/create-drop.dto";
+import { ClaimDropDto } from "./dto/claim-drop.dto";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
-function getUserIdFromRequest(req: Request): number {
-  const user: any = (req as any).user || {};
-  const rawId = user.sub ?? user.id ?? user.userId;
-  const idNum = Number(rawId);
-  if (!idNum || Number.isNaN(idNum)) {
-    throw new Error('Invalid user id in JWT');
-  }
-  return idNum;
-}
-
-class CreateFreeboardDropDto {
-  venueId: number;
-  title: string;
-  description?: string;
-  rewardCents?: number;
-  expiresInMinutes?: number;
-}
-
-@Controller('freeboard')
+@Controller("freeboard")
 export class FreeboardController {
-  constructor(private readonly freeboardService: FreeboardService) {}
+  constructor(
+    private readonly freeboardService: FreeboardService,
+  ) {}
 
-  // Create a new FreeBoard drop at a venue
+  @Post("drop")
   @UseGuards(JwtAuthGuard)
-  @Post('drops')
-  async createDrop(@Req() req: Request, @Body() body: CreateFreeboardDropDto) {
-    const creatorId = getUserIdFromRequest(req);
-
-    const { venueId, title, description, rewardCents, expiresInMinutes } =
-      body;
+  async createDrop(
+    @Req() req: any,
+    @Body() body: CreateDropDto,
+  ) {
+    const creatorId = Number(
+      req.user?.sub ?? req.user?.id ?? req.user?.userId,
+    );
 
     return this.freeboardService.createDrop({
+      venueId: body.venueId,
+      catalogItemId: body.catalogItemId,
       creatorId,
-      venueId,
-      title,
-      description,
-      rewardCents,
-      expiresInMinutes,
+      quantity: body.quantity,
+      maxClaimsPerUser: body.maxClaimsPerUser,
+      expiresAt: new Date(body.expiresAt),
+      displayMode: body.displayMode,
     });
   }
 
-  // Claim a drop by code
+  @Post("claim")
   @UseGuards(JwtAuthGuard)
-  @Post('claim')
-  async claim(@Req() req: Request, @Body('code') code: string) {
-    const userId = getUserIdFromRequest(req);
+  async claimDrop(
+    @Req() req: any,
+    @Body() body: ClaimDropDto,
+  ) {
+    const userId = Number(
+      req.user?.sub ?? req.user?.id ?? req.user?.userId,
+    );
 
     return this.freeboardService.claimDrop({
+      dropId: body.dropId,
       userId,
-      code,
     });
   }
 
-  // List ACTIVE drops for a venue (public)
-  @Get('venue/:venueId')
-  async getVenueDrops(@Param('venueId') venueIdParam: string) {
-    const venueId = Number(venueIdParam);
-    return this.freeboardService.getDropsForVenue(venueId);
+  @Get("venue/:venueId")
+  @UseGuards(JwtAuthGuard)
+  async getDropsForVenue(
+    @Param("venueId") venueId: number,
+    @Req() req: any,
+  ) {
+    const viewerUserId = Number(
+      req.user?.sub ?? req.user?.id ?? req.user?.userId,
+    );
+    const viewerVenueId = req.user?.venueId != null ? Number(req.user?.venueId) : null;
+    const role = String(req.user?.role ?? "").toLowerCase();
+
+    return this.freeboardService.getDropsForVenue(
+      Number(venueId),
+      viewerUserId,
+      viewerVenueId,
+      role,
+    );
   }
 
-  // (Optional) List drops I created – useful later
+  @Get("creator/:creatorId")
   @UseGuards(JwtAuthGuard)
-  @Get('my')
-  async getMyDrops(@Req() req: Request) {
-    const creatorId = getUserIdFromRequest(req);
-    return this.freeboardService.getDropsForCreator(creatorId);
+  async getDropsForCreator(
+    @Param("creatorId") creatorId: number,
+    @Req() req: any,
+  ) {
+    const viewerUserId = Number(
+      req.user?.sub ?? req.user?.id ?? req.user?.userId,
+    );
+
+    return this.freeboardService.getDropsForCreator(
+      Number(creatorId),
+      viewerUserId,
+    );
   }
 }

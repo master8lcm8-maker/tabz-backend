@@ -1,0 +1,112 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import Stripe from 'stripe';
+import { StripeWebhookEvent } from './entities/stripe-webhook-event.entity';
+import { WalletService } from '../../wallet/wallet.service';
+
+@Injectable()
+export class PaymentsService {
+  private stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2026-02-25.clover',
+  });
+
+  constructor(
+    @InjectRepository(StripeWebhookEvent)
+    private readonly eventsRepo: Repository<StripeWebhookEvent>,
+    private readonly walletService: WalletService,
+  ) {}
+
+  async processWebhook(payload: Buffer | string, signature: string) {
+    let event: Stripe.Event;
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET!,
+      );
+    } catch {
+      throw new BadRequestException('Invalid Stripe signature');
+    }
+
+    const eventId = event.id;
+
+    try {
+      await this.eventsRepo.insert({
+        eventId,
+        type: event.type,
+        payload: JSON.parse(JSON.stringify(event)),
+      });
+    } catch {
+      return;
+    }
+
+    await this.handleEvent(event);
+
+    await this.eventsRepo.update(
+      { eventId },
+      { processedAt: new Date() },
+    );
+  }
+
+  async handleEvent(event: Stripe.Event) {
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        await this.handlePaymentSuccess(event);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  async handlePaymentSuccess(event: Stripe.Event) {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+    const userId = Number(paymentIntent.metadata.userId);
+    const amount = paymentIntent.amount;
+
+    if (!userId) return;
+
+    await this.walletService.deposit(userId, amount);
+  }
+  async createPaymentIntent(input: {
+    userId: number;
+    amountCents: number;
+    currency?: string;
+  }) {
+    const userId = Number(input?.userId);
+    const amountCents = Number(input?.amountCents);
+    const currency = String(input?.currency || 'usd').toLowerCase();
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw new BadRequestException('userId must be a positive integer');
+    }
+
+    if (!Number.isInteger(amountCents) || amountCents <= 0) {
+      throw new BadRequestException('amountCents must be a positive integer');
+    }
+
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount: amountCents,
+      currency,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
+      },
+      metadata: {
+        userId: String(userId),
+      },
+    });
+
+    return {
+      id: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      metadata: paymentIntent.metadata,
+      status: paymentIntent.status,
+    };
+  }
+}

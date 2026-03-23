@@ -11,6 +11,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
+type OwnerJwtRequest = Request & {
+  user?: JwtUserPayload;
+};
+
 import { OwnerInfoService } from './owner-info.service';
 import { UpdateOwnerProfileDto } from './dto/update-owner-profile.dto';
 import { UpdateOwnerBankDto } from './dto/update-owner-bank.dto';
@@ -26,7 +30,7 @@ type JwtUserPayload = {
 export class OwnerInfoController {
   constructor(private readonly ownerInfoService: OwnerInfoService) {}
 
-  private getUserFromRequest(req: Request): { userId: number; email: string } {
+  private getUserFromRequest(req: OwnerJwtRequest): { userId: number; email: string } {
     const user = (req.user || {}) as JwtUserPayload;
 
     const userId = user.userId ?? user.sub;
@@ -42,14 +46,14 @@ export class OwnerInfoController {
   // -------- PROFILE --------
 
   @Get('profile')
-  async getProfile(@Req() req: Request) {
+  async getProfile(@Req() req: OwnerJwtRequest) {
     const { userId, email } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerProfile(userId, email);
   }
 
   @Post('profile/update')
   async updateProfile(
-    @Req() req: Request,
+    @Req() req: OwnerJwtRequest,
     @Body() dto: UpdateOwnerProfileDto,
   ) {
     const { userId, email } = this.getUserFromRequest(req);
@@ -59,28 +63,56 @@ export class OwnerInfoController {
   // -------- BANK INFO --------
 
   @Get('bank')
-  async getBank(@Req() req: Request) {
+  async getBank(@Req() req: OwnerJwtRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerBank(userId);
   }
 
   @Post('bank/update')
-  async updateBank(@Req() req: Request, @Body() dto: UpdateOwnerBankDto) {
+  async updateBank(@Req() req: OwnerJwtRequest, @Body() dto: UpdateOwnerBankDto) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.updateOwnerBank(userId, dto);
   }
 
+  // -------- STRIPE --------
+
+  @Post('stripe/account')
+  async createOrGetStripeAccount(@Req() req: OwnerJwtRequest) {
+    const { userId } = this.getUserFromRequest(req);
+    return this.ownerInfoService.createOrGetStripeAccount(userId);
+  }
+
+
+  
+
+  
+
+  @Post('stripe/onboarding')
+  async createStripeOnboardingLink(@Req() req: OwnerJwtRequest) {
+    const { userId } = this.getUserFromRequest(req);
+    return this.ownerInfoService.createStripeOnboardingLink(userId);
+  }
+
+  @Get('stripe/status')
+  async getStripeStatus(@Req() req: OwnerJwtRequest) {
+    const { userId } = this.getUserFromRequest(req);
+    return this.ownerInfoService.refreshStripeAccountStatus(userId);
+  }
   // -------- IDENTITY VERIFICATION --------
 
   @Get('verification')
-  async getVerification(@Req() req: Request) {
+  async getVerification(@Req() req: OwnerJwtRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerVerification(userId);
   }
 
   @Post('verification/start')
-  async startVerification(@Req() req: Request) {
+  async startVerification(@Req() req: OwnerJwtRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.startOwnerVerification(userId);
   }
 }
+
+
+
+

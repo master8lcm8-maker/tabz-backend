@@ -1,0 +1,28 @@
+﻿import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+} from '@nestjs/common';
+
+@Catch(HttpException)
+export class HttpStatusBodySyncFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const res: any = ctx.getResponse();
+
+    const httpStatus = exception.getStatus();
+    const payload = exception.getResponse();
+
+    // If the payload is an object and contains a numeric "status",
+    // we sync transport status to match it.
+    let synced = httpStatus;
+    if (payload && typeof payload === 'object') {
+      const p: any = payload as any;
+      const s = Number(p.status);
+      if (Number.isFinite(s) && s > 0) synced = s;
+    }
+
+    res.status(synced).json(payload);
+  }
+}

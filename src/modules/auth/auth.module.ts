@@ -1,5 +1,4 @@
-﻿// src/modules/auth/auth.module.ts
-import { Module, forwardRef } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,27 +8,30 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { EmailVerificationToken } from './entities/email-verification-token.entity';
 
 import { UsersModule } from '../users/users.module';
 import { Staff } from '../staff/staff.entity';
+import { Venue } from '../venues/venue.entity';
 
-// âœ… allows /auth/me to resolve profile context
 import { ProfileModule } from '../../profile/profile.module';
-import { VenuesModule } from '../venues/venues.module';
 
 @Module({
   imports: [
-    // âœ… ensure ConfigService is available
     ConfigModule,
 
     UsersModule,
-    forwardRef(() => VenuesModule),
-    TypeOrmModule.forFeature([Staff]),
+    TypeOrmModule.forFeature([
+      Staff,
+      Venue,
+      PasswordResetToken,
+      EmailVerificationToken,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
-    // âœ… SINGLE SOURCE OF TRUTH: same secret used by JwtStrategy
     JwtModule.registerAsync({
-      imports: [ConfigModule, VenuesModule],
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const secret =
@@ -47,13 +49,7 @@ import { VenuesModule } from '../venues/venues.module';
     ProfileModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy, // registers passport "jwt"
-    JwtAuthGuard,
-  ],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard],
   exports: [AuthService],
 })
 export class AuthModule {}
-
-

@@ -12,6 +12,16 @@ import { StaffAuthGuard } from './staff-auth.guard';
 import { StaffAuthService } from './staff-auth.service';
 import { Request } from 'express';
 
+type StaffJwtRequest = Request & {
+  user?: {
+    id?: number;
+    name?: string;
+    email?: string;
+    venueId?: number;
+  };
+};
+
+
 class StaffLoginDto {
   email: string;
   password: string;
@@ -27,19 +37,19 @@ export class StaffController {
   // STAFF LOGIN
   @Post('login')
   async login(@Body() dto: StaffLoginDto) {
-    const staff = await this.staffService.validLogin(dto.email, dto.password);
+    const staff = await this.staffService.validateCredentials(dto.email, dto.password);
 
     if (!staff) {
       throw new UnauthorizedException('Invalid staff email or password');
     }
 
-    return this.staffAuthService.issueToken(staff);
+    return this.staffAuthService.login(dto.email, dto.password);
   }
 
   // GET STAFF PROFILE (JWT PROTECTED)
   @UseGuards(StaffAuthGuard)
   @Get('me')
-  async me(@Req() req: Request) {
+  async me(@Req() req: StaffJwtRequest) {
     const staff = req.user as any;
 
     return {

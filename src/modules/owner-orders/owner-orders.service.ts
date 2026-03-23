@@ -1,3 +1,15 @@
+
+export type OwnerOrderDto = {
+  id: number;
+  buyerId: number;
+  buyerName: string | null;
+  itemName: string;
+  quantity: number;
+  amountCents: string;
+  status: string;
+  venueId: number;
+  createdAt: Date | string;
+};
 // src/modules/owner-orders/owner-orders.service.ts
 import {
   BadRequestException,
@@ -12,7 +24,7 @@ import { WebsocketGateway } from '../websocket/websocket.gateway';
 export class OwnerOrdersService {
   constructor(
     private readonly dataSource: DataSource,
-    private readonly websocketGateway: WebsocketGateway, // 👈 REAL-TIME SOCKET
+    private readonly websocketGateway: WebsocketGateway, // ðŸ‘ˆ REAL-TIME SOCKET
   ) {}
 
   private venuesRepo() {
@@ -163,7 +175,7 @@ export class OwnerOrdersService {
     };
 
     // --------------------------------------------
-    // 🔥 REAL-TIME EMIT — ORDER UPDATED
+    // ðŸ”¥ REAL-TIME EMIT â€” ORDER UPDATED
     // --------------------------------------------
     this.websocketGateway.emitOrderUpdated({
       ...dto,

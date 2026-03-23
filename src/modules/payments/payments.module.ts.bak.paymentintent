@@ -1,0 +1,17 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { PaymentsController } from './payments.controller';
+import { PaymentsService } from './payments.service';
+import { StripeWebhookEvent } from './entities/stripe-webhook-event.entity';
+import { WalletModule } from '../../wallet/wallet.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([StripeWebhookEvent]),
+    WalletModule,
+  ],
+  controllers: [PaymentsController],
+  providers: [PaymentsService],
+})
+export class PaymentsModule {}

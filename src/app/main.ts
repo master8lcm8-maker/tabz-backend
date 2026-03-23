@@ -1,48 +1,100 @@
-﻿import { NestFactory } from '@nestjs/core';
+// src/app/main.ts
+
+// FIX: ensure globalThis.crypto exists (needed by @nestjs/schedule on some Node runtimes)
+import { webcrypto } from 'crypto';
+if (!(globalThis as any).crypto) {
+  (globalThis as any).crypto = webcrypto as any;
+}
+
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { HttpStatusBodySyncFilter } from './http-status-body-sync.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpStatusBodySyncFilter());
   app.getHttpAdapter().getInstance().set('etag', false);
 
-  // CORS: deterministic allowlist + echoes exact origin.
-  const allowedOrigins = new Set<string>([
+  // Enable CORS for web (local dev + production web origins)
+  const allow = new Set([
+    // --- PROD WEB ORIGINS ---
+    'https://8tabz.com',
+    'https://www.8tabz.com',
+
+    // --- LOCAL DEV (Expo Web + tooling) ---
+    'http://localhost:19006',        // Expo web default
+    'http://127.0.0.1:19006',
+
     'http://localhost:8081',
-    'http://localhost:8082',
-    'http://localhost:8083',
     'http://127.0.0.1:8081',
+
+    'http://localhost:8082',         // ✅ REQUIRED (your current Expo web)
     'http://127.0.0.1:8082',
+    'http://10.0.0.239:8082',        // ✅ LAN open of Expo web
+
+    'http://localhost:8083',         // ✅ optional but saves time later
     'http://127.0.0.1:8083',
+    'http://10.0.0.239:8083',
+
+    // --- LAN DEV (when opening web from another device) ---
+    'http://10.0.0.239:19006',
+    'http://10.0.0.239:8081',
   ]);
 
-  app.enableCors({
-    origin: (origin: string | undefined, callback: (err: any, allow?: any) => void) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.has(origin)) return callback(null, origin);
-      return callback(new Error(`CORS_BLOCKED_ORIGIN:${origin}`), false);
-    },
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'x-user-id',
-      'Cache-Control',
-      'Pragma',
-      'If-None-Match',
-      'x-dev-seed-secret',
-    ],
-    credentials: true,
-    optionsSuccessStatus: 204,
-    maxAge: 86400,
+  const allowedHeaders = [
+    'Content-Type',
+    'Authorization',
+    'x-user-id',
+    'Cache-Control',
+    'Pragma',
+    'If-None-Match',
+    'x-dev-seed-secret',
+  ];
+
+  // ✅ HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
+  // Minimal and safe: only affects OPTIONS requests.
+  app.getHttpAdapter().getInstance().use((req, res, next) => {
+    if (req.method !== 'OPTIONS') return next();
+
+    const origin = req.headers?.origin;
+    if (origin && allow.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', allowedHeaders.join(','));
+
+    return res.status(204).send();
   });
 
-  const port = Number(process.env.PORT || 3000);
+  app.enableCors({
+    origin: (origin, cb) => {
+      // allow non-browser callers (curl, mobile native, server-to-server)
+      if (!origin) return cb(null, true);
+      return allow.has(origin) ? cb(null, true) : cb(null, false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders,
+  });
+
+  // R4 proof: do NOT log the secret, only presence + length
+  console.log('JWT_SECRET_PRESENT', !!process.env.JWT_SECRET, 'LEN', process.env.JWT_SECRET?.length);
+
+  const port = 3000;
+
+  // Explicit bind to all interfaces (fixes Windows ambiguity)
   const server = await app.listen(port, '0.0.0.0');
 
-  console.log('TABZ backend bound to:', server.address());
+  // Log the real bound address (source of truth)
+  const addr = server.address();
+  console.log('TABZ backend bound to:', addr);
 }
-
 bootstrap();

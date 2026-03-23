@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
+import { ReferralsService } from '../referrals/referrals.service';
 
 export type UserRole = 'owner' | 'buyer';
 
@@ -12,6 +13,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+
+    private readonly referralsService: ReferralsService,
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
@@ -30,6 +33,7 @@ export class UsersService {
     email: string,
     password: string,
     displayName?: string,
+    referralCode?: string,
   ): Promise<User> {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
@@ -40,7 +44,23 @@ export class UsersService {
       displayName,
     });
 
-    return this.usersRepository.save(newUser);
+    const savedUser = await this.usersRepository.save(newUser);
+    const savedUserId = String(savedUser.id);
+
+    if (referralCode) {
+      const code = await this.referralsService.findCode(referralCode);
+
+      if (code && code.ownerUserId !== savedUserId) {
+        await this.referralsService.createAttribution(
+          code.id,
+          code.ownerUserId,
+          savedUserId,
+          code.code,
+        );
+      }
+    }
+
+    return savedUser;
   }
 
   /**
@@ -69,8 +89,6 @@ export class UsersService {
         existing.displayName = displayName;
       }
 
-      // only touch role if provided (still defaulted to buyer if caller didn't pass)
-      // NOTE: this line requires User.role to exist
       (existing as any).role = role;
 
       return this.usersRepository.save(existing);
@@ -80,11 +98,37 @@ export class UsersService {
       email,
       passwordHash,
       displayName,
-      // NOTE: this line requires User.role to exist
       role,
     } as any);
 
-    // ✅ force single-entity overload
     return this.usersRepository.save(newUser as any);
+  }
+
+  /**
+   * Dedicated password hash update for reset-password flow.
+   */
+  async updatePasswordHashByUserId(
+    userId: number,
+    passwordHash: string,
+  ): Promise<User | null> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) return null;
+
+    user.passwordHash = passwordHash;
+    return this.usersRepository.save(user);
+  }
+
+  /**
+   * Dedicated email verification update for verify-email flow.
+   */
+  async updateEmailVerifiedByUserId(
+    userId: number,
+    emailVerified: boolean,
+  ): Promise<User | null> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) return null;
+
+    user.emailVerified = emailVerified;
+    return this.usersRepository.save(user);
   }
 }

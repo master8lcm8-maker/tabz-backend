@@ -1,4 +1,3 @@
-// src/owner/owner-bank-info.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -15,17 +14,34 @@ export class OwnerBankInfo {
 
   @Index()
   @Column({ type: 'int' })
-  ownerId: number;
+  userId: number;
 
-  @Column({ type: 'varchar', length: 120 })
-  bankName: string;
+  @Column({ type: 'text' })
+  accountHolderNameEnc: string;
+
+  @Column({ type: 'text' })
+  routingNumberEnc: string;
+
+  @Column({ type: 'text' })
+  accountNumberEnc: string;
+
+  @Column({ type: 'text' })
+  bankNameEnc: string;
 
   @Column({ type: 'varchar', length: 4 })
-  last4: string;
+  accountLast4: string;
 
-  // 'pending' | 'verified' | 'missing' (we treat 'missing' in code)
-  @Column({ type: 'varchar', length: 20, default: 'pending' })
-  status: string;
+  @Column({ type: 'varchar', nullable: true })
+  stripeAccountId: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  stripeDetailsSubmitted: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  stripeChargesEnabled: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  stripePayoutsEnabled: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

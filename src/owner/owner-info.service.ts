@@ -1,7 +1,8 @@
 // src/owner/owner-info.service.ts
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Stripe from 'stripe';
 
 import { Wallet } from '../wallet/wallet.entity';
 import { Venue } from '../modules/venues/venue.entity';
@@ -27,8 +28,19 @@ export type OwnerVerificationResponse = {
   status: 'required' | 'pending' | 'verified';
 };
 
+export type OwnerStripeAccountResponse = {
+  stripeAccountId: string;
+  detailsSubmitted: boolean;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+};
+
 @Injectable()
 export class OwnerInfoService {
+  private readonly stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2026-02-25.clover',
+  });
+
   constructor(
     @InjectRepository(Wallet)
     private readonly walletRepo: Repository<Wallet>,
@@ -95,10 +107,9 @@ export class OwnerInfoService {
   }
 
   async getOwnerBank(userId: number): Promise<OwnerBankResponse> {
-    const record = await this.bankRepo.findOne({ where: { ownerId: userId } });
+    const record = await this.bankRepo.findOne({ where: { userId } });
 
     if (!record) {
-      // No bank on file
       return {
         bankName: 'Not set',
         last4: '',
@@ -106,13 +117,10 @@ export class OwnerInfoService {
       };
     }
 
-    const status =
-      (record.status as 'verified' | 'pending' | 'missing') || 'pending';
-
     return {
-      bankName: record.bankName || 'Not set',
-      last4: record.last4 || '',
-      status,
+      bankName: record.bankNameEnc || 'Not set',
+      last4: record.accountLast4 || '',
+      status: 'verified',
     };
   }
 
@@ -123,51 +131,151 @@ export class OwnerInfoService {
     const bankName = (dto.bankName ?? '').trim();
     const last4 = this.normalizeLast4(dto.last4);
 
-    let record = await this.bankRepo.findOne({ where: { ownerId: userId } });
+    let record = await this.bankRepo.findOne({ where: { userId } });
 
     if (!record) {
       record = this.bankRepo.create({
-        ownerId: userId,
-        bankName: bankName || null,
-        last4: last4 || null,
-        status: 'pending',
-        verificationStatus: 'required',
+        userId,
+        accountHolderNameEnc: 'PENDING',
+        routingNumberEnc: 'PENDING',
+        accountNumberEnc: 'PENDING',
+        bankNameEnc: bankName || 'Not set',
+        accountLast4: last4 || '0000',
       });
     } else {
       if (bankName) {
-        record.bankName = bankName;
+        record.bankNameEnc = bankName;
       }
       if (last4) {
-        record.last4 = last4;
+        record.accountLast4 = last4;
       }
-      // whenever bank info changes, force bank status back to pending
-      record.status = 'pending';
     }
 
     await this.bankRepo.save(record);
 
-    const status =
-      (record.status as 'verified' | 'pending' | 'missing') || 'pending';
-
     return {
-      bankName: record.bankName || 'Not set',
-      last4: record.last4 || '',
-      status,
+      bankName: record.bankNameEnc || 'Not set',
+      last4: record.accountLast4 || '',
+      status: 'pending',
     };
   }
 
+  // ---------------- STRIPE ACCOUNT ----------------
+
+  async createOrGetStripeAccount(userId: number): Promise<OwnerStripeAccountResponse> {
+    const record = await this.bankRepo.findOne({ where: { userId } });
+
+    if (!record) {
+      throw new BadRequestException('owner_bank_info_required');
+    }
+
+    if (record.stripeAccountId) {
+      const account = await this.stripe.accounts.retrieve(record.stripeAccountId);
+
+      record.stripeDetailsSubmitted = !!account.details_submitted;
+      record.stripeChargesEnabled = !!account.charges_enabled;
+      record.stripePayoutsEnabled = !!account.payouts_enabled;
+      await this.bankRepo.save(record);
+
+      return {
+        stripeAccountId: record.stripeAccountId,
+        detailsSubmitted: record.stripeDetailsSubmitted,
+        chargesEnabled: record.stripeChargesEnabled,
+        payoutsEnabled: record.stripePayoutsEnabled,
+      };
+    }
+
+    const account = await this.stripe.accounts.create({
+      type: 'express',
+      country: 'US',
+      email: undefined,
+      capabilities: {
+        transfers: { requested: true },
+      },
+      business_type: 'individual',
+      metadata: {
+        userId: String(userId),
+      },
+    });
+
+    record.stripeAccountId = account.id;
+    record.stripeDetailsSubmitted = !!account.details_submitted;
+    record.stripeChargesEnabled = !!account.charges_enabled;
+    record.stripePayoutsEnabled = !!account.payouts_enabled;
+    await this.bankRepo.save(record);
+
+    return {
+      stripeAccountId: record.stripeAccountId,
+      detailsSubmitted: record.stripeDetailsSubmitted,
+      chargesEnabled: record.stripeChargesEnabled,
+      payoutsEnabled: record.stripePayoutsEnabled,
+    };
+  }
+
+
+  
+
+  
+
+  async createStripeOnboardingLink(userId: number): Promise<{ url: string }> {
+    const record = await this.bankRepo.findOne({ where: { userId } });
+
+    if (!record || !record.stripeAccountId) {
+      throw new BadRequestException('stripe_account_required');
+    }
+
+    const refreshUrl =
+      process.env.STRIPE_CONNECT_REFRESH_URL ||
+      'http://localhost:8081/owner/bank?refresh=1';
+
+    const returnUrl =
+      process.env.STRIPE_CONNECT_RETURN_URL ||
+      'http://localhost:8081/owner/bank?return=1';
+
+    const link = await this.stripe.accountLinks.create({
+      account: record.stripeAccountId,
+      refresh_url: refreshUrl,
+      return_url: returnUrl,
+      type: 'account_onboarding',
+    });
+
+    return { url: link.url };
+  }
+
+  async refreshStripeAccountStatus(
+    userId: number,
+  ): Promise<OwnerStripeAccountResponse> {
+    const record = await this.bankRepo.findOne({ where: { userId } });
+
+    if (!record || !record.stripeAccountId) {
+      throw new BadRequestException('stripe_account_required');
+    }
+
+    const account = await this.stripe.accounts.retrieve(record.stripeAccountId);
+
+    record.stripeDetailsSubmitted = !!account.details_submitted;
+    record.stripeChargesEnabled = !!account.charges_enabled;
+    record.stripePayoutsEnabled = !!account.payouts_enabled;
+    await this.bankRepo.save(record);
+
+    return {
+      stripeAccountId: record.stripeAccountId,
+      detailsSubmitted: record.stripeDetailsSubmitted,
+      chargesEnabled: record.stripeChargesEnabled,
+      payoutsEnabled: record.stripePayoutsEnabled,
+    };
+  }
   // ---------------- IDENTITY VERIFICATION (STUBBED) ----------------
 
-  /**
-   * For now, keep identity verified so UI looks correct and no 500s.
-   * Later, we can wire this to a real KYC provider if you want.
-   */
   async getOwnerVerification(userId: number): Promise<OwnerVerificationResponse> {
     return { status: 'verified' };
   }
 
   async startOwnerVerification(userId: number): Promise<OwnerVerificationResponse> {
-    // In real life we'd start a flow; here we just confirm it's verified.
     return { status: 'verified' };
   }
 }
+
+
+
+

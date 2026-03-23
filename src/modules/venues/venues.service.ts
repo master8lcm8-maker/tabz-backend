@@ -1,14 +1,15 @@
-// src/modules/venues/venues.service.ts
 import {
   Injectable,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 import { Venue } from './venue.entity';
 import { ProfileService } from '../../profile/profile.service';
+import { FreeboardService } from '../freeboard/freeboard.service';
+import { VenuePresenceService } from '../venue-presence/venue-presence.service';
 
 @Injectable()
 export class VenuesService {
@@ -16,11 +17,10 @@ export class VenuesService {
     @InjectRepository(Venue)
     private readonly venueRepo: Repository<Venue>,
     private readonly profileService: ProfileService,
+    private readonly freeboardService: FreeboardService,
+    private readonly venuePresenceService: VenuePresenceService,
   ) {}
 
-  // ----------------------------
-  // FV-20.1.A / FV-20.2 — PUBLIC DIRECTORY LIST
-  // ----------------------------
   async publicList() {
     const venues = await this.venueRepo
       .createQueryBuilder('v')
@@ -30,22 +30,72 @@ export class VenuesService {
       .orderBy('v.id', 'ASC')
       .getMany();
 
+    const enriched = await Promise.all(
+      venues.map((v) => this.mapVenueDiscoveryCard(v)),
+    );
+
     return {
       ok: true,
-      venues: venues.map((v) => ({
-        id: v.id,
-        slug: v.slug,
-        name: v.name,
-        city: v.city,
-        state: v.state,
-        country: v.country,
-      })),
+      venues: enriched,
     };
   }
 
-  // ----------------------------
-  // FV-24 — PUBLIC VENUE PAGE WITH OWNER-PAGE PARITY
-  // ----------------------------
+  async searchPublic(q?: string, city?: string) {
+    const where: any = {
+      slug: ILike('%'),
+      ownerProfileId: ILike('%'),
+    };
+
+    const query = this.venueRepo.createQueryBuilder('v')
+      .where('v.slug IS NOT NULL')
+      .andWhere("trim(v.slug) <> ''")
+      .andWhere('v.ownerProfileId IS NOT NULL');
+
+    if (q && String(q).trim()) {
+      query.andWhere('LOWER(v.name) LIKE LOWER(:q)', {
+        q: `%${String(q).trim()}%`,
+      });
+    }
+
+    if (city && String(city).trim()) {
+      query.andWhere('LOWER(v.city) = LOWER(:city)', {
+        city: String(city).trim(),
+      });
+    }
+
+    query.orderBy('v.id', 'ASC');
+
+    const venues = await query.getMany();
+    const enriched = await Promise.all(
+      venues.map((v) => this.mapVenueDiscoveryCard(v)),
+    );
+
+    return {
+      ok: true,
+      venues: enriched,
+    };
+  }
+
+  async listActiveVenues() {
+    const venues = await this.venueRepo
+      .createQueryBuilder('v')
+      .where('v.slug IS NOT NULL')
+      .andWhere("trim(v.slug) <> ''")
+      .andWhere('v.ownerProfileId IS NOT NULL')
+      .andWhere('v.isPaused = false')
+      .orderBy('v.id', 'ASC')
+      .getMany();
+
+    const enriched = await Promise.all(
+      venues.map((v) => this.mapVenueDiscoveryCard(v)),
+    );
+
+    return {
+      ok: true,
+      venues: enriched.filter((v) => v.isActiveNow === true),
+    };
+  }
+
   async publicBySlug(slugRaw: string) {
     const slug = String(slugRaw || '').trim();
 
@@ -60,7 +110,6 @@ export class VenuesService {
       throw new NotFoundException('venue_not_found');
     }
 
-    // owner profile must exist + be public-eligible
     const ownerProfile: any = await (this.profileService as any).getById(
       venue.ownerProfileId,
     );
@@ -74,10 +123,6 @@ export class VenuesService {
       throw new NotFoundException('venue_not_found');
     }
 
-    // ----------------------------
-    // FV-24 PARITY CHECK (CRITICAL)
-    // Venue MUST appear on owner's public owner-page
-    // ----------------------------
     const ownerPage = await (this.profileService as any).publicOwnerPageBySlug(
       ownerProfile.slug,
     );
@@ -87,6 +132,8 @@ export class VenuesService {
     if (!found) {
       throw new NotFoundException('venue_not_found');
     }
+
+    const discovery = await this.mapVenueDiscoveryCard(venue);
 
     return {
       ok: true,
@@ -98,6 +145,18 @@ export class VenuesService {
         city: venue.city,
         state: venue.state,
         country: venue.country,
+        avatarUrl: venue.avatarUrl,
+        coverUrl: venue.coverUrl,
+        acceptingDrinks: venue.acceptingDrinks,
+        acceptingRequests: venue.acceptingRequests,
+        acceptingFreeboard: venue.acceptingFreeboard,
+        acceptingRedemptions: venue.acceptingRedemptions,
+        isPrivate: venue.isPrivate,
+        isPaused: venue.isPaused,
+        freeboardLight: discovery.freeboardLight,
+        activeDropCount: discovery.activeDropCount,
+        activeRosterCount: discovery.activeRosterCount,
+        isActiveNow: discovery.isActiveNow,
       },
       ownerProfile: {
         id: ownerProfile.id,
@@ -111,9 +170,6 @@ export class VenuesService {
     };
   }
 
-  // ----------------------------
-  // WRITE / INTERNAL
-  // ----------------------------
   async create(dto: {
     name: string;
     address: string;
@@ -129,7 +185,6 @@ export class VenuesService {
       throw new BadRequestException('name_and_address_are_required');
     }
 
-    // ✅ MUST: determine ownerProfileId (public venues depend on it)
     const profiles = await this.profileService.listForUser(ownerId);
     const ownerProfile = profiles.find((p: any) => {
       const t = String(p?.type || '').toLowerCase();
@@ -140,7 +195,6 @@ export class VenuesService {
       throw new BadRequestException('owner_profile_missing');
     }
 
-    // ✅ MUST: generate a slug so /venues/:slug/public can work
     const baseSlug = this.slugify(name);
     if (!baseSlug) throw new BadRequestException('invalid_venue_name');
 
@@ -174,13 +228,9 @@ export class VenuesService {
     });
   }
 
-  // ----------------------------
-  // FV-25 — update venue media (avatar/cover)
-  // Controller already owner-checks the venue; service just applies patch.
-  // ----------------------------
   async updateMedia(
     venueId: number,
-    patch: { avatarUrl?: string | null; coverUrl?: string | null },
+    patch: { avatarUrl?: string; coverUrl?: string },
   ): Promise<Venue> {
     const id = Number(venueId);
     if (!Number.isFinite(id) || id <= 0) {
@@ -190,19 +240,98 @@ export class VenuesService {
     const venue = await this.venueRepo.findOne({ where: { id } });
     if (!venue) throw new NotFoundException('venue_not_found');
 
-    if ('avatarUrl' in patch) {
-      venue.avatarUrl = patch.avatarUrl ?? null;
+    const nextAvatar = patch?.avatarUrl;
+    const nextCover = patch?.coverUrl;
+
+    const avatarProvided = typeof nextAvatar === 'string';
+    const coverProvided = typeof nextCover === 'string';
+
+    if (!avatarProvided && !coverProvided) {
+      throw new BadRequestException('no_media_fields');
     }
-    if ('coverUrl' in patch) {
-      venue.coverUrl = patch.coverUrl ?? null;
+
+    if (avatarProvided) (venue as any).avatarUrl = nextAvatar;
+    if (coverProvided) (venue as any).coverUrl = nextCover;
+
+    return this.venueRepo.save(venue);
+  }
+
+  async updateVenueSettings(
+    venueId: number,
+    patch: Partial<Pick<
+      Venue,
+      | 'acceptingDrinks'
+      | 'acceptingRequests'
+      | 'acceptingFreeboard'
+      | 'acceptingRedemptions'
+      | 'isPrivate'
+      | 'isPaused'
+    >>,
+  ): Promise<Venue> {
+    const id = Number(venueId);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new BadRequestException('invalid_venue_id');
+    }
+
+    const venue = await this.venueRepo.findOne({ where: { id } });
+    if (!venue) throw new NotFoundException('venue_not_found');
+
+    if (typeof patch.acceptingDrinks === 'boolean') {
+      venue.acceptingDrinks = patch.acceptingDrinks;
+    }
+
+    if (typeof patch.acceptingRequests === 'boolean') {
+      venue.acceptingRequests = patch.acceptingRequests;
+    }
+
+    if (typeof patch.acceptingFreeboard === 'boolean') {
+      venue.acceptingFreeboard = patch.acceptingFreeboard;
+    }
+
+    if (typeof patch.acceptingRedemptions === 'boolean') {
+      venue.acceptingRedemptions = patch.acceptingRedemptions;
+    }
+
+    if (typeof patch.isPrivate === 'boolean') {
+      venue.isPrivate = patch.isPrivate;
+    }
+
+    if (typeof patch.isPaused === 'boolean') {
+      venue.isPaused = patch.isPaused;
     }
 
     return this.venueRepo.save(venue);
   }
 
-  // ----------------------------
-  // helpers
-  // ----------------------------
+  private async mapVenueDiscoveryCard(venue: Venue) {
+    const activeDrops = await this.freeboardService.getDropsForVenue(venue.id, venue.ownerId, venue.id, "owner");
+    const roster = await this.venuePresenceService.getVenueRoster(venue.id);
+
+    const activeDropCount = Array.isArray(activeDrops) ? activeDrops.length : 0;
+    const activeRosterCount = Array.isArray(roster) ? roster.length : 0;
+
+    return {
+      id: venue.id,
+      slug: venue.slug,
+      name: venue.name,
+      city: venue.city,
+      state: venue.state,
+      country: venue.country,
+      avatarUrl: venue.avatarUrl,
+      coverUrl: venue.coverUrl,
+      acceptingDrinks: venue.acceptingDrinks,
+      acceptingRequests: venue.acceptingRequests,
+      acceptingFreeboard: venue.acceptingFreeboard,
+      acceptingRedemptions: venue.acceptingRedemptions,
+      isPrivate: venue.isPrivate,
+      isPaused: venue.isPaused,
+      activeDropCount,
+      activeRosterCount,
+      freeboardLight: activeDropCount > 0 ? 'green' : 'grey',
+      isActiveNow: activeDropCount > 0 || activeRosterCount > 0,
+    };
+  }
+
   private slugify(input: string): string {
     const s = String(input || '')
       .toLowerCase()
@@ -212,7 +341,6 @@ export class VenuesService {
       .replace(/^-+|-+$/g, '')
       .replace(/-{2,}/g, '-');
 
-    // hard cap to DB column length (120)
     return s.slice(0, 120);
   }
 
@@ -224,12 +352,10 @@ export class VenuesService {
 
     if (!(await exists(slug))) return slug;
 
-    // append deterministic-ish suffix; keep under 120
     const suffix = `-${Date.now()}`;
     const maxBaseLen = 120 - suffix.length;
     slug = `${base.slice(0, Math.max(1, maxBaseLen))}${suffix}`;
 
-    // extremely unlikely collision, but safe:
     if (!(await exists(slug))) return slug;
 
     const suffix2 = `-${Date.now()}-${Math.floor(Math.random() * 10000)}`;

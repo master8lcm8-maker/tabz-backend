@@ -1,3 +1,4 @@
+// src/wallet/cashout-scheduler.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,7 +11,7 @@ import { WalletTransaction } from './wallet-transaction.entity';
 /**
  * CashoutSchedulerService
  *
- * OPTION A – MOCK ENGINE
+ * OPTION A â€“ MOCK ENGINE
  *
  * - Every 30 seconds, it looks for all PENDING cashouts.
  * - For each PENDING cashout, it randomly decides:
@@ -47,7 +48,7 @@ export class CashoutSchedulerService {
   // Run every 30 seconds
   @Interval(30_000)
   async handleTick() {
-    // ✅ DEV FLAG: only run the mock engine when explicitly enabled
+    // âœ… DEV FLAG: only run the mock engine when explicitly enabled
     // Set env: MOCK_CASHOUT_ENGINE=true
     const enabled =
       String(process.env.MOCK_CASHOUT_ENGINE || '').toLowerCase() === 'true';
@@ -55,17 +56,17 @@ export class CashoutSchedulerService {
 
     // Find all cashouts that are still pending
     const pending = await this.cashoutRepo.find({
-      where: { status: 'PENDING' },
-      order: { createdAt: 'ASC' },
+      where: { status: 'PENDING' as any } as any,
+      order: { createdAt: 'ASC' as any } as any,
     });
 
     if (!pending.length) {
-      this.logger.log('💸 Cashout scheduler tick – no pending cashouts');
+      this.logger.log('ðŸ’¸ Cashout scheduler tick â€“ no pending cashouts');
       return;
     }
 
     this.logger.log(
-      `💸 Cashout scheduler processing ${pending.length} pending cashout(s)`,
+      `ðŸ’¸ Cashout scheduler processing ${pending.length} pending cashout(s)`,
     );
 
     for (const cashout of pending) {
@@ -93,109 +94,106 @@ export class CashoutSchedulerService {
       ];
       const reason = reasons[Math.floor(Math.random() * reasons.length)];
 
-      // ✅ FAILED PATH (FV-10)
-      const saved = await this.cashoutRepo.manager.transaction(
-        async (manager) => {
-          const cashoutRepo = manager.getRepository(CashoutRequest);
-          const walletRepo = manager.getRepository(Wallet);
-          const txRepo = manager.getRepository(WalletTransaction);
+      // âœ… FAILED PATH (FV-10)
+      const saved = await this.cashoutRepo.manager.transaction(async (manager) => {
+        const cashoutRepo = manager.getRepository(CashoutRequest);
+        const walletRepo = manager.getRepository(Wallet);
+        const txRepo = manager.getRepository(WalletTransaction);
 
-          const fresh = await cashoutRepo.findOne({
-            where: { id: cashout.id },
-          });
-          if (!fresh) return null;
-          if (fresh.status !== 'PENDING') return null;
+        const fresh = await cashoutRepo.findOne({
+          where: { id: cashout.id } as any,
+        });
+        if (!fresh) return null;
+        if (fresh.status !== 'PENDING') return null;
 
-          const wallet = await walletRepo.findOne({
-            where: { id: fresh.walletId },
-          });
-          if (!wallet) {
-            throw new Error('Wallet not found for cashout refund');
-          }
+        const wallet = await walletRepo.findOne({
+          where: { id: (fresh as any).walletId } as any,
+        });
+        if (!wallet) {
+          throw new Error('Wallet not found for cashout refund');
+        }
 
-          const amt = Number(fresh.amountCents) || 0;
-          if (!Number.isFinite(amt) || amt <= 0) {
-            throw new Error('Invalid cashout amount for refund');
-          }
+        const amt = Number((fresh as any).amountCents) || 0;
+        if (!Number.isFinite(amt) || amt <= 0) {
+          throw new Error('Invalid cashout amount for refund');
+        }
 
-          wallet.cashoutAvailableCents += amt;
-          await walletRepo.save(wallet);
+        // âœ… FIX: avoid bigint-string concat on wallet fields
+        wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amt;
+        await walletRepo.save(wallet);
 
-          await txRepo.save(
-            txRepo.create({
-              walletId: wallet.id,
-              type: 'cashout',
-              amountCents: amt,
-              metadata: {
-                reason: 'cashout_refund',
-                cashoutId: fresh.id,
-                failureReason: reason,
-                via: 'mock_cashout_engine',
-              },
-            }),
-          );
+        await txRepo.save(
+          txRepo.create({
+            walletId: (wallet as any).id,
+            type: 'cashout_reversed',
+            amountCents: amt,
+            metadata: {
+              reason: 'cashout_refund',
+              cashoutId: (fresh as any).id,
+              failureReason: reason,
+              via: 'mock_cashout_engine',
+            },
+          } as any),
+        );
 
-          fresh.status = 'FAILED';
-          fresh.failureReason = reason;
+        (fresh as any).status = 'FAILED';
+        (fresh as any).failureReason = reason;
 
-          return await cashoutRepo.save(fresh);
-        },
-      );
+        return await cashoutRepo.save(fresh);
+      });
 
       if (!saved) return;
 
       this.websocketGateway.emitCashoutUpdated(saved);
 
       this.logger.log(
-        `💸 Cashout ${saved.id} FAILED – reason=${saved.failureReason}, amountCents=${saved.amountCents}`,
+        `ðŸ’¸ Cashout ${saved.id} FAILED â€“ reason=${(saved as any).failureReason}, amountCents=${(saved as any).amountCents}`,
       );
       return;
     }
 
-    // ✅ SUCCESS PATH (FV-11 FIX)
-    const saved = await this.cashoutRepo.manager.transaction(
-      async (manager) => {
-        const cashoutRepo = manager.getRepository(CashoutRequest);
-        const txRepo = manager.getRepository(WalletTransaction);
+    // âœ… SUCCESS PATH (FV-11 FIX)
+    const saved = await this.cashoutRepo.manager.transaction(async (manager) => {
+      const cashoutRepo = manager.getRepository(CashoutRequest);
+      const txRepo = manager.getRepository(WalletTransaction);
 
-        const fresh = await cashoutRepo.findOne({
-          where: { id: cashout.id },
-        });
-        if (!fresh) return null;
-        if (fresh.status !== 'PENDING') return null;
+      const fresh = await cashoutRepo.findOne({
+        where: { id: cashout.id } as any,
+      });
+      if (!fresh) return null;
+      if ((fresh as any).status !== 'PENDING') return null;
 
-        const amt = Number(fresh.amountCents) || 0;
-        if (!Number.isFinite(amt) || amt <= 0) {
-          throw new Error('Invalid cashout amount for completion');
-        }
+      const amt = Number((fresh as any).amountCents) || 0;
+      if (!Number.isFinite(amt) || amt <= 0) {
+        throw new Error('Invalid cashout amount for completion');
+      }
 
-        // ✅ COMPLETION LEDGER ROW (balances the original -amt)
-        await txRepo.save(
-          txRepo.create({
-            walletId: fresh.walletId,
-            type: 'cashout',
-            amountCents: amt,
-            metadata: {
-              reason: 'cashout_complete',
-              cashoutId: fresh.id,
-              via: 'mock_cashout_engine',
-            },
-          }),
-        );
+      // âœ… COMPLETION LEDGER ROW (balances the original -amt)
+      await txRepo.save(
+        txRepo.create({
+          walletId: (fresh as any).walletId,
+          type: 'cashout_settled',
+          amountCents: amt,
+          metadata: {
+            reason: 'cashout_complete',
+            cashoutId: (fresh as any).id,
+            via: 'mock_cashout_engine',
+          },
+        } as any),
+      );
 
-        fresh.status = 'COMPLETED';
-        fresh.failureReason = null;
+      (fresh as any).status = 'COMPLETED';
+      (fresh as any).failureReason = null;
 
-        return await cashoutRepo.save(fresh);
-      },
-    );
+      return await cashoutRepo.save(fresh);
+    });
 
     if (!saved) return;
 
     this.websocketGateway.emitCashoutUpdated(saved);
 
     this.logger.log(
-      `💸 Cashout ${saved.id} COMPLETED – amountCents=${saved.amountCents}`,
+      `ðŸ’¸ Cashout ${saved.id} COMPLETED â€“ amountCents=${(saved as any).amountCents}`,
     );
   }
 }

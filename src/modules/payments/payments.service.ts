@@ -1,0 +1,226 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import Stripe from 'stripe';
+import { StripeWebhookEvent } from './entities/stripe-webhook-event.entity';
+import { CashoutRequest } from '../../wallet/cashout-request.entity';
+import { DepositIntent } from './entities/deposit-intent.entity';
+import { WalletService } from '../../wallet/wallet.service';
+
+@Injectable()
+export class PaymentsService {
+  private stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2026-02-25.clover',
+  });
+
+  constructor(
+    @InjectRepository(StripeWebhookEvent)
+    private readonly eventsRepo: Repository<StripeWebhookEvent>,
+
+    @InjectRepository(DepositIntent)
+    private readonly depositIntentRepo: Repository<DepositIntent>,
+
+    @InjectRepository(CashoutRequest)
+    private readonly cashoutRepo: Repository<CashoutRequest>,
+
+    private readonly walletService: WalletService,
+  ) {}
+
+  async processWebhook(payload: Buffer | string, signature: string) {
+    let event: Stripe.Event;
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET!,
+      );
+    } catch {
+      throw new BadRequestException('Invalid Stripe signature');
+    }
+
+    const eventId = event.id;
+
+    try {
+      await this.eventsRepo.insert({
+        eventId,
+        type: event.type,
+        payload: JSON.parse(JSON.stringify(event)),
+      });
+    } catch {
+      return;
+    }
+
+    await this.handleEvent(event);
+
+    await this.eventsRepo.update(
+      { eventId },
+      { processedAt: new Date() },
+    );
+  }
+
+  async handleEvent(event: Stripe.Event) {
+    const eventType = String((event as any).type || '');
+
+    switch (eventType as any) {
+
+      case 'transfer.created': {
+        const transfer = event.data.object as any;
+        await this.cashoutRepo.update(
+          { stripeTransferId: transfer.id },
+          {
+            providerStatus: 'transfer_created'
+          }
+        );
+        break;
+      }
+
+      case 'transfer.paid': {
+        const transfer = event.data.object as any;
+        await this.cashoutRepo.update(
+          { stripeTransferId: transfer.id },
+          {
+            status: 'PAID',
+            providerStatus: 'transfer_paid'
+          }
+        );
+        break;
+      }
+
+      case 'transfer.failed': {
+        const transfer = event.data.object as any;
+        await this.cashoutRepo.update(
+          { stripeTransferId: transfer.id },
+          {
+            status: 'FAILED',
+            providerStatus: 'transfer_failed',
+            failureReason: transfer.failure_message ?? 'stripe_transfer_failed'
+          }
+        );
+        break;
+      }
+
+      case 'transfer.reversed': {
+        const transfer = event.data.object as any;
+        await this.cashoutRepo.update(
+          { stripeTransferId: transfer.id },
+          {
+            status: 'REVERSED',
+            providerStatus: 'transfer_reversed',
+            reversedAt: new Date()
+          }
+        );
+        break;
+      }
+      case 'payment_intent.succeeded':
+        await this.handlePaymentSuccess(event);
+        break;
+
+      case 'payment_intent.payment_failed':
+        await this.handlePaymentFailed(event);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  async handlePaymentSuccess(event: Stripe.Event) {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+    const depositIntentId = Number(paymentIntent.metadata.depositIntentId);
+    if (!depositIntentId) return;
+
+    const depositIntent = await this.depositIntentRepo.findOne({
+      where: { id: depositIntentId },
+    });
+
+    if (!depositIntent) return;
+
+    if (depositIntent.status === 'succeeded') {
+      return;
+    }
+
+    await this.walletService.deposit(
+      depositIntent.userId,
+      depositIntent.amountCents, "stripe:" + paymentIntent.id,
+    );
+
+    depositIntent.status = 'succeeded';
+    await this.depositIntentRepo.save(depositIntent);
+  }
+
+
+  async handlePaymentFailed(event: Stripe.Event) {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+    const depositIntentId = Number(paymentIntent.metadata.depositIntentId);
+    if (!depositIntentId) return;
+
+    const depositIntent = await this.depositIntentRepo.findOne({
+      where: { id: depositIntentId },
+    });
+
+    if (!depositIntent) return;
+
+    if (depositIntent.status === 'succeeded') {
+      return;
+    }
+
+    depositIntent.status = 'failed';
+    await this.depositIntentRepo.save(depositIntent);
+  }
+
+  async createPaymentIntent(input: {
+    userId: number;
+    amountCents: number;
+    currency?: string;
+  }) {
+    const userId = Number(input?.userId);
+    const amountCents = Number(input?.amountCents);
+    const currency = String(input?.currency || 'usd').toLowerCase();
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      throw new BadRequestException('userId must be a positive integer');
+    }
+
+    if (!Number.isInteger(amountCents) || amountCents <= 0) {
+      throw new BadRequestException('amountCents must be a positive integer');
+    }
+
+    const depositIntent = await this.depositIntentRepo.save({
+      userId,
+      amountCents,
+      currency,
+      status: 'created',
+      stripePaymentIntentId: null,
+    });
+
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount: amountCents,
+      currency,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
+      },
+      metadata: {
+        depositIntentId: String(depositIntent.id),
+        userId: String(userId),
+        purpose: 'wallet_topup',
+      },
+    });
+
+    depositIntent.stripePaymentIntentId = paymentIntent.id;
+    await this.depositIntentRepo.save(depositIntent);
+
+    return {
+      id: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      metadata: paymentIntent.metadata,
+      status: paymentIntent.status,
+    };
+  }
+}
+

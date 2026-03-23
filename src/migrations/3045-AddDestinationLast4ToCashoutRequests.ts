@@ -1,46 +1,44 @@
-﻿import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddDestinationLast4ToCashoutRequests1733290000000 implements MigrationInterface {
-  name = 'AddDestinationLast4ToCashoutRequests1733290000000';
+  name = "AddDestinationLast4ToCashoutRequests1733290000000";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // SQLite-only (kept for reference; breaks on Postgres):
-// SQLite-only (reference; do NOT execute on Postgres):
-// const cols = await queryRunner.query("PRAGMA table_info('cashout_requests')");
-    // const has =
-    //   Array.isArray(cols) &&
-    //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'destinationlast4');
-    // if (has) return;
-
-    // Cross-db check (works on Postgres + SQLite in TypeORM):
-    const has = await queryRunner.hasColumn('cashout_requests', 'destinationLast4');
-    if (has) return;
-
-    await queryRunner.addColumn(
-      'cashout_requests',
-      new TableColumn({
-        name: 'destinationLast4',
-        type: 'varchar',
-        length: '4',
-        isNullable: true,
-      }),
-    );
+    await queryRunner.query(`
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.tables
+    WHERE table_schema='public'
+      AND table_name='cashout_requests'
+  ) AND NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema='public'
+      AND table_name='cashout_requests'
+      AND column_name='destinationLast4'
+  ) THEN
+    ALTER TABLE "cashout_requests" ADD "destinationLast4" character varying(4);
+  END IF;
+END $$;
+`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // SQLite-only (kept for reference; breaks on Postgres):
-// SQLite-only (reference; do NOT execute on Postgres):
-// const cols = await queryRunner.query("PRAGMA table_info('cashout_requests')");
-    // const has =
-    //   Array.isArray(cols) &&
-    //   cols.some((c: any) => String(c?.name || '').toLowerCase() === 'destinationlast4');
-    // if (!has) return;
-
-    // Cross-db check:
-    const has = await queryRunner.hasColumn('cashout_requests', 'destinationLast4');
-    if (!has) return;
-
-    await queryRunner.dropColumn('cashout_requests', 'destinationLast4');
+    await queryRunner.query(`
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema='public'
+      AND table_name='cashout_requests'
+      AND column_name='destinationLast4'
+  ) THEN
+    ALTER TABLE "cashout_requests" DROP COLUMN "destinationLast4";
+  END IF;
+END $$;
+`);
   }
 }
-

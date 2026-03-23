@@ -1,15 +1,22 @@
-﻿// src/app/app.module.ts
-import { Module } from '@nestjs/common';
+﻿import { WishlistModule } from "../modules/wishlist/wishlist.module";
+import { DrinkRequestsModule } from "../modules/drink-requests/drink-requests.module";
+import { OwnerOpsModule } from "../modules/owner-ops/owner-ops.module";
+import { StaffOpsModule } from "../modules/staff-ops/staff-ops.module";
+import { NotificationsModule } from "../modules/notifications/notifications.module";
+import { RedemptionsModule } from "../modules/redemptions/redemptions.module";
+import { GiftsModule } from "../modules/gifts/gifts.module";
+import { CatalogModule } from "../modules/catalog/catalog.module";
+import { VenuePresenceModule } from "../modules/venue-presence/venue-presence.module";
+// src/app/app.module.ts
+import { Module } from '@nestjs/common';
+
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import dataSource from '../data-source';
-import { ScheduleModule } from '@nestjs/schedule';
 
+import { CreditsModule } from '../modules/credits/credits.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
 
@@ -18,75 +25,118 @@ import { UsersModule } from '../modules/users/users.module';
 import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
-// ? ADD
 import { VenuesModule } from '../modules/venues/venues.module';
-
-// ? ADD
 import { IdentityModule } from '../identity/identity.module';
-
-// ? ADD (HEALTH)
 import { HealthModule } from '../health/health.module';
-
-// ? P3: Engagement runtime
-import { EngagementModule } from '../modules/engagement/engagement.module';
-import { PasswordResetModule } from '../modules/password-reset/password-reset.module';
-
-// P3: Freeboard
+import { DrinksModule } from '../modules/drinks/drinks.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
+import { PaymentsModule } from '../modules/payments/payments.module';
+import { OwnerInfoModule } from '../owner/owner-info.module';
+import { LedgerModule } from '../modules/ledger/ledger.module';
 
 @Module({
-  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [AppService],
   controllers: [AppController],
   imports: [
-    AccountDeletionModule,
-    ScheduleModule.forRoot(),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }]),
-    // P3: Engagement
-    EngagementModule,
-    PasswordResetModule,
-
-    // P3: Freeboard
+    VenuePresenceModule,
+    CatalogModule,
+    GiftsModule,
     FreeboardModule,
+    RedemptionsModule,
+    NotificationsModule,
+    StaffOpsModule,
+    OwnerOpsModule,
+    DrinkRequestsModule,
+    WishlistModule,
+    ConfigModule.forRoot({ isGlobal: true }),
 
-    // Global config
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),    // DB: use the same single source of truth as TypeORM CLI/runtime (src/data-source.ts)
-    // - If DATABASE_URL is set -> Postgres
-    // - else -> SQLite
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => ({
-        ...(dataSource.options as any),
+    TypeOrmModule.forRoot((() => {
+      const rawUrl = String(process.env.DATABASE_URL || process.env.TYPEORM_URL || '').trim();
+      const hasPgUrl = rawUrl.length > 0;
+      const hasPgHost = String(process.env.DB_HOST || '').trim().length > 0;
+
+      if (!hasPgUrl && !hasPgHost) {
+        throw new Error(
+          'TABZ boot blocked: Postgres config required (DATABASE_URL/TYPEORM_URL or DB_HOST). SQLite is forbidden.',
+        );
+      }
+
+      let url = rawUrl;
+
+      if (!url) {
+        const u = String(process.env.DB_USERNAME || '').trim();
+        const p = String(process.env.DB_PASSWORD || '').trim();
+        const h = String(process.env.DB_HOST || '').trim();
+        const port = String(process.env.DB_PORT || '').trim();
+        const db = String(process.env.DB_NAME || '').trim();
+
+        const sslRaw = String(process.env.DB_SSL || 'true').toLowerCase();
+        const sslMode =
+          sslRaw === 'true' || sslRaw === '1' || sslRaw === 'require'
+            ? '?sslmode=require'
+            : '';
+
+        if (!u || !p || !h || !port || !db) {
+          throw new Error(
+            'TABZ boot blocked: incomplete Postgres DB_* config. Required: DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME.',
+          );
+        }
+
+        url =
+          `postgresql://${encodeURIComponent(u)}:${encodeURIComponent(p)}` +
+          `@${h}:${port}/${db}${sslMode}`;
+
+        process.env.DATABASE_URL = url;
+      }
+
+      const normalizedUrl = url.toLowerCase();
+      if (
+        normalizedUrl.startsWith('sqlite:') ||
+        normalizedUrl.startsWith('file:') ||
+        normalizedUrl.includes('sqlite')
+      ) {
+        throw new Error('TABZ boot blocked: SQLite connection strings are forbidden by OATH1-H.');
+      }
+
+      if (process.env.DEBUG_DB === '1') {
+        try {
+          const safe = new URL(url);
+          console.log('[DEBUG_DB] using postgres', {
+            host: safe.hostname,
+            port: safe.port,
+            db: safe.pathname?.replace('/', ''),
+            sslmode: safe.searchParams.get('sslmode'),
+          });
+        } catch {
+          console.log('[DEBUG_DB] using postgres (unable to parse url)');
+        }
+      }
+
+      return {
+        type: 'postgres',
+        url,
         autoLoadEntities: true,
         synchronize: false,
-      }),
-    }),
+        ssl: { rejectUnauthorized: false },
+      } as any;
+    })()),
 
-    // Core modules
     UsersModule,
     AuthModule,
     WalletModule,
     StoreItemsModule,
     ProfileModule,
-
-    // ? FV-17 � venues endpoints
+    CreditsModule,
     VenuesModule,
-
-    // Identity
     IdentityModule,
-
-    // Health (liveness / readiness)
     HealthModule,
-
-    // Dev tools
+    DrinksModule,
     DevSeedModule,
+    AccountDeletionModule,
+    PaymentsModule,
+    OwnerInfoModule,
+    LedgerModule,
   ],
 })
 export class AppModule {}
-
-
-
-
-
-
 

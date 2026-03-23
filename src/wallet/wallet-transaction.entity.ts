@@ -1,4 +1,3 @@
-// src/wallet/wallet-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -19,18 +18,22 @@ export type WalletTransactionType =
   | 'payout_credit'
   | 'transfer_in'
   | 'transfer_out'
-  | 'cashout';
+  | 'cashout'
+  | 'cashout_reserved'
+  | 'cashout_settled'
+  | 'cashout_reversed'
+  | 'owner_earned'
+  | 'platform_fee'
+  | 'referral_reward'
+  | 'adjustment_credit'
+  | 'adjustment_debit'
+  | 'unlock_spendable';
 
 @Entity('wallet_transactions')
 export class WalletTransaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  /**
-   * Foreign key to the wallet that owns this transaction.
-   * Existing rows may have this null (from before we added it),
-   * but all new rows created by WalletService will set it.
-   */
   @Column({ nullable: true })
   walletId: number | null;
 
@@ -44,12 +47,11 @@ export class WalletTransaction {
   @Column({ type: 'bigint' })
   amountCents: number;
 
-  /**
-   * Extra info about the transaction:
-   * - fee, venueShare, receiverId, itemId, venueId, etc
-   */
   @Column({ type: 'simple-json', nullable: true })
   metadata: any | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  depositRef: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

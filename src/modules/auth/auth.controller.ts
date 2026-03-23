@@ -5,10 +5,10 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginDto } from './dtos/login.dto';
+import { RegisterDto } from './dtos/register.dto';
 
 import { ProfileService } from '../../profile/profile.service';
 import { ProfileType } from '../../profile/profile.types';
-import { VenuesService } from '../venues/venues.service';
 
 interface AuthRequest extends Request {
   user?: {
@@ -26,8 +26,11 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly profileService: ProfileService,
-    private readonly venuesService: VenuesService,
   ) {}
+
+  // -------------------------
+  // LOGIN / REGISTER
+  // -------------------------
 
   @Post('login')
   async login(@Body() dto: LoginDto) {
@@ -49,6 +52,52 @@ export class AuthController {
     return this.authService.loginStaff(dto);
   }
 
+  @Post('register')
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  // -------------------------
+  // PASSWORD RESET
+  // -------------------------
+
+  @Post('request-password-reset')
+  async requestPasswordReset(
+    @Body('email') email: string,
+    @Req() req: Request,
+  ) {
+    return this.authService.requestPasswordReset(email, {
+      requestedIp: req.ip,
+      requestedUserAgent: req.headers['user-agent'] ?? null,
+    });
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.resetPassword(token, password);
+  }
+
+  // -------------------------
+  // EMAIL VERIFICATION
+  // -------------------------
+
+  @Post('request-email-verification')
+  async requestEmailVerification(@Body('email') email: string) {
+    return this.authService.requestEmailVerification(email);
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  // -------------------------
+  // AUTH PROFILE
+  // -------------------------
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@Req() req: AuthRequest) {
@@ -57,12 +106,7 @@ export class AuthController {
 
     const email = req.user?.email ?? null;
     const role = req.user?.role ?? null;
-    let venueId = req.user?.venueId ?? null;
-
-    if (!venueId && role === 'owner' && userId) {
-      const venues = await this.venuesService.findByOwner(userId);
-      venueId = venues?.[0]?.id ?? null;
-    }
+    const venueId = req.user?.venueId ?? null;
 
     if (!userId) {
       return {
@@ -78,16 +122,11 @@ export class AuthController {
 
     const profiles = await this.profileService.listForUser(userId);
 
-    // 1) Map role → desired ProfileType (NOW includes staff)
     let desiredType: ProfileType | null = null;
     if (role === 'owner') desiredType = ProfileType.OWNER;
     if (role === 'buyer') desiredType = ProfileType.BUYER;
     if (role === 'staff') desiredType = ProfileType.STAFF;
 
-    // 2) Pick primary profile:
-    //    - prefer role-matching active profile
-    //    - else first active profile
-    //    - else first profile (stable fallback)
     const profile =
       (desiredType
         ? profiles.find(

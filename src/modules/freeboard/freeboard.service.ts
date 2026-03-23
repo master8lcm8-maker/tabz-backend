@@ -1,206 +1,466 @@
 import {
-  Injectable,
   BadRequestException,
+  ForbiddenException,
+  Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { WalletService } from '../../wallet/wallet.service';
-import { Repository, LessThan, MoreThan } from 'typeorm';
-import { FreeboardDrop, FreeboardDropStatus } from './freeboard-drop.entity';
-import { randomBytes } from 'crypto';
+  Inject,
+  forwardRef,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { LessThan, MoreThan, Not, Repository } from "typeorm";
+import { FreeboardItem } from "./entities/freeboard-item.entity";
+import { FreeboardClaim } from "./entities/freeboard-claim.entity";
+import { CatalogService } from "../catalog/catalog.service";
+import { VenuesService } from "../venues/venues.service";
+import { NotificationsService } from "../notifications/notifications.service";
+import { RedemptionsService } from "../redemptions/redemptions.service";
+import { VenuePresenceService } from "../venue-presence/venue-presence.service";
+import { Redemption } from "../redemptions/entities/redemption.entity";
 
 @Injectable()
 export class FreeboardService {
   constructor(
-    @InjectRepository(FreeboardDrop)
-    private readonly dropsRepo: Repository<FreeboardDrop>,
-    private readonly walletService: WalletService,
+    @InjectRepository(FreeboardItem)
+    private readonly freeboardRepository: Repository<FreeboardItem>,
+    @InjectRepository(FreeboardClaim)
+    private readonly freeboardClaimsRepository: Repository<FreeboardClaim>,
+    @InjectRepository(Redemption)
+    private readonly redemptionsRepository: Repository<Redemption>,
+    private readonly catalogService: CatalogService,
+    @Inject(forwardRef(() => VenuesService))
+    private readonly venuesService: VenuesService,
+    private readonly notificationsService: NotificationsService,
+    private readonly redemptionsService: RedemptionsService,
+    private readonly venuePresenceService: VenuePresenceService,
   ) {}
 
-  // NOTE: Controller sends "message" but DB/entity requires NOT NULL "title".
-  // We map message -> title at insert time to satisfy SQLITE schema.
   async createDrop(
-    creatorIdOrDto: number | { creatorId?: number; dropperId?: number; venueId: number; message?: string; title?: string; description?: string; rewardCents?: number; expiresInMinutes?: number },
-    venueId?: number,
-    message?: string,
-    expiresInMinutes = 60,
-  ): Promise<FreeboardDrop> {
-    // accept either positional args OR object dto from controller (supports creatorId/dropperId)
-    let creatorId: number;
-    let vId: number;
-    let msg: string;
-    let exp: number;
-    let rewardCents: number;
+    data: Partial<FreeboardItem> & {
+      creatorId?: number;
+      title?: string;
+      code?: string;
+    },
+  ) {
+    const venueId = Number(data.venueId);
+    const catalogItemId = Number(data.catalogItemId);
+    const droppedByUserId = Number(data.droppedByUserId ?? data.creatorId);
+    const quantity = Number(data.quantity ?? 1);
+    const maxClaimsPerUser =
+      data.maxClaimsPerUser != null ? Number(data.maxClaimsPerUser) : null;
+    const expiresAt = data.expiresAt as Date;
 
-if (typeof creatorIdOrDto === 'object') {
-      const dto: any = creatorIdOrDto as any;
-      creatorId = Number(dto.creatorId ?? dto.dropperId);
-      vId = Number(dto.venueId);
-      msg = String((dto.message ?? dto.title ?? dto.description) ?? '');
-      exp = (dto.expiresInMinutes === null || dto.expiresInMinutes === undefined) ? 60 : Number(dto.expiresInMinutes);
-      rewardCents = (dto.rewardCents === null || dto.rewardCents === undefined) ? 0 : Number(dto.rewardCents);
-} else {
-      creatorId = Number(creatorIdOrDto);
-      vId = Number(venueId);
-      msg = String(message ?? '');
-      exp = (expiresInMinutes === null || expiresInMinutes === undefined) ? 60 : Number(expiresInMinutes);
-      rewardCents = 0;
-}
-
-    // rebind to the variable names the existing implementation below expects
-    venueId = vId;
-    message = msg;
-    expiresInMinutes = exp;
-
-    if (!message || !message.trim()) {
-      throw new BadRequestException('Message is required for a drop.');
+    if (!droppedByUserId) {
+      throw new BadRequestException("creator_required");
     }
 
-    if (rewardCents < 0) {
-      throw new BadRequestException('rewardCents must be >= 0');
+    if (!venueId) {
+      throw new BadRequestException("venue_required");
     }
-const now = new Date();
-    const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
 
-    const drop = this.dropsRepo.create({
-      creatorId,
+    if (!catalogItemId) {
+      throw new BadRequestException("catalog_item_required");
+    }
+
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      throw new BadRequestException("quantity_must_be_positive");
+    }
+
+    if (
+      maxClaimsPerUser != null &&
+      (!Number.isFinite(maxClaimsPerUser) || maxClaimsPerUser <= 0)
+    ) {
+      throw new BadRequestException("max_claims_per_user_must_be_positive");
+    }
+
+    if (!(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime())) {
+      throw new BadRequestException("invalid_expires_at");
+    }
+
+    if (expiresAt.getTime() <= Date.now()) {
+      throw new BadRequestException("expires_at_must_be_future");
+    }
+
+    const venue = await this.venuesService.findAll().then((rows) =>
+      rows.find((v) => v.id === venueId),
+    );
+
+    if (!venue) {
+      throw new NotFoundException("venue_not_found");
+    }
+
+    if (Number(venue.ownerId) !== droppedByUserId) {
+      throw new ForbiddenException("venue_not_owned_by_creator");
+    }
+
+    if (venue.isPaused) {
+      throw new BadRequestException("venue_paused");
+    }
+
+    if (!venue.acceptingFreeboard) {
+      throw new BadRequestException("venue_not_accepting_freeboard");
+    }
+
+    const item = await this.catalogService.getItemById(catalogItemId);
+    if (!item) {
+      throw new NotFoundException("catalog_item_not_found");
+    }
+
+    if (item.venueId !== venueId) {
+      throw new BadRequestException("catalog_item_venue_mismatch");
+    }
+
+    if (!item.isActive) {
+      throw new BadRequestException("catalog_item_inactive");
+    }
+
+    if (!item.redeemable) {
+      throw new BadRequestException("catalog_item_not_redeemable");
+    }
+
+    const availableInventory =
+      await this.catalogService.getAvailableInventory(catalogItemId);
+
+    if (
+      availableInventory != null &&
+      quantity > availableInventory
+    ) {
+      throw new BadRequestException("drop_quantity_exceeds_inventory");
+    }
+
+    const boardItem = this.freeboardRepository.create({
       venueId,
-
-      // DB column is "title" (NOT NULL)
-      title: message,
-
-      rewardCents: String(rewardCents),
-status: 'ACTIVE' as FreeboardDropStatus,
-
-      // DB column is claimedByUserId
-      claimedByUserId: null,
-
-      claimCode: this.generateClaimCode(),
+      catalogItemId,
+      droppedByUserId,
+      giftTransactionId: data.giftTransactionId ?? null,
+      displayMode: data.displayMode ?? "named",
+      status: data.status ?? "active",
+      quantity,
+      claimedQuantity: data.claimedQuantity ?? 0,
+      maxClaimsPerUser,
       expiresAt,
-      claimedAt: null,
+      claimedAt: data.claimedAt ?? null,
+      expiredAt: data.expiredAt ?? null,
     });
 
-    return this.dropsRepo.save(drop);
-  }
+    const saved = await this.freeboardRepository.save(boardItem);
 
-  async claimDrop(
-    claimCodeOrDto: string | { code?: string; claimCode?: string; userId?: number; claimerId?: number },
-    claimerIdArg?: number,
-  ): Promise<FreeboardDrop> {
-    // accept either positional args OR object dto from controller (supports userId/claimerId, code/claimCode)
-    let claimerId: number;
-    let claimCode: string;
-
-    if (typeof claimCodeOrDto === 'object') {
-      const dto: any = claimCodeOrDto as any;
-      claimerId = Number(dto.userId ?? dto.claimerId);
-      claimCode = String(dto.code ?? dto.claimCode ?? '');
-    } else {
-      claimCode = String(claimCodeOrDto ?? '');
-      claimerId = Number(claimerIdArg);
-    }
-
-    if (!claimCode) {
-      throw new BadRequestException('Claim code is required.');
-    }
-
-    if (!Number.isFinite(claimerId) || claimerId <= 0) {
-      throw new BadRequestException('Valid claimer id is required.');
-    }
-
-    const now = new Date();
-
-    // Atomic claim: only one caller can flip ACTIVE -> CLAIMED
-    const result = await this.dropsRepo
-      .createQueryBuilder()
-      .update(FreeboardDrop)
-      .set({
-        status: 'CLAIMED' as FreeboardDropStatus,
-        claimedAt: now,
-        claimedByUserId: claimerId,
-      })
-      .where('claimCode = :claimCode', { claimCode })
-      .andWhere('status = :status', { status: 'ACTIVE' })
-      .andWhere('(expiresAt IS NULL OR expiresAt > :now)', { now })
-      .execute();
-
-    if (result.affected && result.affected > 0) {
-      // read back the claimed row
-      const claimed = await this.dropsRepo.findOne({ where: { claimCode } });
-
-      // freeboard_reward_deposit_patch
-      const reward = Number((claimed as any)?.rewardCents ?? 0);
-      if (Number.isFinite(reward) && reward > 0) {
-        await this.walletService.deposit(claimerId, reward);
-      }
-
-      return claimed!;
-    }
-
-    // If atomic update didn't happen, figure out why (not found / not active / expired)
-    const drop = await this.dropsRepo.findOne({ where: { claimCode } });
-
-    if (!drop) {
-      throw new NotFoundException('Drop not found for that claim code.');
-    }
-
-    if (drop.status !== 'ACTIVE') {
-      throw new BadRequestException('Drop is not active.');
-    }
-
-    if (drop.expiresAt && drop.expiresAt < now) {
-      drop.status = 'EXPIRED';
-      await this.dropsRepo.save(drop);
-      throw new BadRequestException('Drop has expired.');
-    }
-
-    throw new BadRequestException('Unable to claim drop.');
-  }
-
-  async getDropsForVenue(venueId: number): Promise<FreeboardDrop[]> {
-    const now = new Date();
-
-    return this.dropsRepo.find({
-      where: {
-        venueId,
-        status: 'ACTIVE',
-        expiresAt: MoreThan(now),
+    await this.notificationsService.createNotification({
+      userId: droppedByUserId,
+      type: "freeboard_drop_created",
+      title: "FreeBoard drop created",
+      body: "Your FreeBoard drop is now live.",
+      dataJson: {
+        freeboardItemId: saved.id,
+        venueId: saved.venueId,
+        catalogItemId: saved.catalogItemId,
       },
-      order: { createdAt: 'DESC' },
     });
+
+    return saved;
   }
 
-  async getDropsForCreator(creatorId: number): Promise<FreeboardDrop[]> {
-    return this.dropsRepo.find({
-      where: {
-        creatorId,
-      },
-      order: { createdAt: 'DESC' },
-    });
-  }
+  async getDropsForVenue(venueId: number, viewerUserId: number, viewerVenueId?: number | null, viewerRole?: string | null) {
+    const targetVenueId = Number(venueId);
+    const userId = Number(viewerUserId);
+    const scopedViewerVenueId =
+      viewerVenueId != null ? Number(viewerVenueId) : null;
+    const role = String(viewerRole ?? "").toLowerCase();
 
-  async cleanupExpiredDrops(): Promise<void> {
+    if (!targetVenueId) {
+      throw new BadRequestException("venue_required");
+    }
+
+    if (!userId) {
+      throw new BadRequestException("viewer_user_required");
+    }
+
+    const venue = await this.venuesService.findAll().then((rows) =>
+      rows.find((v) => v.id === targetVenueId),
+    );
+
+    if (!venue) {
+      throw new NotFoundException("venue_not_found");
+    }
+
+    const isOwner = Number(venue.ownerId) === userId;
+    const isVenueStaff =
+      role === "staff" &&
+      !!scopedViewerVenueId &&
+      scopedViewerVenueId === targetVenueId;
+
+    const roster = await this.venuePresenceService.getVenueRoster(targetVenueId);
+    const isVisibleAtVenue = roster.some((p) => Number(p.userId) === userId);
+
+    if (!isOwner && !isVenueStaff && !isVisibleAtVenue) {
+      throw new ForbiddenException("freeboard_venue_forbidden");
+    }
+
     const now = new Date();
 
-    const expired = await this.dropsRepo.find({
-      where: {
-        status: 'ACTIVE',
+    const staleDrops = await this.freeboardRepository.find({
+      where: [
+        {
+          venueId: targetVenueId,
+          status: "active",
+          expiresAt: LessThan(now),
+        },
+        {
+          venueId: targetVenueId,
+          status: "claimed",
+          expiresAt: LessThan(now),
+        },
+      ],
+    });
+
+    await this.freeboardRepository.update(
+      {
+        venueId: targetVenueId,
+        status: Not("expired"),
         expiresAt: LessThan(now),
       },
-    });
+      {
+        status: "expired",
+        expiredAt: now,
+      },
+    );
 
-    if (!expired.length) return;
-
-    for (const drop of expired) {
-      drop.status = 'EXPIRED';
+    for (const staleDrop of staleDrops) {
+      await this.expirePendingLifecycleForDrop(staleDrop.id);
     }
 
-    await this.dropsRepo.save(expired);
+    return this.freeboardRepository.find({
+      where: {
+        venueId: targetVenueId,
+        status: "active",
+        expiresAt: MoreThan(now),
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
   }
 
-  private generateClaimCode(): string {
-    // short code, uppercased hex, e.g. "007A6250"
-    return randomBytes(4).toString('hex').toUpperCase();
+  async claimDrop(input: { dropId: number; userId?: number; code?: string }) {
+    const userId = input.userId != null ? Number(input.userId) : null;
+    if (!userId) {
+      throw new BadRequestException("user_required");
+    }
+
+    const item = await this.freeboardRepository.findOne({
+      where: { id: input.dropId },
+    });
+
+    if (!item) {
+      throw new NotFoundException("drop_not_found");
+    }
+
+    const roster = await this.venuePresenceService.getVenueRoster(item.venueId);
+    const claimantPresence = roster.find((p) => Number(p.userId) === userId);
+
+    if (!claimantPresence) {
+      throw new BadRequestException("claimant_not_visible_at_venue");
+    }
+
+    if (item.maxClaimsPerUser != null) {
+      const priorClaims = await this.freeboardClaimsRepository.count({
+        where: {
+          freeboardItemId: item.id,
+          userId,
+          claimStatus: "claimed",
+        },
+      });
+
+      if (priorClaims >= item.maxClaimsPerUser) {
+        throw new BadRequestException("drop_max_claims_per_user_reached");
+      }
+    }
+
+    const now = new Date();
+
+    if (item.status !== "active") {
+      throw new BadRequestException("drop_not_active");
+    }
+
+    if (item.expiresAt.getTime() <= now.getTime()) {
+      await this.freeboardRepository.update(
+        { id: item.id },
+        {
+          status: "expired",
+          expiredAt: now,
+        },
+      );
+      await this.expirePendingLifecycleForDrop(item.id);
+      throw new BadRequestException("drop_expired");
+    }
+
+    const claimResult = await this.freeboardRepository
+      .createQueryBuilder()
+      .update(FreeboardItem)
+      .set({
+        claimedQuantity: () => '"claimedQuantity" + 1',
+        status: () => `CASE
+          WHEN "claimedQuantity" + 1 >= quantity THEN 'claimed'
+          ELSE status
+        END`,
+        claimedAt: () => `CASE
+          WHEN "claimedQuantity" + 1 >= quantity THEN NOW()
+          ELSE "claimedAt"
+        END`,
+      })
+      .where('id = :id', { id: item.id })
+      .andWhere(`status = 'active'`)
+      .andWhere(`"expiresAt" > NOW()`)
+      .andWhere(`"claimedQuantity" < quantity`)
+      .returning('*')
+      .execute();
+
+    if (!claimResult.affected) {
+      const latest = await this.freeboardRepository.findOne({
+        where: { id: item.id },
+      });
+
+      if (!latest) {
+        throw new NotFoundException("drop_not_found");
+      }
+
+      if (latest.status !== "active") {
+        throw new BadRequestException(
+          latest.status === "expired" ? "drop_expired" : "drop_not_active",
+        );
+      }
+
+      if (latest.expiresAt.getTime() <= Date.now()) {
+        await this.freeboardRepository.update(
+          { id: latest.id },
+          {
+            status: "expired",
+            expiredAt: new Date(),
+          },
+        );
+        await this.expirePendingLifecycleForDrop(latest.id);
+        throw new BadRequestException("drop_expired");
+      }
+
+      if (latest.claimedQuantity >= latest.quantity) {
+        throw new BadRequestException("drop_fully_claimed");
+      }
+
+      throw new BadRequestException("drop_claim_failed");
+    }
+
+    const updated = claimResult.raw?.[0] ?? null;
+
+    const redemption = await this.redemptionsService.createRedemption({
+      userId,
+      venueId: item.venueId,
+      catalogItemId: item.catalogItemId,
+      sourceType: "freeboard",
+      sourceId: item.id,
+    });
+
+    await this.freeboardClaimsRepository.save(
+      this.freeboardClaimsRepository.create({
+        freeboardItemId: item.id,
+        userId,
+        venueId: item.venueId,
+        redemptionId: redemption?.id ?? null,
+        claimStatus: "claimed",
+        claimSource: "venue",
+      }),
+    );
+
+    if (item.droppedByUserId) {
+      await this.notificationsService.createNotification({
+        userId: item.droppedByUserId,
+        type: "freeboard_item_claimed",
+        title: "FreeBoard item claimed",
+        body: "Someone claimed your FreeBoard item.",
+        dataJson: {
+          freeboardItemId: item.id,
+          claimedByUserId: userId,
+          venueId: item.venueId,
+          redemptionId: redemption?.id ?? null,
+        },
+      });
+    }
+
+    return {
+      freeboardItem: updated,
+      redemption,
+    };
+  }
+
+  async getDropsForCreator(creatorId: number, viewerUserId: number) {
+    const ownerId = Number(creatorId);
+    const viewerId = Number(viewerUserId);
+
+    if (!ownerId) {
+      throw new BadRequestException("creator_id_required");
+    }
+
+    if (!viewerId) {
+      throw new BadRequestException("viewer_user_required");
+    }
+
+    if (ownerId !== viewerId) {
+      throw new ForbiddenException("freeboard_creator_history_forbidden");
+    }
+
+    return this.freeboardRepository.find({
+      where: {
+        droppedByUserId: ownerId,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+  }
+
+  private async expirePendingLifecycleForDrop(dropId: number) {
+    const targetDropId = Number(dropId);
+
+    if (!targetDropId) {
+      return;
+    }
+
+    const pendingRedemptions = await this.redemptionsRepository.find({
+      where: {
+        sourceType: "freeboard",
+        sourceId: targetDropId,
+        status: "pending",
+      },
+    });
+
+    if (!pendingRedemptions.length) {
+      return;
+    }
+
+    const redemptionIds = pendingRedemptions.map((r) => Number(r.id));
+
+    await this.redemptionsRepository.update(
+      {
+        sourceType: "freeboard",
+        sourceId: targetDropId,
+        status: "pending",
+      },
+      {
+        status: "expired",
+      },
+    );
+
+    await this.catalogService.markReservationsExpired(redemptionIds);
+
+    for (const redemptionId of redemptionIds) {
+      await this.freeboardClaimsRepository.update(
+        {
+          redemptionId,
+          claimStatus: "claimed",
+        },
+        {
+          claimStatus: "expired",
+        },
+      );
+    }
   }
 }
 

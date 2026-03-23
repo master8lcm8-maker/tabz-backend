@@ -1,0 +1,19 @@
+﻿import 'reflect-metadata';
+import { DataSource } from 'typeorm';
+
+const root = __dirname.replace(/\\/g, '/');
+
+const url = (process.env.DATABASE_URL || '').trim();
+if (!url) {
+  throw new Error('DATABASE_URL is required. SQLite is not supported.');
+}
+
+export default new DataSource({
+  type: 'postgres',
+  url,
+  ssl: { rejectUnauthorized: false },
+  entities: [root + '/**/*.entity.ts', root + '/**/*.entity.js'],
+  migrations: [root + '/migrations/*.ts', root + '/migrations/*.js'],
+  synchronize: false,
+  migrationsRun: true,
+});

@@ -10,7 +10,7 @@ import {
   UseGuards,
   ForbiddenException,
   Query,
-  HttpException, // âœ… M31.1: preserve upstream status codes
+  HttpException, // ✅ M31.1: preserve upstream status codes
 } from '@nestjs/common';
 import { DevEndpointGuard } from '../app/dev-endpoint.guard';
 import { WalletService } from './wallet.service';
@@ -77,6 +77,23 @@ export class WalletController {
   }
 
   // --------------------------------------------------
+  // SPEND
+  // --------------------------------------------------
+  @Post('spend')
+  async spend(@Req() req, @Body() body: { amountCents: number }) {
+    this.assertWalletRole(req);
+    const userId = this.getUserId(req);
+    const amount = Number(body?.amountCents);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException('Invalid spend amount');
+    }
+
+    return this.walletService.spend(userId, amount);
+  }
+
+
+  // --------------------------------------------------
   // TRANSFER
   // --------------------------------------------------
   @Post('transfer')
@@ -108,6 +125,15 @@ export class WalletController {
   async cashout(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
+
+    // ============================
+    // R12: CASHOUT IS OWNER-ONLY
+    // ============================
+    // Must be outside try{} so buyer rejection is NOT wrapped
+    const role = String(req?.user?.role ?? '').toLowerCase();
+    if (role !== 'owner') {
+      throw new ForbiddenException('owner_only');
+    }
 
     try {
       // ===== GATE 1: Identity must be verified =====
@@ -172,15 +198,11 @@ export class WalletController {
         createdAt: cashout.createdAt,
       };
     } catch (e: any) {
-      // ðŸ”’ M30: FORCE JSON ERROR BODY (NO BEHAVIOR CHANGE)
-      // eslint-disable-next-line no-console
       console.error('[wallet.cashout] error', e);
 
-      const detail = e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
+      const detail =
+        e?.response?.message ?? e?.message ?? 'Unknown cashout failure';
 
-      // âœ… M31.1 FIX:
-      // Preserve the original status code on the HTTP transport
-      // while still returning our structured JSON body.
       const status = Number(e?.status);
       const httpStatus = Number.isFinite(status) && status > 0 ? status : 400;
 
@@ -206,6 +228,27 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, status ?? null);
   }
 
+  @Get('cashouts/failed')
+  async getFailedCashouts(@Req() req) {
+    this.assertWalletRole(req);
+    const userId = this.getUserId(req);
+    return this.walletService.listCashoutsCanonical(userId, 'failed');
+  }
+
+  @Get('cashouts/pending')
+  async getPendingCashouts(@Req() req) {
+    this.assertWalletRole(req);
+    const userId = this.getUserId(req);
+    return this.walletService.listCashoutsCanonical(userId, 'pending');
+  }
+
+  @Get('cashouts/completed')
+  async getCompletedCashouts(@Req() req) {
+    this.assertWalletRole(req);
+    const userId = this.getUserId(req);
+    return this.walletService.listCashoutsCanonical(userId, 'completed');
+  }
+
   @Get('cashouts/:id')
   async getCashoutById(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
@@ -217,13 +260,6 @@ export class WalletController {
     return this.walletService.getCashoutForUserById(userId, cashoutId);
   }
 
-  @Get('cashouts/failed')
-  async getFailedCashouts(@Req() req) {
-    this.assertWalletRole(req);
-    const userId = this.getUserId(req);
-    return this.walletService.listCashoutsCanonical(userId, 'failed');
-  }
-
   @Post('cashouts/:id/complete')
   async completeCashout(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
@@ -231,8 +267,7 @@ export class WalletController {
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-    const cashout = await this.walletService.adminCompleteCashout(cashoutId);
-    return cashout;
+    return this.walletService.adminCompleteCashout(cashoutId);
   }
 
   @Post('cashouts/:id/fail')
@@ -285,7 +320,7 @@ export class WalletController {
   }
 
   @UseGuards(DevEndpointGuard)
-@Post('dev/add-cashout-balance')
+  @Post('dev/add-cashout-balance')
   async devAddCashout(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     const userId = this.getUserId(req);
@@ -297,7 +332,7 @@ export class WalletController {
   }
 
   @UseGuards(DevEndpointGuard)
-@Post('unlock-spendable')
+  @Post('unlock-spendable')
   async unlockSpendable(@Req() req, @Body() body: { amountCents: number }) {
     this.assertWalletRole(req);
     if (String(req?.user?.role).toLowerCase() !== 'buyer') {
@@ -309,6 +344,45 @@ export class WalletController {
       throw new BadRequestException('amountCents must be a positive number');
     }
     return this.walletService.unlockSpendableBalance(userId, amount);
+  }
+
+  @UseGuards(DevEndpointGuard)
+  @Post('dev/spend-with-payout')
+  async devSpendWithPayout(
+    @Req() req,
+    @Body()
+    body: {
+      venueOwnerId: number;
+      amountCents: number;
+      platformFeePercent: number;
+    },
+  ) {
+    this.assertWalletRole(req);
+    const buyerId = this.getUserId(req);
+
+    const venueOwnerId = Number(body?.venueOwnerId);
+    const amount = Number(body?.amountCents);
+    const fee = Number(body?.platformFeePercent);
+
+    if (!Number.isFinite(venueOwnerId) || venueOwnerId <= 0) {
+      throw new BadRequestException('Invalid venueOwnerId');
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException('Invalid amountCents');
+    }
+
+    if (!Number.isFinite(fee) || fee < 0 || fee > 100) {
+      throw new BadRequestException('Invalid platformFeePercent');
+    }
+
+    return this.walletService.chargeStoreItemPurchase(
+      buyerId,
+      venueOwnerId,
+      amount,
+      fee,
+      {},
+    );
   }
 
   @Get('metrics')
@@ -332,18 +406,18 @@ export class WalletController {
     return this.walletService.getTransactionsForUser(userId);
   }
 
-  @Get('cashouts/pending')
-  async getPendingCashouts(@Req() req) {
+  @Post('cashouts/:id/reverse')
+  async reverseCashout(@Req() req, @Param('id') id: string) {
     this.assertWalletRole(req);
-    const userId = this.getUserId(req);
-    return this.walletService.listCashoutsCanonical(userId, 'pending');
-  }
 
-  @Get('cashouts/completed')
-  async getCompletedCashouts(@Req() req) {
-    this.assertWalletRole(req);
-    const userId = this.getUserId(req);
-    return this.walletService.listCashoutsCanonical(userId, 'completed');
+    const cashoutId = Number(id);
+    if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+      throw new BadRequestException('Invalid cashout id');
+    }
+
+    return this.walletService.adminReverseCashout(cashoutId);
   }
 }
+
+
 

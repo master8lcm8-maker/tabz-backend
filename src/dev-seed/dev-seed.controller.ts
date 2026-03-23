@@ -21,9 +21,20 @@ import { Venue } from '../modules/venues/venue.entity';
 
 // ✅ ADD
 import { StoreItemsService } from '../modules/store-items/store-items.service';
+
 @UseGuards(DevEndpointGuard)
 @Controller('dev-seed')
 export class DevSeedController {
+  private toSlug(input: string, fallback: string) {
+    const s = String(input || '')
+      .trim()
+      .toLowerCase()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return s || fallback;
+  }
+
   constructor(
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
@@ -44,19 +55,43 @@ export class DevSeedController {
   // 🔒 Dev-seed access gate (minimal + explicit)
   // ------------------------------------------------------------
   private assertDevSeedAllowed(req: any) {
-    if (String(process.env.NODE_ENV || '').toLowerCase() === 'production') {
-      throw new UnauthorizedException('dev_seed_disabled');
-    }
+    const secret = String(process.env.DEV_SEED_SECRET || '').trim();
 
-    const secret = String(process.env.DEV_SEED_SECRET || '');
+    // R5 instrumentation (safe): presence + length only (never log the value)
+    console.log('[DEV_SEED]', {
+      present: !!secret,
+      len: secret ? secret.length : 0,
+    });
+
     if (!secret) {
       throw new UnauthorizedException('dev_seed_secret_missing');
     }
 
-    const provided = String(req?.headers?.['x-dev-seed-secret'] || '');
-    if (provided !== secret) {
+    const provided = String(req?.headers?.['x-dev-seed-secret'] || '').trim();
+    if (!provided || provided !== secret) {
       throw new UnauthorizedException('dev_seed_forbidden');
     }
+  }
+
+  // ------------------------------------------------------------
+  // Helper: force user role in DB (idempotent)
+  // (Dev-seed MUST override UsersService default role='buyer')
+  // ------------------------------------------------------------
+  private async ensureUserRole(params: {
+    userId: number;
+    role: 'buyer' | 'owner' | 'staff';
+  }) {
+    const userId = Number(params.userId);
+    if (!Number.isFinite(userId) || userId <= 0) return;
+
+    const role = String(params.role || '').trim() as any;
+    if (role !== 'buyer' && role !== 'owner' && role !== 'staff') return;
+
+    // Postgres parameterized update
+    await this.dataSource.query(
+      `update users set role = $1 where id = $2 and (role is null or role <> $1)`,
+      [role, userId],
+    );
   }
 
   // ------------------------------------------------------------
@@ -140,16 +175,24 @@ export class DevSeedController {
     });
 
     if (!venue) {
+      const slug = this.toSlug(venueName, 'venue-' + ownerUserId);
       venue = this.venueRepo.create({
         ownerId: ownerUserId,
         ownerProfileId,
         name: venueName,
+        slug,
         address: null,
         city: null,
         state: null,
-        country: null,
+        country: 'US',
       });
       return await this.venueRepo.save(venue);
+    }
+
+    // Backfill missing slug (prevents any legacy null-slug venue from breaking downstream logic)
+    if (!venue.slug) {
+      venue.slug = this.toSlug(venue.name, 'venue-' + ownerUserId);
+      venue = await this.venueRepo.save(venue);
     }
 
     if (!venue.ownerProfileId) {
@@ -158,6 +201,69 @@ export class DevSeedController {
     }
 
     return venue;
+  }
+
+  // ------------------------------------------------------------
+  // Helper: get a real venue id for staff seeding (no FK roulette)
+  // ------------------------------------------------------------
+  private async ensureVenueForStaff(req: any): Promise<Venue> {
+    // Make sure owner user + owner profile + venue exist (idempotent)
+    const ownerEmail = 'owner@tabz.app';
+    const ownerPassword = 'password';
+    const ownerDisplayName = 'Demo Owner';
+
+    const ownerUser = await this.ensureUser({
+      email: ownerEmail,
+      password: ownerPassword,
+      displayName: ownerDisplayName,
+    });
+
+    if (!ownerUser?.id) {
+      throw new InternalServerErrorException('owner_user_missing_id');
+    }
+
+    // ✅ Ensure correct user role for owner
+    await this.ensureUserRole({ userId: ownerUser.id, role: 'owner' });
+
+    const ownerProfile = await this.ensureProfile({
+      userId: ownerUser.id,
+      displayName: ownerDisplayName,
+      type: ProfileType.OWNER,
+    });
+
+    if (!ownerProfile?.id) {
+      throw new InternalServerErrorException('owner_profile_missing_id');
+    }
+
+    // Ensure venue exists for that owner (this is the venue staff should FK to)
+    let venue = await this.ensureOwnerVenueLink({
+      ownerUserId: ownerUser.id,
+      ownerProfileId: ownerProfile.id,
+      venueName: 'Demo Venue',
+    });
+
+    // Absolute sanity check: if the venue still doesn't have an id, abort loudly
+    const venueId = Number((venue as any)?.id);
+    if (!Number.isFinite(venueId) || venueId <= 0) {
+      throw new InternalServerErrorException('venue_missing_id_after_ensure');
+    }
+
+    // Re-fetch to ensure it's actually persisted and FK-visible
+    const persisted = await this.venueRepo.findOne({
+      where: { id: venueId as any },
+    });
+    if (!persisted?.id) {
+      throw new InternalServerErrorException('venue_not_persisted');
+    }
+
+    // Backfill slug if needed
+    if (!persisted.slug) {
+      persisted.slug = this.toSlug(persisted.name, 'venue-' + ownerUser.id);
+      venue = await this.venueRepo.save(persisted);
+      return venue;
+    }
+
+    return persisted;
   }
 
   // ------------------------------------------------------------
@@ -172,6 +278,11 @@ export class DevSeedController {
     const displayName = 'Demo Buyer';
 
     const user = await this.ensureUser({ email, password, displayName });
+
+    // ✅ Ensure correct user role for buyer
+    if (user?.id) {
+      await this.ensureUserRole({ userId: user.id, role: 'buyer' });
+    }
 
     if (user?.id) {
       await this.ensureProfile({
@@ -196,6 +307,11 @@ export class DevSeedController {
     const displayName = 'Demo Owner';
 
     const user = await this.ensureUser({ email, password, displayName });
+
+    // ✅ Ensure correct user role for owner
+    if (user?.id) {
+      await this.ensureUserRole({ userId: user.id, role: 'owner' });
+    }
 
     if (user?.id) {
       const profile = await this.ensureProfile({
@@ -229,6 +345,11 @@ export class DevSeedController {
 
     const user = await this.ensureUser({ email, password, displayName });
 
+    // ✅ Ensure correct user role for owner2
+    if (user?.id) {
+      await this.ensureUserRole({ userId: user.id, role: 'owner' });
+    }
+
     if (user?.id) {
       const profile = await this.ensureProfile({
         userId: user.id,
@@ -258,13 +379,25 @@ export class DevSeedController {
     const email = 'staff@tabz.app';
     const password = 'password'; // ✅ match proofs
     const name = 'Demo Staff';
-    const venueId = 4;
+
+    // ✅ Fix: never pick "first venue" (can point at legacy/bad rows).
+    // Always seed/ensure the real owner venue and FK to that.
+    const venue = await this.ensureVenueForStaff(req);
+    if (!venue?.id) {
+      throw new BadRequestException('no_venue_for_staff');
+    }
+    const venueId = Number((venue as any).id);
 
     const user = await this.ensureUser({
       email,
       password,
       displayName: name,
     });
+
+    // ✅ Ensure correct user role for staff (fixes /auth/me showing buyer)
+    if (user?.id) {
+      await this.ensureUserRole({ userId: user.id, role: 'staff' });
+    }
 
     if (user?.id) {
       await this.ensureProfile({
@@ -327,6 +460,12 @@ export class DevSeedController {
     const venue = await this.venueRepo.findOne({ where: { ownerId } });
     if (!venue?.id) {
       throw new BadRequestException('owner_venue_missing');
+    }
+
+    // Backfill slug if legacy venue exists with null slug
+    if (!venue.slug) {
+      venue.slug = this.toSlug(venue.name, 'venue-' + ownerId);
+      await this.venueRepo.save(venue);
     }
 
     // Idempotent item: reuse an existing item if present
@@ -402,9 +541,18 @@ export class DevSeedController {
 
       if (!profile?.id) continue;
 
+      // ✅ Ensure correct user role for legacy owners touched by this repair
+      await this.ensureUserRole({ userId: ownerId, role: 'owner' });
+
       const toFix = legacyVenues.filter((v) => Number(v.ownerId) === ownerId);
       for (const v of toFix) {
         v.ownerProfileId = profile.id;
+
+        // Also backfill slug if needed
+        if (!v.slug) {
+          v.slug = this.toSlug(v.name, 'venue-' + ownerId);
+        }
+
         await this.venueRepo.save(v);
 
         fixedVenueIds.push(v.id);
@@ -451,4 +599,3 @@ export class DevSeedController {
     return { ok: true, buyer, owner, owner2, staff };
   }
 }
-
