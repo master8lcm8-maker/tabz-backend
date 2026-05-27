@@ -474,6 +474,32 @@
         </article>
       </div>
     </section>
+
+    <section id="public-freeboard" class="shell">
+      <div class="section-head">
+        <h2>Browse active FreeBoard drops</h2>
+        <p>FreeBoard public browse uses the live TABZ route for active, unexpired sponsored drops. Claiming requires signed-in user access.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">FreeBoard</span>
+          <h3>Load active drops</h3>
+          <p>Uses GET /freeboard/venue/1 and only returns ACTIVE drops that have not expired.</p>
+          <button id="freeboard-load-button" class="btn primary" type="button">Load Active FreeBoard</button>
+          <p id="freeboard-status" class="microcopy" aria-live="polite">FreeBoard has not loaded yet.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Active drops</span>
+          <h3>Venue 1 FreeBoard</h3>
+          <div id="freeboard-drops" class="microcopy">No FreeBoard drops loaded yet.</div>
+        </article>
+        <article class="card">
+          <span class="tag">Claim rule</span>
+          <h3>Signed-in claim flow</h3>
+          <p>Public users may browse active drops. Claiming uses POST /freeboard/claim and requires JWT authentication.</p>
+        </article>
+      </div>
+    </section>
     <section id="users" class="shell">
       <div class="section-head">
         <h2>User experience</h2>
@@ -771,6 +797,54 @@
             discoveryStatus.textContent = 'Live discovery loaded from TABZ public routes.';
           } catch (error) {
             discoveryStatus.textContent = 'Discovery request could not reach TABZ API.';
+          }
+        });
+      }
+    </script>
+    <script>
+      const freeboardButton = document.getElementById('freeboard-load-button');
+      const freeboardStatus = document.getElementById('freeboard-status');
+      const freeboardDrops = document.getElementById('freeboard-drops');
+
+      function renderFreeboardDrops(rows) {
+        if (!freeboardDrops) return;
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          freeboardDrops.textContent = 'No active FreeBoard drops returned for venue 1.';
+          return;
+        }
+
+        const ul = document.createElement('ul');
+        rows.slice(0, 6).forEach((drop) => {
+          const li = document.createElement('li');
+          const title = drop.title || ('Drop ID ' + drop.id);
+          const reward = drop.rewardCents ? ' — reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
+          const expires = drop.expiresAt ? ' — expires ' + new Date(drop.expiresAt).toLocaleString() : '';
+          li.textContent = String(title) + reward + expires;
+          ul.appendChild(li);
+        });
+
+        freeboardDrops.innerHTML = '';
+        freeboardDrops.appendChild(ul);
+      }
+
+      if (freeboardButton && freeboardStatus) {
+        freeboardButton.addEventListener('click', async () => {
+          freeboardStatus.textContent = 'Loading active FreeBoard drops...';
+
+          try {
+            const response = await fetch('/freeboard/venue/1');
+
+            if (!response.ok) {
+              freeboardStatus.textContent = 'FreeBoard request failed. Public route returned an error.';
+              return;
+            }
+
+            const drops = await response.json();
+            renderFreeboardDrops(drops);
+            freeboardStatus.textContent = 'Active FreeBoard route loaded from TABZ public API.';
+          } catch (error) {
+            freeboardStatus.textContent = 'FreeBoard request could not reach TABZ API.';
           }
         });
       }
