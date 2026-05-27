@@ -443,6 +443,37 @@
       </div>
     </section>
 
+
+    <section id="public-discovery" class="shell">
+      <div class="section-head">
+        <h2>Browse live venues, profiles, and items</h2>
+        <p>Public discovery uses live TABZ routes for venues, public profiles, and store/menu items.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Discovery</span>
+          <h3>Load public TABZ discovery</h3>
+          <p>Uses GET /venues/public, GET /profiles/public, and GET /store-items.</p>
+          <button id="discovery-load-button" class="btn primary" type="button">Load Live Discovery</button>
+          <p id="discovery-status" class="microcopy" aria-live="polite">Discovery has not loaded yet.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Venues</span>
+          <h3>Public venues</h3>
+          <div id="discovery-venues" class="microcopy">No venues loaded yet.</div>
+        </article>
+        <article class="card">
+          <span class="tag">Profiles</span>
+          <h3>Public profiles</h3>
+          <div id="discovery-profiles" class="microcopy">No profiles loaded yet.</div>
+        </article>
+        <article class="card">
+          <span class="tag">Items</span>
+          <h3>Store and menu items</h3>
+          <div id="discovery-items" class="microcopy">No items loaded yet.</div>
+        </article>
+      </div>
+    </section>
     <section id="users" class="shell">
       <div class="section-head">
         <h2>User experience</h2>
@@ -682,6 +713,64 @@
             ownerLoginStatus.textContent = 'Venue owner login successful. Owner session token saved for the dashboard flow.';
           } catch (error) {
             ownerLoginStatus.textContent = 'Venue owner login request could not reach TABZ API.';
+          }
+        });
+      }
+    </script>
+    <script>
+      const discoveryButton = document.getElementById('discovery-load-button');
+      const discoveryStatus = document.getElementById('discovery-status');
+      const discoveryVenues = document.getElementById('discovery-venues');
+      const discoveryProfiles = document.getElementById('discovery-profiles');
+      const discoveryItems = document.getElementById('discovery-items');
+
+      function renderDiscoveryList(target, rows, labelKey) {
+        if (!target) return;
+        if (!Array.isArray(rows) || rows.length === 0) {
+          target.textContent = 'No public records returned yet.';
+          return;
+        }
+
+        const ul = document.createElement('ul');
+        rows.slice(0, 6).forEach((row) => {
+          const li = document.createElement('li');
+          const primary = row[labelKey] || row.name || row.displayName || row.slug || ('ID ' + row.id);
+          const secondary = row.slug ? ' — ' + row.slug : '';
+          li.textContent = String(primary) + secondary;
+          ul.appendChild(li);
+        });
+
+        target.innerHTML = '';
+        target.appendChild(ul);
+      }
+
+      if (discoveryButton && discoveryStatus) {
+        discoveryButton.addEventListener('click', async () => {
+          discoveryStatus.textContent = 'Loading live TABZ discovery routes...';
+
+          try {
+            const responses = await Promise.all([
+              fetch('/venues/public'),
+              fetch('/profiles/public'),
+              fetch('/store-items')
+            ]);
+
+            if (responses.some((response) => !response.ok)) {
+              discoveryStatus.textContent = 'Discovery request failed. One or more public routes returned an error.';
+              return;
+            }
+
+            const venuesData = await responses[0].json();
+            const profilesData = await responses[1].json();
+            const itemsData = await responses[2].json();
+
+            renderDiscoveryList(discoveryVenues, venuesData.venues || venuesData.value || venuesData, 'name');
+            renderDiscoveryList(discoveryProfiles, profilesData.profiles || profilesData.value || profilesData, 'displayName');
+            renderDiscoveryList(discoveryItems, itemsData.value || itemsData.items || itemsData, 'name');
+
+            discoveryStatus.textContent = 'Live discovery loaded from TABZ public routes.';
+          } catch (error) {
+            discoveryStatus.textContent = 'Discovery request could not reach TABZ API.';
           }
         });
       }
