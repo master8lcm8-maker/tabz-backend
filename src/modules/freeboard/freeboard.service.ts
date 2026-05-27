@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository, LessThan, MoreThan } from 'typeorm';
 import { FreeboardDrop, FreeboardDropStatus } from './freeboard-drop.entity';
 import { randomBytes } from 'crypto';
 
@@ -95,10 +95,13 @@ export class FreeboardService {
   }
 
   async getDropsForVenue(venueId: number): Promise<FreeboardDrop[]> {
+    const now = new Date();
+
     return this.dropsRepo.find({
       where: {
         venueId,
         status: 'ACTIVE',
+        expiresAt: MoreThan(now),
       },
       order: { createdAt: 'DESC' },
     });
