@@ -473,6 +473,18 @@
         <p>Venue owners manage a real business dashboard, not a hidden backend route.</p>
       </div>
       <div class="grid">
+        <article class="card">
+          <span class="tag">Owner login</span>
+          <h3>Access venue dashboard</h3>
+          <form id="owner-login-form" class="cta-form">
+            <label for="owner-email">Owner email</label>
+            <input id="owner-email" name="email" type="email" autocomplete="username" placeholder="owner@tabz.app" required>
+            <label for="owner-password">Password</label>
+            <input id="owner-password" name="password" type="password" autocomplete="current-password" placeholder="Enter owner password" required>
+            <button class="btn primary" type="submit">Login as Venue Owner</button>
+            <p id="owner-login-status" class="microcopy" aria-live="polite">Uses POST /auth/login-owner for the venue owner account flow.</p>
+          </form>
+        </article>
         <article class="card"><span class="tag">Onboard</span><h3>Create venue profile</h3><p>Business type, address, region, contact info, photos, public profile, and operating status.</p></article>
         <article class="card"><span class="tag">Operate</span><h3>Items, orders, gifts</h3><p>Add menu/store items, manage orders, gifts, FreeBoard claims, redemptions, and manage staff.</p></article>
         <article class="card"><span class="tag">Earn</span><h3>Wallet + payouts</h3><p>See earnings, payout status, payout readiness, payout sources, cashouts, failures, and payout history.</p></article>
@@ -626,6 +638,50 @@
             userLoginStatus.textContent = 'User login successful. User session token saved for the account flow.';
           } catch (error) {
             userLoginStatus.textContent = 'User login request could not reach TABZ API.';
+          }
+        });
+      }
+    </script>
+    <script>
+      const ownerLoginForm = document.getElementById('owner-login-form');
+      const ownerLoginStatus = document.getElementById('owner-login-status');
+
+      if (ownerLoginForm && ownerLoginStatus) {
+        ownerLoginForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(ownerLoginForm);
+          const email = String(formData.get('email') || '').trim();
+          const password = String(formData.get('password') || '');
+
+          ownerLoginStatus.textContent = 'Checking venue owner credentials...';
+
+          try {
+            const response = await fetch('/auth/login-owner', {
+              method: 'POST'
+              ,headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+              ownerLoginStatus.textContent = 'Venue owner login failed. Check credentials or owner account status.';
+              return;
+            }
+
+            const data = await response.json();
+            const token = data.access_token || data.accessToken || '';
+
+            if (!token) {
+              ownerLoginStatus.textContent = 'Venue owner login succeeded but no token was returned.';
+              return;
+            }
+
+            window.localStorage.setItem('tabz_owner_access_token', token);
+            ownerLoginStatus.textContent = 'Venue owner login successful. Owner session token saved for the dashboard flow.';
+          } catch (error) {
+            ownerLoginStatus.textContent = 'Venue owner login request could not reach TABZ API.';
           }
         });
       }
