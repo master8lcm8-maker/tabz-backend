@@ -449,6 +449,18 @@
         <p>Users must be able to create an account, manage a profile, browse venues, send gifts, claim FreeBoard, redeem, and see wallet/history.</p>
       </div>
       <div class="grid">
+        <article class="card">
+          <span class="tag">User login</span>
+          <h3>Access user account</h3>
+          <form id="user-login-form" class="cta-form">
+            <label for="user-email">User email</label>
+            <input id="user-email" name="email" type="email" autocomplete="username" placeholder="buyer@tabz.app" required>
+            <label for="user-password">Password</label>
+            <input id="user-password" name="password" type="password" autocomplete="current-password" placeholder="Enter user password" required>
+            <button class="btn primary" type="submit">Login as User</button>
+            <p id="user-login-status" class="microcopy" aria-live="polite">Uses POST /auth/login-buyer for the user account flow.</p>
+          </form>
+        </article>
         <article class="card"><span class="tag">Account</span><h3>Create account + profile</h3><p>Web and mobile signup, login, profile, privacy, notifications, and account controls.</p></article>
         <article class="card"><span class="tag">Venue life</span><h3>Gifts, FreeBoard, orders</h3><p>Send/receive gifts, claim FreeBoard drops, order items, and track every state.</p></article>
         <article class="card"><span class="tag">Wallet</span><h3>Wallet + entitlements</h3><p>See wallet/entitlements, balances, entitlement value, cashout rules, QR redemption, notifications/history, and transaction history.</p></article>
@@ -570,6 +582,50 @@
             staffLoginStatus.textContent = 'Staff login successful. Staff session token saved for the assigned venue flow.';
           } catch (error) {
             staffLoginStatus.textContent = 'Staff login request could not reach TABZ API.';
+          }
+        });
+      }
+    </script>
+    <script>
+      const userLoginForm = document.getElementById('user-login-form');
+      const userLoginStatus = document.getElementById('user-login-status');
+
+      if (userLoginForm && userLoginStatus) {
+        userLoginForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(userLoginForm);
+          const email = String(formData.get('email') || '').trim();
+          const password = String(formData.get('password') || '');
+
+          userLoginStatus.textContent = 'Checking user credentials...';
+
+          try {
+            const response = await fetch('/auth/login-buyer', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+              userLoginStatus.textContent = 'User login failed. Check credentials or account status.';
+              return;
+            }
+
+            const data = await response.json();
+            const token = data.access_token || data.accessToken || '';
+
+            if (!token) {
+              userLoginStatus.textContent = 'User login succeeded but no token was returned.';
+              return;
+            }
+
+            window.localStorage.setItem('tabz_user_access_token', token);
+            userLoginStatus.textContent = 'User login successful. User session token saved for the account flow.';
+          } catch (error) {
+            userLoginStatus.textContent = 'User login request could not reach TABZ API.';
           }
         });
       }
