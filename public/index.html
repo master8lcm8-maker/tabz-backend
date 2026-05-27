@@ -477,6 +477,30 @@
 
 
 
+
+    <section id="qr-redemption-flow" class="shell">
+      <div class="section-head">
+        <h2>QR redemption, claims, and wallet value</h2>
+        <p>8TABZ redemption uses protected live routes. Staff and signed-in users must authenticate before redeeming, claiming, or viewing wallet value.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Staff redeem</span>
+          <h3>Redeem drink by code</h3>
+          <p>Protected route: POST /drinks/redeem. Staff redeems valid drink gift codes; non-staff roles are blocked.</p>
+        </article>
+        <article class="card">
+          <span class="tag">FreeBoard claim</span>
+          <h3>Claim sponsored drops</h3>
+          <p>Protected routes: POST /freeboard/claim and GET /freeboard/my. Users claim by code and track their created or claimed drops.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Wallet value</span>
+          <h3>Track balance and cashout rules</h3>
+          <p>Protected wallet routes: GET /wallet/summary, POST /wallet/transfer, and POST /wallet/cashout.</p>
+        </article>
+      </div>
+    </section>
     <section id="store-menu-order-flow" class="shell">
       <div class="section-head">
         <h2>Browse and order store/menu items</h2>
