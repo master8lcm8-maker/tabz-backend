@@ -473,6 +473,18 @@
         <p>Staff must have a separate limited experience for assigned venue operations.</p>
       </div>
       <div class="grid">
+        <article class="card">
+          <span class="tag">Staff login</span>
+          <h3>Access assigned venue queue</h3>
+          <form id="staff-login-form" class="cta-form">
+            <label for="staff-email">Staff email</label>
+            <input id="staff-email" name="email" type="email" autocomplete="username" placeholder="staff@tabz.app" required>
+            <label for="staff-password">Password</label>
+            <input id="staff-password" name="password" type="password" autocomplete="current-password" placeholder="Enter staff password" required>
+            <button class="btn primary" type="submit">Login as Staff</button>
+            <p id="staff-login-status" class="microcopy" aria-live="polite">Uses POST /auth/login-staff. Staff access is limited to assigned venue operations.</p>
+          </form>
+        </article>
         <article class="card"><span class="tag">Limited access</span><h3>Assigned venue only</h3><p>Staff sees only the assigned venue queue, not owner wallet or Admin HQ data.</p></article>
         <article class="card"><span class="tag">Queue</span><h3>Orders, gifts, FreeBoard</h3><p>Pending orders, gift redemptions, FreeBoard claims, and QR entitlement status.</p></article>
         <article class="card"><span class="tag">Redeem</span><h3>Approve or reject</h3><p>Redeem/reject valid items, reject expired/invalid claims, and leave an auditable trail.</p></article>
@@ -518,6 +530,50 @@
       </span>
     </div>
   </footer>
+    <script>
+      const staffLoginForm = document.getElementById('staff-login-form');
+      const staffLoginStatus = document.getElementById('staff-login-status');
+
+      if (staffLoginForm && staffLoginStatus) {
+        staffLoginForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(staffLoginForm);
+          const email = String(formData.get('email') || '').trim();
+          const password = String(formData.get('password') || '');
+
+          staffLoginStatus.textContent = 'Checking staff credentials...';
+
+          try {
+            const response = await fetch('/auth/login-staff', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+              staffLoginStatus.textContent = 'Staff login failed. Check credentials or staff assignment.';
+              return;
+            }
+
+            const data = await response.json();
+            const token = data.access_token || data.accessToken || '';
+
+            if (!token) {
+              staffLoginStatus.textContent = 'Staff login succeeded but no token was returned.';
+              return;
+            }
+
+            window.localStorage.setItem('tabz_staff_access_token', token);
+            staffLoginStatus.textContent = 'Staff login successful. Staff session token saved for the assigned venue flow.';
+          } catch (error) {
+            staffLoginStatus.textContent = 'Staff login request could not reach TABZ API.';
+          }
+        });
+      }
+    </script>
 </body>
 </html>
 
