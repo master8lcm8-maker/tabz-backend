@@ -7,18 +7,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { Staff } from './staff.entity';
 import { StaffService } from './staff.service';
 import { StaffAdminController } from './staff.admin.controller';
+import { StaffController } from './staff.controller';
 import { StaffAuthController } from './staff-auth.controller';
 import { StaffAuthService } from './staff-auth.service';
 import { StaffStrategy } from './staff.strategy';
 import { StaffAuthStrategy } from './staff-auth.strategy';
 
-// âœ… ADD: bring Venue entity into the TypeORM module graph
+// ✅ ADD: bring Venue entity into the TypeORM module graph
 import { VenuesModule } from '../venues/venues.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Staff]),
-    // âœ… ADD
+    // ✅ ADD
     VenuesModule,
     PassportModule.register({ defaultStrategy: 'staff-jwt' }),
     JwtModule.register({
@@ -26,7 +27,7 @@ import { VenuesModule } from '../venues/venues.module';
       signOptions: { expiresIn: '7d' },
     }),
   ],
-  controllers: [StaffAdminController, StaffAuthController],
+  controllers: [StaffAdminController, StaffController, StaffAuthController],
   providers: [
     StaffService,
     StaffAuthService,

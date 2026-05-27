@@ -1,4 +1,4 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
@@ -17,7 +17,6 @@ import { StoreItemsModule } from '../modules/store-items/store-items.module';
 import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
 import { VenuesModule } from '../modules/venues/venues.module';
-import { StaffModule } from '../modules/staff/staff.module';
 import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
@@ -111,7 +110,6 @@ import { DrinksModule } from '../modules/drinks/drinks.module';
     ProfileModule,
     CreditsModule,
     VenuesModule,
-    StaffModule,
     IdentityModule,
     HealthModule,
     DrinksModule,
