@@ -1,0 +1,523 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>8TABZ — Venue Gifting, FreeBoard, Orders & Redemption</title>
+  <meta name="description" content="8TABZ is a web and mobile venue engagement platform for users, bars, clubs, stores, staff, and admins." />
+  <style>
+    :root {
+      --bg: #030604;
+      --panel: rgba(10, 18, 14, 0.78);
+      --panel-strong: rgba(13, 25, 18, 0.94);
+      --lime: #84ff3f;
+      --lime-2: #b7ff73;
+      --silver: #d6ddd8;
+      --muted: #8d9b93;
+      --line: rgba(132, 255, 63, 0.22);
+      --danger: #ffef9a;
+      --white: #f7fff9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(132, 255, 63, 0.22), transparent 34rem),
+        radial-gradient(circle at 85% 10%, rgba(214, 221, 216, 0.11), transparent 30rem),
+        linear-gradient(145deg, #010201 0%, #050905 48%, #010201 100%);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(3, 6, 4, 0.82);
+      border-bottom: 1px solid rgba(132, 255, 63, 0.14);
+    }
+
+    .nav-inner {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #84ff3f, #d6ddd8);
+      color: #031006;
+      box-shadow: 0 0 30px rgba(132, 255, 63, 0.42);
+      font-weight: 1000;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      color: var(--silver);
+      font-size: 0.92rem;
+    }
+
+    .nav-links a {
+      padding: 9px 11px;
+      border-radius: 999px;
+    }
+
+    .nav-links a:hover {
+      background: rgba(132, 255, 63, 0.12);
+      color: var(--lime-2);
+    }
+
+    .hero {
+      padding: 86px 0 58px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--lime-2);
+      background: rgba(132, 255, 63, 0.08);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 6.6rem);
+      line-height: 0.88;
+      margin: 22px 0 20px;
+      letter-spacing: -0.07em;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, var(--white), var(--lime), var(--silver));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      font-size: clamp(1.05rem, 2vw, 1.32rem);
+      line-height: 1.65;
+      color: var(--silver);
+      max-width: 760px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 13px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 13px 18px;
+      border: 1px solid rgba(132, 255, 63, 0.25);
+      background: rgba(132, 255, 63, 0.08);
+      color: var(--white);
+      font-weight: 850;
+      min-height: 48px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--lime), #baff74);
+      color: #041006;
+      box-shadow: 0 0 36px rgba(132, 255, 63, 0.28);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .visual-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(13, 25, 18, 0.92), rgba(3, 6, 4, 0.82));
+      border-radius: 32px;
+      padding: 22px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45), 0 0 70px rgba(132, 255, 63, 0.12);
+    }
+
+    .phone {
+      border-radius: 28px;
+      background: #071009;
+      border: 1px solid rgba(214, 221, 216, 0.16);
+      padding: 16px;
+    }
+
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid rgba(132, 255, 63, 0.16);
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(132, 255, 63, 0.07);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.45rem;
+      color: var(--lime);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    section {
+      padding: 54px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 0.95;
+      margin: 0;
+      letter-spacing: -0.05em;
+    }
+
+    .section-head p {
+      max-width: 520px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 26px;
+      padding: 22px;
+      min-height: 190px;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 1.18rem;
+    }
+
+    .card p, .card li {
+      color: var(--silver);
+      line-height: 1.55;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      color: var(--lime-2);
+      border: 1px solid rgba(132, 255, 63, 0.22);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 14px;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 850;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      counter-reset: flow;
+    }
+
+    .flow-step {
+      counter-increment: flow;
+      position: relative;
+      border-radius: 24px;
+      padding: 20px;
+      min-height: 170px;
+      background: linear-gradient(180deg, rgba(132, 255, 63, 0.12), rgba(10, 18, 14, 0.72));
+      border: 1px solid var(--line);
+    }
+
+    .flow-step:before {
+      content: counter(flow);
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--lime);
+      color: #041006;
+      font-weight: 950;
+      margin-bottom: 14px;
+    }
+
+    .trust {
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(132, 255, 63, 0.13), rgba(214, 221, 216, 0.06));
+    }
+
+    .footer {
+      border-top: 1px solid rgba(132, 255, 63, 0.16);
+      padding: 26px 0 44px;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer a {
+      color: var(--silver);
+      margin-right: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 48px;
+      }
+
+      .grid, .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: 14px;
+      }
+
+      .nav-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="shell nav-inner">
+      <a class="brand" href="#top" aria-label="8TABZ home">
+        <span class="brand-mark">8</span>
+        <span>8TABZ</span>
+      </a>
+      <div class="nav-links" aria-label="Primary navigation">
+        <a href="#how">How it works</a>
+        <a href="#users">Users</a>
+        <a href="#venues">Venues</a>
+        <a href="#staff">Staff</a>
+        <a href="#admin">Admin HQ</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="shell hero">
+      <div>
+        <span class="eyebrow">Web + mobile venue engagement platform</span>
+        <h1><span class="gradient">Send it.</span><br />Redeem it.<br />Track it.</h1>
+        <p class="hero-copy">
+          8TABZ connects users, bars, clubs, stores, staff, and admins through gifting, FreeBoard drops,
+          ordering, QR redemption, wallets, payouts, notifications, and full Admin HQ visibility.
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="#users">Start as User</a>
+          <a class="btn" href="#venues">Join as Venue / Bar / Club / Store</a>
+          <a class="btn" href="#staff">Staff Login</a>
+          <a class="btn" href="#admin">Admin HQ</a>
+        </div>
+      </div>
+
+      <aside class="visual-card" aria-label="8TABZ platform preview">
+        <div class="phone">
+          <div class="phone-top">
+            <span>8TABZ LIVE OPS</span>
+            <span>Wallet + Redeem</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><strong>Gift</strong><span>send drinks, items, and venue value</span></div>
+            <div class="metric"><strong>QR</strong><span>staff redeem / reject entitlements</span></div>
+            <div class="metric"><strong>FreeBoard</strong><span>claim sponsored public drops</span></div>
+            <div class="metric"><strong>HQ</strong><span>audit users, venues, wallet, ledger</span></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="how" class="shell">
+      <div class="section-head">
+        <h2>How 8TABZ works</h2>
+        <p>Every role gets a clear path. Every paid value gets a visible state. No feature should stay buried in code.</p>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><h3>Discover</h3><p>Users discover venues, browse venues, bars, clubs, stores, menus, products, and public venue profiles.</p></div>
+        <div class="flow-step"><h3>Send / Claim / Buy</h3><p>Users send gifts, users claim FreeBoard items, and users buy/order items from venue menus and stores.</p></div>
+        <div class="flow-step"><h3>Redeem</h3><p>Staff confirms, redeems, or rejects QR and entitlement states at the venue.</p></div>
+        <div class="flow-step"><h3>Audit</h3><p>Admin HQ audits users, venues, wallets, ledger/reconciliation, refunds/disputes, payouts, risk, and final resolution.</p></div>
+      </div>
+    </section>
+
+    <section id="users" class="shell">
+      <div class="section-head">
+        <h2>User experience</h2>
+        <p>Users must be able to create an account, manage a profile, browse venues, send gifts, claim FreeBoard, redeem, and see wallet/history.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Account</span><h3>Create account + profile</h3><p>Web and mobile signup, login, profile, privacy, notifications, and account controls.</p></article>
+        <article class="card"><span class="tag">Venue life</span><h3>Gifts, FreeBoard, orders</h3><p>Send/receive gifts, claim FreeBoard drops, order items, and track every state.</p></article>
+        <article class="card"><span class="tag">Wallet</span><h3>Wallet + entitlements</h3><p>See wallet/entitlements, balances, entitlement value, cashout rules, QR redemption, notifications/history, and transaction history.</p></article>
+      </div>
+    </section>
+
+    <section id="venues" class="shell">
+      <div class="section-head">
+        <h2>Venue, bar, club, and store owners</h2>
+        <p>Venue owners manage a real business dashboard, not a hidden backend route.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Onboard</span><h3>Create venue profile</h3><p>Business type, address, region, contact info, photos, public profile, and operating status.</p></article>
+        <article class="card"><span class="tag">Operate</span><h3>Items, orders, gifts</h3><p>Add menu/store items, manage orders, gifts, FreeBoard claims, redemptions, and manage staff.</p></article>
+        <article class="card"><span class="tag">Earn</span><h3>Wallet + payouts</h3><p>See earnings, payout status, payout readiness, payout sources, cashouts, failures, and payout history.</p></article>
+      </div>
+    </section>
+
+    <section id="staff" class="shell">
+      <div class="section-head">
+        <h2>Staff redemption</h2>
+        <p>Staff must have a separate limited experience for assigned venue operations.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Limited access</span><h3>Assigned venue only</h3><p>Staff sees only the assigned venue queue, not owner wallet or Admin HQ data.</p></article>
+        <article class="card"><span class="tag">Queue</span><h3>Orders, gifts, FreeBoard</h3><p>Pending orders, gift redemptions, FreeBoard claims, and QR entitlement status.</p></article>
+        <article class="card"><span class="tag">Redeem</span><h3>Approve or reject</h3><p>Redeem/reject valid items, reject expired/invalid claims, and leave an auditable trail.</p></article>
+      </div>
+    </section>
+
+    <section id="admin" class="shell">
+      <div class="section-head">
+        <h2>Admin HQ visibility</h2>
+        <p>Admin HQ is the command layer for final operations, wallet policy, and platform integrity.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Platform</span><h3>Users, venues, staff</h3><p>Track account roles, onboarding, venue state, staff assignments, and access boundaries.</p></article>
+        <article class="card"><span class="tag">Money</span><h3>Wallet, ledger, payouts</h3><p>Wallet policy, ledger reconciliation, Stripe/payment events, cashouts, payouts, and outstanding liability.</p></article>
+        <article class="card"><span class="tag">Resolution</span><h3>Refunds, disputes, risk</h3><p>Monitor refunds, disputes, risk/fraud signals, final operations readiness, and admin audit trail.</p></article>
+      </div>
+    </section>
+
+    <section class="shell">
+      <div class="trust">
+        <h2>Every paid event needs a final state.</h2>
+        <p>
+          8TABZ is designed so gifts, FreeBoard items, orders, redemptions, refunds, disputes, payouts, and wallet activity
+          stay visible across user, venue, staff, Admin HQ, backend, and ledger proof.
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="#users">Get Started</a>
+          <a class="btn" href="privacy.html">Privacy</a>
+          <a class="btn" href="terms.html">Terms</a>
+          <a class="btn" href="support.html">Support</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <span>© 2026 8TABZ. Web + mobile venue engagement platform.</span>
+      <span>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="support.html">Support</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>
+

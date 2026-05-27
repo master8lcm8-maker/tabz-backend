@@ -1,3 +1,4 @@
+import { join } from 'path';
 // src/app/main.ts
 
 //  FIX: ensure globalThis.crypto exists (needed by @nestjs/schedule on some Node runtimes)
@@ -9,6 +10,7 @@ if (!(globalThis as any).crypto) {
 import { NestFactory } from '@nestjs/core';
 import { HttpStatusBodySyncFilter } from './http-status-body-sync.filter';
 import { AppModule } from './app.module';
+const express = require('express');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -80,6 +82,11 @@ async function bootstrap() {
   const port = 3000;
 
   //  Explicit bind to all interfaces (fixes Windows ambiguity)
+  // PHASE25_PUBLIC_FACE_STATIC_MOUNT
+  // Serve the staged public 8TABZ web face from backend/public.
+  // Existing API routes such as /health remain available.
+  const publicRoot = join(process.cwd(), 'public');
+  app.use(express.static(publicRoot, { index: 'index.html' }));
   const server = await app.listen(port, '0.0.0.0');
 
   //  Log the real bound address (source of truth)
