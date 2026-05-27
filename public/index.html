@@ -476,6 +476,30 @@
     </section>
 
 
+
+    <section id="store-menu-order-flow" class="shell">
+      <div class="section-head">
+        <h2>Browse and order store/menu items</h2>
+        <p>8TABZ store and menu ordering uses public browse routes and protected order routes. Public visitors can browse items; ordering and order management require sign-in.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Public browse</span>
+          <h3>Browse items</h3>
+          <p>Public routes: GET /store-items, GET /store-items/venue/1, and GET /store-items/1.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Buyer order</span>
+          <h3>Create and view orders</h3>
+          <p>Protected buyer routes: POST /store-items/order and GET /store-items/my-orders.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Owner and staff</span>
+          <h3>Manage order flow</h3>
+          <p>Protected operations routes: GET /store-items/owner/orders and GET /store-items/staff/orders.</p>
+        </article>
+      </div>
+    </section>
     <section id="drink-gift-flow" class="shell">
       <div class="section-head">
         <h2>Send drink gifts</h2>
