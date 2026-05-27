@@ -475,6 +475,30 @@
       </div>
     </section>
 
+
+    <section id="drink-gift-flow" class="shell">
+      <div class="section-head">
+        <h2>Send drink gifts</h2>
+        <p>8TABZ drink gifting uses the protected drink order flow. Users must sign in before sending, viewing, or redeeming drink gifts.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Gift route</span>
+          <h3>Create drink gift</h3>
+          <p>Protected route: POST /drinks/orders. This creates a pending drink order/gift tied to a venue and sender.</p>
+        </article>
+        <article class="card">
+          <span class="tag">User history</span>
+          <h3>My sent drink gifts</h3>
+          <p>Protected route: GET /drinks/my. Signed-in users can view drink gifts/orders they created.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Staff redeem</span>
+          <h3>Redeem by code</h3>
+          <p>Protected staff route: POST /drinks/redeem. Staff redeems valid drink gift codes and blocks unauthorized roles.</p>
+        </article>
+      </div>
+    </section>
     <section id="public-freeboard" class="shell">
       <div class="section-head">
         <h2>Browse active FreeBoard drops</h2>
