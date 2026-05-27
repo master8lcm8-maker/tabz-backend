@@ -16,36 +16,55 @@ export class FreeboardService {
     private readonly dropsRepo: Repository<FreeboardDrop>,
   ) {}
 
-  async createDrop(
-    creatorId: number,
-    venueId: number,
-    message: string,
-    expiresInMinutes = 60,
-  ): Promise<FreeboardDrop> {
-    if (!message || !message.trim()) {
-      throw new BadRequestException('Message is required for a drop.');
+  async createDrop(input: {
+    creatorId: number;
+    venueId: number;
+    title: string;
+    description?: string;
+    rewardCents?: number;
+    expiresInMinutes?: number;
+  }): Promise<FreeboardDrop> {
+    const title = String(input?.title ?? '').trim();
+
+    if (!title) {
+      throw new BadRequestException('Title is required for a drop.');
+    }
+
+    const expiresInMinutes = Number(input?.expiresInMinutes ?? 60);
+    if (!Number.isFinite(expiresInMinutes) || expiresInMinutes <= 0) {
+      throw new BadRequestException('expiresInMinutes must be a positive number.');
+    }
+
+    const rewardCents = Number(input?.rewardCents ?? 0);
+    if (!Number.isFinite(rewardCents) || rewardCents < 0) {
+      throw new BadRequestException('rewardCents must be a non-negative number.');
     }
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresInMinutes * 60 * 1000);
 
     const drop = this.dropsRepo.create({
-      creatorId,
-      venueId,
-      message,
+      creatorId: input.creatorId,
+      venueId: input.venueId,
+      title,
+      description: input.description ?? null,
+      rewardCents: String(Math.trunc(rewardCents)),
       status: 'ACTIVE' as FreeboardDropStatus,
       claimCode: this.generateClaimCode(),
       expiresAt,
       claimedAt: null,
+      claimedByUserId: null,
     });
 
     return this.dropsRepo.save(drop);
   }
 
-  async claimDrop(
-    claimCode: string,
-    claimerId: number,
-  ): Promise<FreeboardDrop> {
+  async claimDrop(input: {
+    userId: number;
+    code: string;
+  }): Promise<FreeboardDrop> {
+    const claimCode = String(input?.code ?? '').trim();
+
     if (!claimCode) {
       throw new BadRequestException('Claim code is required.');
     }
@@ -70,7 +89,7 @@ export class FreeboardService {
 
     drop.status = 'CLAIMED';
     drop.claimedAt = new Date();
-    drop.claimerId = claimerId;
+    drop.claimedByUserId = input.userId;
 
     return this.dropsRepo.save(drop);
   }

@@ -20,6 +20,7 @@ import { VenuesModule } from '../modules/venues/venues.module';
 import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
+import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 
 @Module({
   providers: [AppService],
@@ -113,6 +114,7 @@ import { DrinksModule } from '../modules/drinks/drinks.module';
     IdentityModule,
     HealthModule,
     DrinksModule,
+    FreeboardModule,
     DevSeedModule,
     AccountDeletionModule,
   ],
