@@ -62,4 +62,10 @@ export class StaffService {
 
     return staff;
   }
+
+  // PHASE25_STAFF_COMPAT_VALIDLOGIN_ALIAS
+  // Compatibility alias for legacy StaffController call.
+  async validLogin(email: string, password: string): Promise<Staff | null> {
+    return this.validateCredentials(email, password);
+  }
 }
