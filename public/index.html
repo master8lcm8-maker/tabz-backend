@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>8TABZ ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Venue Gifting, FreeBoard, Orders & Redemption</title>
+  <title>8TABZ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â Venue Gifting, FreeBoard, Orders & Redemption</title>
   <meta name="description" content="8TABZ is a web and mobile venue engagement platform for users, bars, clubs, stores, staff, and admins." />
   <style>
     :root {
@@ -590,7 +590,7 @@
             <p id="user-login-status" class="microcopy" aria-live="polite">Uses POST /auth/login-buyer for the user account flow.</p>
           </form>
         </article>
-        <article class="card"><span class="tag">Account</span><h3>Create account + profile</h3><p>Web and mobile signup, login, profile, privacy, notifications, and account controls.</p></article>
+        <article id="notifications-lifecycle-alerts-routes-card" class="card"><span class="tag">Lifecycle alerts</span><h3>Protected lifecycle source routes</h3><p>Protected live source routes: GET /drinks/my, GET /drinks/venue-orders, POST /drinks/orders, POST /drinks/redeem, GET /freeboard/my, POST /freeboard/drops, POST /freeboard/claim, GET /store-items/my-orders, GET /store-items/staff/orders, POST /store-items/order, POST /store-items/my-orders/:orderId/cancel, POST /store-items/staff/orders/:orderId/mark, POST /store-items/staff/orders/:orderId/cancel, GET /wallet/transactions, GET /wallet/cashouts, and GET /credits/balance. Public live route: GET /freeboard/venue/1.</p><p class="microcopy">Blocked from working notification claims until proven live: /notifications, /notifications/unread, /notifications/count, /notifications/badges, /notifications/:id/read, /notifications/read-all, /alerts, /alerts/unread, /messages, /inbox, push notifications, notification center, unread/read notification state, and badge system.</p></article>
         <article class="card"><span class="tag">Venue life</span><h3>Gifts, FreeBoard, orders</h3><p>Send/receive gifts, claim FreeBoard drops, order items, and track every state.</p></article>
         <article class="card"><span class="tag">Wallet</span><h3>Wallet + entitlements</h3><p>See wallet/entitlements, balances, entitlement value, cashout rules, QR redemption, notifications/history, and transaction history.</p></article>
         <article id="user-account-profile-session-routes-card" class="card"><span class="tag">User account</span><h3>Protected profile, session, and history</h3><p>Protected live routes: POST /auth/login, POST /auth/login-buyer, GET /auth/me, GET /users/me, GET /profiles/me, POST /profiles/me/avatar, POST /profiles/me/cover, POST /account-deletion/request, POST /account-deletion/confirm, POST /identity/start, GET /identity/status, GET /wallet/summary, GET /wallet/transactions, GET /credits/balance, GET /drinks/my, GET /store-items/my-orders, and GET /freeboard/my. Public live route: GET /profiles/public.</p><p class="microcopy">Blocked from working user-route claims until proven live: POST /profiles/me profile update, /profiles/buyer-1/public, /profiles/buyer-1, and /profiles/owner-1/owner-page/public.</p></article>
@@ -695,7 +695,7 @@
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2026 8TABZ. Web + mobile venue engagement platform.</span>
+      <span>ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2026 8TABZ. Web + mobile venue engagement platform.</span>
       <span>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
@@ -853,7 +853,7 @@
         rows.slice(0, 6).forEach((row) => {
           const li = document.createElement('li');
           const primary = row[labelKey] || row.name || row.displayName || row.slug || ('ID ' + row.id);
-          const secondary = row.slug ? ' ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ' + row.slug : '';
+          const secondary = row.slug ? ' ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ' + row.slug : '';
           li.textContent = String(primary) + secondary;
           ul.appendChild(li);
         });
@@ -910,8 +910,8 @@
         rows.slice(0, 6).forEach((drop) => {
           const li = document.createElement('li');
           const title = drop.title || ('Drop ID ' + drop.id);
-          const reward = drop.rewardCents ? ' ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
-          const expires = drop.expiresAt ? ' ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â expires ' + new Date(drop.expiresAt).toLocaleString() : '';
+          const reward = drop.rewardCents ? ' ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
+          const expires = drop.expiresAt ? ' ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â expires ' + new Date(drop.expiresAt).toLocaleString() : '';
           li.textContent = String(title) + reward + expires;
           ul.appendChild(li);
         });
