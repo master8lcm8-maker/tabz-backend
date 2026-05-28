@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>8TABZ — Venue Gifting, FreeBoard, Orders & Redemption</title>
+  <title>8TABZ â€” Venue Gifting, FreeBoard, Orders & Redemption</title>
   <meta name="description" content="8TABZ is a web and mobile venue engagement platform for users, bars, clubs, stores, staff, and admins." />
   <style>
     :root {
@@ -652,6 +652,7 @@
       <div class="grid">
         <article class="card"><span class="tag">Platform</span><h3>Users, venues, staff</h3><p>Track account roles, onboarding, venue state, staff assignments, and access boundaries.</p></article>
         <article class="card"><span class="tag">Money</span><h3>Wallet, ledger, payouts</h3><p>Wallet policy, ledger reconciliation, Stripe/payment events, cashouts, payouts, and outstanding liability.</p></article>
+        <article id="admin-cashout-operations-card" class="card"><span class="tag">Cashout ops</span><h3>Protected cashout operations</h3><p>Protected live routes: GET /wallet/cashouts, GET /wallet/cashouts/:id, GET /wallet/cashouts/failed, POST /wallet/cashouts/:id/complete, POST /wallet/cashouts/:id/fail, POST /wallet/cashouts/:id/repair-refund, POST /wallet/cashouts/:id/cancel, and POST /wallet/cashouts/:id/retry.</p><p class="microcopy">Blocked from working Admin HQ route claims until proven live: /staff-admin/create, /owner/payouts, /safety/reports, /safety/blocks, /safety/report, /safety/block, and /safety/unblock. POST /admin/store-items remains YELLOW after 400 live response.</p></article>
         <article class="card"><span class="tag">Resolution</span><h3>Refunds, disputes, risk</h3><p>Monitor refunds, disputes, risk/fraud signals, final operations readiness, and admin audit trail.</p></article>
       </div>
     </section>
@@ -691,7 +692,7 @@
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>© 2026 8TABZ. Web + mobile venue engagement platform.</span>
+      <span>Â© 2026 8TABZ. Web + mobile venue engagement platform.</span>
       <span>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
@@ -849,7 +850,7 @@
         rows.slice(0, 6).forEach((row) => {
           const li = document.createElement('li');
           const primary = row[labelKey] || row.name || row.displayName || row.slug || ('ID ' + row.id);
-          const secondary = row.slug ? ' — ' + row.slug : '';
+          const secondary = row.slug ? ' â€” ' + row.slug : '';
           li.textContent = String(primary) + secondary;
           ul.appendChild(li);
         });
@@ -906,8 +907,8 @@
         rows.slice(0, 6).forEach((drop) => {
           const li = document.createElement('li');
           const title = drop.title || ('Drop ID ' + drop.id);
-          const reward = drop.rewardCents ? ' — reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
-          const expires = drop.expiresAt ? ' — expires ' + new Date(drop.expiresAt).toLocaleString() : '';
+          const reward = drop.rewardCents ? ' â€” reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
+          const expires = drop.expiresAt ? ' â€” expires ' + new Date(drop.expiresAt).toLocaleString() : '';
           li.textContent = String(title) + reward + expires;
           ul.appendChild(li);
         });
