@@ -1,4 +1,4 @@
-import { join } from 'path';
+﻿import { join } from 'path';
 // src/app/main.ts
 
 //  FIX: ensure globalThis.crypto exists (needed by @nestjs/schedule on some Node runtimes)
@@ -46,7 +46,7 @@ async function bootstrap() {
     'x-dev-seed-secret'
   ];
 
-  // ✅ HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
+  // âœ… HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
   // This is minimal and safe: it only affects OPTIONS requests.
   app.getHttpAdapter().getInstance().use((req, res, next) => {
     if (req.method !== 'OPTIONS') return next();
@@ -86,6 +86,26 @@ async function bootstrap() {
   // Serve the staged public 8TABZ web face from backend/public.
   // Existing API routes such as /health remain available.
   const publicRoot = join(process.cwd(), 'public');
+
+  // PHASE26_PUBLIC_LEGAL_SUPPORT_CLEAN_ROUTES
+  const publicCleanRoutes: Record<string, string> = {
+    '/privacy': 'privacy.html',
+    '/terms': 'terms.html',
+    '/support': 'support.html',
+    '/contact': 'contact.html',
+    '/help': 'help.html',
+    '/legal': 'legal.html',
+    '/compliance': 'compliance.html',
+    '/data-export': 'data-export.html',
+    '/safety/report': 'safety-report.html',
+  };
+
+  for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
+    app.getHttpAdapter().getInstance().get(routePath, (_req, res) => {
+      res.sendFile(join(publicRoot, fileName));
+    });
+  }
+
   app.use(express.static(publicRoot, { index: 'index.html' }));
   const server = await app.listen(port, '0.0.0.0');
 
