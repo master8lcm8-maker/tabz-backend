@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>8TABZ Ã¢â‚¬â€ Venue Gifting, FreeBoard, Orders & Redemption</title>
+  <title>8TABZ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Venue Gifting, FreeBoard, Orders & Redemption</title>
   <meta name="description" content="8TABZ is a web and mobile venue engagement platform for users, bars, clubs, stores, staff, and admins." />
   <style>
     :root {
@@ -642,6 +642,7 @@
         <article class="card"><span class="tag">Limited access</span><h3>Assigned venue only</h3><p>Staff sees only the assigned venue queue, not owner wallet or Admin HQ data.</p></article>
         <article class="card"><span class="tag">Queue</span><h3>Orders, gifts, FreeBoard</h3><p>Pending orders, gift redemptions, FreeBoard claims, and QR entitlement status.</p></article>
         <article class="card"><span class="tag">Redeem</span><h3>Approve or reject</h3><p>Redeem/reject valid items, reject expired/invalid claims, and leave an auditable trail.</p></article>
+        <article id="staff-queue-redemption-routes-card" class="card"><span class="tag">Staff routes</span><h3>Protected queue and redemption</h3><p>Protected live routes: POST /drinks/redeem, GET /store-items/staff/orders, GET /store-items/staff/orders/:orderId, POST /store-items/staff/orders/:orderId/mark, POST /store-items/staff/orders/:orderId/cancel, POST /freeboard/claim, and GET /freeboard/my. Public live route: GET /freeboard/venue/1.</p><p class="microcopy">Blocked from working staff-route claims until proven live: /auth/login-staff as GREEN login after 500, /staff/login, /staff/me, and /foods/redeem.</p></article>
       </div>
     </section>
 
@@ -693,7 +694,7 @@
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>Ã‚Â© 2026 8TABZ. Web + mobile venue engagement platform.</span>
+      <span>Ãƒâ€šÃ‚Â© 2026 8TABZ. Web + mobile venue engagement platform.</span>
       <span>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
@@ -851,7 +852,7 @@
         rows.slice(0, 6).forEach((row) => {
           const li = document.createElement('li');
           const primary = row[labelKey] || row.name || row.displayName || row.slug || ('ID ' + row.id);
-          const secondary = row.slug ? ' Ã¢â‚¬â€ ' + row.slug : '';
+          const secondary = row.slug ? ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ' + row.slug : '';
           li.textContent = String(primary) + secondary;
           ul.appendChild(li);
         });
@@ -908,8 +909,8 @@
         rows.slice(0, 6).forEach((drop) => {
           const li = document.createElement('li');
           const title = drop.title || ('Drop ID ' + drop.id);
-          const reward = drop.rewardCents ? ' Ã¢â‚¬â€ reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
-          const expires = drop.expiresAt ? ' Ã¢â‚¬â€ expires ' + new Date(drop.expiresAt).toLocaleString() : '';
+          const reward = drop.rewardCents ? ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â reward $' + (Number(drop.rewardCents) / 100).toFixed(2) : '';
+          const expires = drop.expiresAt ? ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â expires ' + new Date(drop.expiresAt).toLocaleString() : '';
           li.textContent = String(title) + reward + expires;
           ul.appendChild(li);
         });
