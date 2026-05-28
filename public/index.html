@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -656,6 +656,22 @@
       </div>
     </section>
 
+    <section id="wallet-ledger-payout-flow" class="shell">
+      <div class="section-head">
+        <span class="eyebrow">Wallet / ledger / payout visibility</span>
+        <h2>Protected wallet history, cashout, and payout readiness</h2>
+        <p>These are protected live routes. Signed-in users and owners must authenticate before viewing balances, wallet history, payout readiness, cashout queues, or credit request details.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Wallet summary</span><h3>Balance and policy view</h3><p>Protected route: GET /wallet/summary. Shows wallet value only after authentication.</p></article>
+        <article class="card"><span class="tag">History</span><h3>Wallet transaction history</h3><p>Protected route: GET /wallet/transactions. Standalone /transactions is not claimed because it is not live-proven.</p></article>
+        <article class="card"><span class="tag">Metrics</span><h3>Owner money visibility</h3><p>Protected routes: GET /wallet/metrics and GET /wallet/next-payout for payout readiness and wallet operating status.</p></article>
+        <article class="card"><span class="tag">Cashout</span><h3>Cashout queue states</h3><p>Protected routes: POST /wallet/cashout, GET /wallet/cashouts/pending, and GET /wallet/cashouts/completed.</p></article>
+        <article class="card"><span class="tag">Transfer</span><h3>Wallet transfer action</h3><p>Protected route: POST /wallet/transfer. Requires authentication before any value movement can be requested.</p></article>
+        <article class="card"><span class="tag">Credits</span><h3>Credit balance and requests</h3><p>Protected routes: GET /credits/balance and GET /credits/requests/:id. Credit visibility stays behind authentication.</p></article>
+      </div>
+      <p class="microcopy">Blocked from working-route claims until proven live: /owner/payouts, /owner/payouts/next, /ledger, /transactions, /payments, /stripe/events, and /reconciliation.</p>
+    </section>
     <section class="shell">
       <div class="trust">
         <h2>Every paid event needs a final state.</h2>
