@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -1217,16 +1217,27 @@
 
       <section id="promotions" class="section shell">
         <div class="promo-venue-row">
-          <article class="promo-box">
+          <article class="promo-box" id="referral-lab">
             <span class="tag">Promotions & Affiliate Program</span>
-            <h2>Growth engine for nightlife.</h2>
+            <h2>Build your 8TABZ referral link.</h2>
             <p style="color:var(--muted);line-height:1.55">
-              Promote 8TABZ, refer venues and users, support sponsored placements, and build measurable traffic across the venue ecosystem.
+              Create a public referral code, copy your share link, and let 8TABZ record click and signup attribution through the live referral backend. Rewards stay policy-controlled and are not paid from this public form.
             </p>
-            <div class="ref-link"><span>8tabz.com/ref/yourlink</span><strong>OPEN</strong></div>
+
+            <div class="ref-link" id="referralShareBox"><span id="referralShareText">8tabz.com/ref/your-code</span><strong>READY</strong></div>
+
+            <form id="referralCreateForm" class="email-box" style="margin-top:16px; max-width:100%;" autocomplete="off">
+              <input id="referralCodeInput" aria-label="Referral code" type="text" placeholder="Choose your code, example: maria-nightlife" />
+              <button type="submit" aria-label="Create referral link">Create</button>
+            </form>
+
+            <p id="referralStatus" style="color:var(--dim);font-size:13px;line-height:1.5;margin:12px 0 0;">
+              Enter a simple code using letters, numbers, dashes, or underscores.
+            </p>
+
             <div class="spark" aria-hidden="true"></div>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-              <a class="btn primary" href="#promotions">Join & Start Earning</a>
+              <button class="btn primary" id="copyReferralLinkBtn" type="button">Copy Share Link</button>
               <a class="btn" href="#featured-venues">Explore Promotions</a>
             </div>
           </article>
@@ -1347,6 +1358,88 @@
       </div>
     </footer>
   </div>
+  <script>
+    (function () {
+      var form = document.getElementById('referralCreateForm');
+      var input = document.getElementById('referralCodeInput');
+      var status = document.getElementById('referralStatus');
+      var shareText = document.getElementById('referralShareText');
+      var copyButton = document.getElementById('copyReferralLinkBtn');
+
+      function cleanCode(value) {
+        return String(value || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 64);
+      }
+
+      function setStatus(message, isError) {
+        if (!status) return;
+        status.textContent = message;
+        status.style.color = isError ? '#ffb4b4' : 'var(--dim)';
+      }
+
+      if (form) {
+        form.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          var code = cleanCode(input && input.value);
+          if (!code) {
+            setStatus('Choose a referral code first.', true);
+            return;
+          }
+
+          setStatus('Creating referral link...', false);
+
+          try {
+            var response = await fetch('/referrals/links', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ownerUserId: 1,
+                code: code,
+                targetType: 'public_web',
+                targetId: null,
+                rewardCents: 0,
+                metadata: {
+                  source: 'public_homepage_referral_form',
+                  phase: '26D'
+                }
+              })
+            });
+
+            var data = await response.json().catch(function () { return {}; });
+
+            if (!response.ok) {
+              var msg = data && data.message ? data.message : 'Referral link could not be created.';
+              setStatus(String(msg), true);
+              return;
+            }
+
+            var shareUrl = window.location.origin + '/?ref=' + encodeURIComponent(data.code || code);
+            if (shareText) shareText.textContent = shareUrl;
+            setStatus('Referral link created. Copy and share it. Click/signup attribution is record-only until reward policy is enabled.', false);
+          } catch (error) {
+            setStatus('Referral link request failed. Try again after checking connection.', true);
+          }
+        });
+      }
+
+      if (copyButton) {
+        copyButton.addEventListener('click', async function () {
+          var value = shareText ? shareText.textContent : '';
+          if (!value) {
+            setStatus('Create a referral link first.', true);
+            return;
+          }
+
+          try {
+            await navigator.clipboard.writeText(value);
+            setStatus('Share link copied.', false);
+          } catch (error) {
+            setStatus('Copy failed. Select the link text manually.', true);
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
 
