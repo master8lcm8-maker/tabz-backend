@@ -31,7 +31,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     ConfigModule.forRoot({ isGlobal: true }),
 
     TypeOrmModule.forRoot((() => {
-      // 🔒 OATH1-H: backend runtime must be Postgres-only.
+      // OATH1-H: backend runtime must be Postgres-only.
       // Allowed config sources:
       //   1) DATABASE_URL / TYPEORM_URL
       //   2) DB_HOST + DB_PORT + DB_USERNAME + DB_PASSWORD + DB_NAME
@@ -97,12 +97,38 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
         }
       }
 
+      const safePgUrl = new URL(url);
+      const pgHost = safePgUrl.hostname.toLowerCase();
+      const isLocalPostgresHost =
+        pgHost === 'localhost' ||
+        pgHost === '127.0.0.1' ||
+        pgHost === '::1';
+
+      const sslFlag = String(
+        process.env.TABZ_PG_SSL ||
+          process.env.DB_SSL ||
+          process.env.PGSSLMODE ||
+          safePgUrl.searchParams.get('sslmode') ||
+          '',
+      )
+        .toLowerCase()
+        .trim();
+
+      const usePgSsl =
+        sslFlag === '1' ||
+        sslFlag === 'true' ||
+        sslFlag === 'require' ||
+        sslFlag === 'on' ||
+        sslFlag === 'no-verify' ||
+        sslFlag === 'verify-full' ||
+        (!sslFlag && !isLocalPostgresHost);
+
       return {
         type: 'postgres',
         url,
         autoLoadEntities: true,
         synchronize: false,
-        ssl: { rejectUnauthorized: false },
+        ssl: usePgSsl ? { rejectUnauthorized: false } : false,
       } as any;
     })()),
 

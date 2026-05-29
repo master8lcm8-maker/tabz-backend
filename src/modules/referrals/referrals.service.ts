@@ -36,6 +36,22 @@ export class ReferralsService {
     return code;
   }
 
+  private getReferralRewardPolicy(): {
+    rewardPostingEnabled: false;
+    maxRewardCents: number;
+    allowedSignupEventType: 'signup';
+    duplicateAttributionPolicy: string;
+    selfReferralPolicy: string;
+  } {
+    return {
+      rewardPostingEnabled: false,
+      maxRewardCents: 0,
+      allowedSignupEventType: 'signup',
+      duplicateAttributionPolicy: 'block_duplicate_signup_attribution_per_referral_link',
+      selfReferralPolicy: 'block_actor_user_id_equal_attributed_user_id',
+    };
+  }
+
   async createReferralLink(input: {
     ownerUserId: number;
     code: string;
@@ -47,9 +63,14 @@ export class ReferralsService {
     const ownerUserId = this.assertPositiveInt(input?.ownerUserId, 'owner_user_id_required');
     const code = this.normalizeCode(input?.code);
     const rewardCents = Number(input?.rewardCents ?? 0);
+    const rewardPolicy = this.getReferralRewardPolicy();
 
     if (!Number.isFinite(rewardCents) || rewardCents < 0) {
       throw new BadRequestException('invalid_reward_cents');
+    }
+
+    if (rewardCents > rewardPolicy.maxRewardCents) {
+      throw new BadRequestException('referral_rewards_disabled_record_only_policy');
     }
 
     const existing = await this.referralLinkRepo.findOne({ where: { code } });
@@ -77,7 +98,10 @@ export class ReferralsService {
       metadata: {
         ...(input?.metadata ?? {}),
         phase26Runtime: 'referral_link_created_record_only_no_wallet_mutation',
-        walletLedgerRewardPosting: 'not_enabled_until_referral_events_proven',
+        rewardPolicyStatus: 'record_only_rewards_disabled',
+        rewardPostingEnabled: rewardPolicy.rewardPostingEnabled,
+        maxRewardCents: rewardPolicy.maxRewardCents,
+        walletLedgerRewardPosting: 'not_enabled_until_policy_and_anti_fraud_controls_are_proven',
       },
     });
 
@@ -164,6 +188,23 @@ export class ReferralsService {
       throw new BadRequestException('invalid_actor_user_id');
     }
 
+    if (actorUserId !== null && actorUserId === attributedUserId) {
+      throw new BadRequestException('self_referral_blocked');
+    }
+
+    const duplicateAttribution = await this.referralEventRepo.findOne({
+      where: {
+        referralLinkId: link.id,
+        eventType: 'signup',
+        attributedUserId,
+      },
+    });
+
+    if (duplicateAttribution) {
+      throw new BadRequestException('duplicate_referral_signup_attribution_blocked');
+    }
+
+    const rewardPolicy = this.getReferralRewardPolicy();
     const event = this.referralEventRepo.create({
       referralLinkId: link.id,
       eventType: 'signup',
@@ -176,6 +217,10 @@ export class ReferralsService {
       metadata: {
         ...(input?.metadata ?? {}),
         phase26Runtime: 'referral_signup_record_only_no_wallet_mutation',
+        rewardPolicyStatus: 'record_only_rewards_disabled',
+        rewardPostingEnabled: rewardPolicy.rewardPostingEnabled,
+        duplicateAttributionPolicy: rewardPolicy.duplicateAttributionPolicy,
+        selfReferralPolicy: rewardPolicy.selfReferralPolicy,
         rewardCentsTrackedOnly: Number(link.rewardCents ?? 0),
       },
     });
