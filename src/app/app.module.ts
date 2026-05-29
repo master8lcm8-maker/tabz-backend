@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CreditsModule } from '../modules/credits/credits.module';
+import { PromotionsModule } from '../modules/promotions/promotions.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
 
@@ -110,6 +111,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     StoreItemsModule,
     ProfileModule,
     CreditsModule,
+    PromotionsModule,
     VenuesModule,
     IdentityModule,
     HealthModule,
@@ -120,3 +122,4 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
   ],
 })
 export class AppModule {}
+
