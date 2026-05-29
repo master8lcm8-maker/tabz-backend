@@ -187,4 +187,126 @@ export class ReferralsService {
 
     return saved;
   }
+  private normalizeAdminLimit(input: unknown, fallback = 25, max = 100): number {
+    const n = Number(input ?? fallback);
+    if (!Number.isFinite(n) || n <= 0) return fallback;
+    return Math.min(Math.trunc(n), max);
+  }
+
+  async adminGetReferralOverview(): Promise<{
+    totalLinks: number;
+    activeLinks: number;
+    pausedLinks: number;
+    disabledLinks: number;
+    totalEvents: number;
+    clickEvents: number;
+    signupEvents: number;
+    conversionEvents: number;
+    rewardPostingEnabled: false;
+    policyStatus: string;
+  }> {
+    const [
+      totalLinks,
+      activeLinks,
+      pausedLinks,
+      disabledLinks,
+      totalEvents,
+      clickEvents,
+      signupEvents,
+      conversionEvents,
+    ] = await Promise.all([
+      this.referralLinkRepo.count(),
+      this.referralLinkRepo.count({ where: { status: 'active' } }),
+      this.referralLinkRepo.count({ where: { status: 'paused' } }),
+      this.referralLinkRepo.count({ where: { status: 'disabled' } }),
+      this.referralEventRepo.count(),
+      this.referralEventRepo.count({ where: { eventType: 'click' } }),
+      this.referralEventRepo.count({ where: { eventType: 'signup' } }),
+      this.referralEventRepo.count({ where: { eventType: 'conversion' } }),
+    ]);
+
+    return {
+      totalLinks,
+      activeLinks,
+      pausedLinks,
+      disabledLinks,
+      totalEvents,
+      clickEvents,
+      signupEvents,
+      conversionEvents,
+      rewardPostingEnabled: false,
+      policyStatus: 'record_only_admin_visibility_no_wallet_ledger_rewards',
+    };
+  }
+
+  async adminListReferralLinks(input?: {
+    limit?: number;
+    status?: string | null;
+    ownerUserId?: number | null;
+  }): Promise<{ total: number; items: ReferralLink[]; rewardPostingEnabled: false }> {
+    const limit = this.normalizeAdminLimit(input?.limit);
+    const where: Record<string, unknown> = {};
+
+    const status = input?.status == null ? null : String(input.status).trim();
+    if (status) {
+      if (!['active', 'paused', 'disabled'].includes(status)) {
+        throw new BadRequestException('invalid_referral_status');
+      }
+      where.status = status;
+    }
+
+    if (input?.ownerUserId !== null && input?.ownerUserId !== undefined) {
+      where.ownerUserId = this.assertPositiveInt(input.ownerUserId, 'invalid_owner_user_id');
+    }
+
+    const [items, total] = await this.referralLinkRepo.findAndCount({
+      where,
+      order: { id: 'DESC' },
+      take: limit,
+    });
+
+    return {
+      total,
+      items,
+      rewardPostingEnabled: false,
+    };
+  }
+
+  async adminListReferralEvents(input?: {
+    limit?: number;
+    referralLinkId?: number | null;
+    eventType?: string | null;
+    attributedUserId?: number | null;
+  }): Promise<{ total: number; items: ReferralEvent[]; rewardPostingEnabled: false }> {
+    const limit = this.normalizeAdminLimit(input?.limit);
+    const where: Record<string, unknown> = {};
+
+    if (input?.referralLinkId !== null && input?.referralLinkId !== undefined) {
+      where.referralLinkId = this.assertPositiveInt(input.referralLinkId, 'invalid_referral_link_id');
+    }
+
+    const eventType = input?.eventType == null ? null : String(input.eventType).trim();
+    if (eventType) {
+      if (!['click', 'signup', 'conversion'].includes(eventType)) {
+        throw new BadRequestException('invalid_referral_event_type');
+      }
+      where.eventType = eventType;
+    }
+
+    if (input?.attributedUserId !== null && input?.attributedUserId !== undefined) {
+      where.attributedUserId = this.assertPositiveInt(input.attributedUserId, 'invalid_attributed_user_id');
+    }
+
+    const [items, total] = await this.referralEventRepo.findAndCount({
+      where,
+      order: { id: 'DESC' },
+      take: limit,
+    });
+
+    return {
+      total,
+      items,
+      rewardPostingEnabled: false,
+    };
+  }
 }

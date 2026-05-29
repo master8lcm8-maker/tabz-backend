@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ReferralsService } from './referrals.service';
 
 @Controller('referrals')
@@ -23,5 +23,37 @@ export class ReferralsController {
   @Post('events/signup')
   recordSignup(@Body() body: any) {
     return this.referralsService.recordSignup(body);
+  }
+  @Get('admin/overview')
+  adminReferralOverview() {
+    return this.referralsService.adminGetReferralOverview();
+  }
+
+  @Get('admin/links')
+  adminReferralLinks(
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+    @Query('ownerUserId') ownerUserId?: string,
+  ) {
+    return this.referralsService.adminListReferralLinks({
+      limit: limit === undefined ? undefined : Number(limit),
+      status: status ?? null,
+      ownerUserId: ownerUserId === undefined ? null : Number(ownerUserId),
+    });
+  }
+
+  @Get('admin/events')
+  adminReferralEvents(
+    @Query('limit') limit?: string,
+    @Query('referralLinkId') referralLinkId?: string,
+    @Query('eventType') eventType?: string,
+    @Query('attributedUserId') attributedUserId?: string,
+  ) {
+    return this.referralsService.adminListReferralEvents({
+      limit: limit === undefined ? undefined : Number(limit),
+      referralLinkId: referralLinkId === undefined ? null : Number(referralLinkId),
+      eventType: eventType ?? null,
+      attributedUserId: attributedUserId === undefined ? null : Number(attributedUserId),
+    });
   }
 }
