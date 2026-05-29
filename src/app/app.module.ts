@@ -1,4 +1,4 @@
-﻿// src/app/app.module.ts
+// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CreditsModule } from '../modules/credits/credits.module';
 import { PromotionsModule } from '../modules/promotions/promotions.module';
+import { ReferralsModule } from '../modules/referrals/referrals.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
 
@@ -112,6 +113,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     ProfileModule,
     CreditsModule,
     PromotionsModule,
+    ReferralsModule,
     VenuesModule,
     IdentityModule,
     HealthModule,
