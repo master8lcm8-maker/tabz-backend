@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddFailureReasonAndRetryOfCashoutIdToCashoutRequests3047
+export class AddFailureReasonAndRetryOfCashoutIdToCashoutRequests1733400000000
   implements MigrationInterface
 {
-  name = 'AddFailureReasonAndRetryOfCashoutIdToCashoutRequests3047';
+  name = 'AddFailureReasonAndRetryOfCashoutIdToCashoutRequests1733400000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -159,3 +159,4 @@ END $$;
     `);
   }
 }
+
