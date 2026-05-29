@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddWalletIdToCashoutRequests3046 implements MigrationInterface {
-  // ✅ Must match what prod already recorded in public.migrations.name
-  name = '3046-AddWalletIdToCashoutRequests';
+export class AddWalletIdToCashoutRequests1733410000000 implements MigrationInterface {
+  // Must match what prod already recorded in public.migrations.name
+  name = 'AddWalletIdToCashoutRequests1733410000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Production already has walletId, so keep this migration safe/idempotent.
