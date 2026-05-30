@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CreditsModule } from '../modules/credits/credits.module';
 import { PromotionsModule } from '../modules/promotions/promotions.module';
 import { ReferralsModule } from '../modules/referrals/referrals.module';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { ProfileModule } from '../profile/profile.module';
 
@@ -140,6 +141,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     CreditsModule,
     PromotionsModule,
     ReferralsModule,
+    NotificationsModule,
     VenuesModule,
     IdentityModule,
     HealthModule,

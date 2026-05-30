@@ -1,4 +1,4 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 
@@ -42,7 +42,20 @@ if (!url) {
     `@${h}:${port}/${db}${sslMode}`;
 
   process.env.DATABASE_URL = url;
+
+
 }
+
+const parsedDbUrl = new URL(url);
+const isLocalCliPostgresHost =
+  parsedDbUrl.hostname === 'localhost' || parsedDbUrl.hostname === '127.0.0.1';
+
+const cliSslRaw = String(process.env.DB_SSL || '').toLowerCase();
+const useCliPgSsl =
+  !isLocalCliPostgresHost &&
+  cliSslRaw !== 'false' &&
+  cliSslRaw !== '0' &&
+  cliSslRaw !== 'disable';
 
 const normalizedUrl = url.toLowerCase();
 if (
@@ -56,7 +69,7 @@ if (
 export default new DataSource({
   type: 'postgres',
   url,
-  ssl: { rejectUnauthorized: false },
+  ssl: useCliPgSsl ? { rejectUnauthorized: false } : false,
   entities: ['src/**/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
