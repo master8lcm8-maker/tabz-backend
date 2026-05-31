@@ -1,4 +1,4 @@
-// src/modules/auth/auth.controller.ts
+﻿// src/modules/auth/auth.controller.ts
 import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -71,7 +71,7 @@ export class AuthController {
 
     const profiles = await this.profileService.listForUser(userId);
 
-    // 1) Map role → desired ProfileType (NOW includes staff)
+    // 1) Map role â†’ desired ProfileType (NOW includes staff)
     let desiredType: ProfileType | null = null;
     if (role === 'owner') desiredType = ProfileType.OWNER;
     if (role === 'buyer') desiredType = ProfileType.BUYER;
@@ -102,4 +102,18 @@ export class AuthController {
       profiles,
     };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Req() req: AuthRequest) {
+    return {
+      ok: true,
+      action: 'logout',
+      message: 'Logout acknowledged. Client must clear stored TABZ auth token/session storage.',
+      userId: req?.user?.userId ?? req?.user?.id ?? req?.user?.sub ?? null,
+      tokenRevokedServerSide: false,
+      sessionType: 'stateless_jwt',
+    };
+  }
 }
+
