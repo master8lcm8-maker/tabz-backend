@@ -452,6 +452,80 @@ export class StoreItemsService {
   }
 
   // ----------------------------------------------------
+
+  async findOrdersByOwner(ownerId: number): Promise<any[]> {
+    return this.findOrdersByOwnerLive(ownerId);
+  }
+
+  async ownerMarkOrder(
+    ownerId: number,
+    orderId: number,
+    status: string,
+  ): Promise<StoreItemOrder> {
+    if (!ownerId || ownerId <= 0) throw new BadRequestException('ownerId must be positive.');
+    if (!orderId || orderId <= 0) throw new BadRequestException('orderId must be positive.');
+
+    const allowed = new Set(['pending', 'completed', 'canceled']);
+    const next = String(status || '').toLowerCase();
+    if (!allowed.has(next)) throw new BadRequestException('Invalid status.');
+
+    const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
+    if (!order) throw new BadRequestException('Order not found');
+
+    const row = await this.dataSource
+      .createQueryBuilder()
+      .select('v.ownerId', 'ownerId')
+      .from('store_item_orders', 'o')
+      .innerJoin('venues', 'v', 'v.id = o.venueId')
+      .where('o.id = :orderId', { orderId })
+      .getRawOne<{ ownerId: number | string | null }>();
+
+    if (!row || Number(row.ownerId) !== Number(ownerId)) {
+      throw new BadRequestException('Order not found for this owner');
+    }
+
+    if (String(order.status).toLowerCase() === 'completed' && next !== 'completed') {
+      throw new BadRequestException('Cannot change a completed order.');
+    }
+
+    order.status = next as any;
+    const saved = await this.storeItemOrderRepo.save(order);
+
+    this.websocketGateway.emitOrderUpdated(saved);
+
+    return saved;
+  }
+
+  async ownerCancelOrder(ownerId: number, orderId: number): Promise<StoreItemOrder> {
+    if (!ownerId || ownerId <= 0) throw new BadRequestException('ownerId must be positive.');
+    if (!orderId || orderId <= 0) throw new BadRequestException('orderId must be positive.');
+
+    const order = await this.storeItemOrderRepo.findOne({ where: { id: orderId } });
+    if (!order) throw new BadRequestException('Order not found');
+
+    const row = await this.dataSource
+      .createQueryBuilder()
+      .select('v.ownerId', 'ownerId')
+      .from('store_item_orders', 'o')
+      .innerJoin('venues', 'v', 'v.id = o.venueId')
+      .where('o.id = :orderId', { orderId })
+      .getRawOne<{ ownerId: number | string | null }>();
+
+    if (!row || Number(row.ownerId) !== Number(ownerId)) {
+      throw new BadRequestException('Order not found for this owner');
+    }
+
+    if (String(order.status).toLowerCase() === 'completed') {
+      throw new BadRequestException('Cannot cancel a completed order.');
+    }
+
+    order.status = 'canceled' as any;
+    const saved = await this.storeItemOrderRepo.save(order);
+
+    this.websocketGateway.emitOrderUpdated(saved);
+
+    return saved;
+  }
   // ORDER CREATION + WALLET INTEGRATION
   // ----------------------------------------------------
   async createOrderForUser(
@@ -700,3 +774,4 @@ export class StoreItemsService {
     return saved;
   }
 }
+

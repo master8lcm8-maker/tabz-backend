@@ -1,9 +1,10 @@
-// src/modules/store-items/store-items.module.ts
+﻿// src/modules/store-items/store-items.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StoreItemsController } from './store-items.controller';
-import { StoreItemsAdminController } from './store-items.admin.controller'; // ✅ FIX: correct filename
+import { StoreItemsAdminController } from './store-items.admin.controller';
+import { StoreItemsOwnerController } from './store-items.owner.controller'; // âœ… FIX: correct filename
 import { StoreItemsService } from './store-items.service';
 
 import { StoreItem } from './store-item.entity';
@@ -16,10 +17,11 @@ import { WebsocketModule } from '../websocket/websocket.module';
   imports: [
     TypeOrmModule.forFeature([StoreItem, StoreItemOrder]),
     WalletModule,
-    WebsocketModule, // ✅ provides/export WebsocketGateway
+    WebsocketModule, // âœ… provides/export WebsocketGateway
   ],
-  controllers: [StoreItemsController, StoreItemsAdminController],
+  controllers: [StoreItemsController, StoreItemsAdminController, StoreItemsOwnerController],
   providers: [StoreItemsService],
   exports: [StoreItemsService],
 })
 export class StoreItemsModule {}
+
