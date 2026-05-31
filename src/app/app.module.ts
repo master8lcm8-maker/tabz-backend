@@ -25,6 +25,7 @@ import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 import { QrModule } from '../modules/qr/qr.module';
+import { FoodsModule } from '../modules/foods/foods.module';
 
 @Module({
   providers: [AppService],
@@ -149,10 +150,12 @@ import { QrModule } from '../modules/qr/qr.module';
     DrinksModule,
     FreeboardModule,
     QrModule,
+    FoodsModule,
     DevSeedModule,
     AccountDeletionModule,
   ],
 })
 export class AppModule {}
+
 
 
