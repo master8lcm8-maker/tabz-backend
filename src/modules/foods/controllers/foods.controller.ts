@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FoodsService } from '../foods.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -48,7 +49,7 @@ function getUserIdFromRequest(req: any): number {
 export class FoodsController {
   constructor(private readonly foodsService: FoodsService) {}
 
-  // POST /foods/orders — create a food order
+  // POST /foods/orders â€” create a food order
   @UseGuards(JwtAuthGuard)
   @Post('orders')
   async createOrder(@Req() req: any, @Body() dto: CreateFoodOrderDto) {
@@ -65,7 +66,7 @@ export class FoodsController {
     });
   }
 
-  // GET /foods/my — list food orders I sent
+  // GET /foods/my â€” list food orders I sent
   @UseGuards(JwtAuthGuard)
   @Get('my')
   async findMyOrders(@Req() req: any) {
@@ -73,10 +74,17 @@ export class FoodsController {
     return this.foodsService.findMyOrders(userId);
   }
 
-  // POST /foods/redeem — staff redeems a food order by code
+  // POST /foods/redeem â€” staff redeems a food order by code
   @UseGuards(JwtAuthGuard)
   @Post('redeem')
-  async redeem(@Body() dto: RedeemFoodDto) {
+  async redeem(@Req() req: any, @Body() dto: RedeemFoodDto) {
+    const role = String(req?.user?.role || '').toLowerCase();
+
+    if (role !== 'staff') {
+      throw new ForbiddenException('forbidden');
+    }
+
     return this.foodsService.redeemByCode(dto.redemptionCode);
   }
 }
+
