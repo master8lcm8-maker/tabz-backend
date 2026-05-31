@@ -1,6 +1,7 @@
-﻿import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
+﻿import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { QrService } from './qr.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 type AuthUser = {
   sub?: number;
@@ -22,6 +23,7 @@ export class QrController {
     return this.qrService.scan({ code, kind });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('redeem')
   redeem(@Req() req: AuthRequest, @Body() body: { code?: string; kind?: string }) {
     const user = req.user ?? {};
@@ -35,3 +37,4 @@ export class QrController {
     });
   }
 }
+
