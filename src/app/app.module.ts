@@ -1,4 +1,4 @@
-// src/app/app.module.ts
+﻿// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
@@ -24,6 +24,7 @@ import { IdentityModule } from '../identity/identity.module';
 import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
+import { QrModule } from '../modules/qr/qr.module';
 
 @Module({
   providers: [AppService],
@@ -147,9 +148,11 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
     HealthModule,
     DrinksModule,
     FreeboardModule,
+    QrModule,
     DevSeedModule,
     AccountDeletionModule,
   ],
 })
 export class AppModule {}
+
 
