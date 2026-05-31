@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>8TABZ â€” Send it. Redeem it. Track it.</title>
+  <title>8TABZ Ã¢â‚¬â€ Send it. Redeem it. Track it.</title>
   <meta name="description" content="8TABZ is the web and mobile venue engagement ecosystem for users, venues, staff, Admin HQ, promotions, wallet visibility, QR redemption, and nightlife growth." />
   <style>
     :root {
@@ -798,7 +798,7 @@
       }
     }
   
-    /* 26B-PUBLIC-12 visual polish overrides â€” premium 2028 public face */
+    /* 26B-PUBLIC-12 visual polish overrides Ã¢â‚¬â€ premium 2028 public face */
     .shell {
       width: min(1920px, calc(100% - 42px));
     }
@@ -1233,7 +1233,7 @@
           <aside class="module-panel" aria-label="Core platform modules">
             <div class="panel-head">
               <span>Core Platform Modules</span>
-              <a href="#how">Explore All â€º</a>
+              <a href="#how">Explore All Ã¢â‚¬Âº</a>
             </div>
 
             <div class="module-grid">
@@ -1374,11 +1374,11 @@
             </div>
 
             <div class="venues">
-              <article class="venue-card"><div class="venue-art"></div><span class="tag">Nightclub</span><h3>Neon District</h3><p>Downtown Â· 4.8 â˜…</p></article>
-              <article class="venue-card"><div class="venue-art"></div><span class="tag">Cocktail Bar</span><h3>Luna Lounge</h3><p>Midtown Â· 4.7 â˜…</p></article>
-              <article class="venue-card"><div class="venue-art"></div><span class="tag">Nightclub</span><h3>Vertex Club</h3><p>Uptown Â· 4.9 â˜…</p></article>
-              <article class="venue-card"><div class="venue-art"></div><span class="tag">Taproom</span><h3>Echo Taproom</h3><p>Riverside Â· 4.6 â˜…</p></article>
-              <article class="venue-card"><div class="venue-art"></div><span class="tag">Rooftop</span><h3>Skyline Rooftop</h3><p>Downtown Â· 4.8 â˜…</p></article>
+              <article class="venue-card"><div class="venue-art"></div><span class="tag">Nightclub</span><h3>Neon District</h3><p>Downtown Ã‚Â· 4.8 Ã¢Ëœâ€¦</p></article>
+              <article class="venue-card"><div class="venue-art"></div><span class="tag">Cocktail Bar</span><h3>Luna Lounge</h3><p>Midtown Ã‚Â· 4.7 Ã¢Ëœâ€¦</p></article>
+              <article class="venue-card"><div class="venue-art"></div><span class="tag">Nightclub</span><h3>Vertex Club</h3><p>Uptown Ã‚Â· 4.9 Ã¢Ëœâ€¦</p></article>
+              <article class="venue-card"><div class="venue-art"></div><span class="tag">Taproom</span><h3>Echo Taproom</h3><p>Riverside Ã‚Â· 4.6 Ã¢Ëœâ€¦</p></article>
+              <article class="venue-card"><div class="venue-art"></div><span class="tag">Rooftop</span><h3>Skyline Rooftop</h3><p>Downtown Ã‚Â· 4.8 Ã¢Ëœâ€¦</p></article>
             </div>
           </section>
         </div>
@@ -1428,18 +1428,18 @@
           stay visible from the product face to the backend ledger.
         </p>
       </div>
-      <div class="notification-status-pill" id="notification-status-pill">Checking session…</div>
+      <div class="notification-status-pill" id="notification-status-pill">Checking sessionâ€¦</div>
     </div>
 
     <div class="notification-hud-grid">
       <article class="notification-hud-card">
         <span class="hud-label">Unread</span>
-        <strong id="notification-unread-count">—</strong>
+        <strong id="notification-unread-count">â€”</strong>
         <small>Live count from /notifications/count</small>
       </article>
       <article class="notification-hud-card">
         <span class="hud-label">Total</span>
-        <strong id="notification-total-count">—</strong>
+        <strong id="notification-total-count">â€”</strong>
         <small>User-visible event history</small>
       </article>
       <article class="notification-hud-card">
@@ -1464,6 +1464,50 @@
       </div>
     </div>
   </section>
+
+<section id="tabzQrRedemptionConsole" class="section" aria-label="QR redemption console">
+  <div class="section-label">Live QR Redemption</div>
+  <h2>Scan or enter a TABZ code</h2>
+  <p class="section-copy">
+    Use this console to verify real TABZ QR redemption flows. Enter a drink, FreeBoard, or food redemption code, choose the correct type, then scan or redeem through the live backend.
+  </p>
+
+  <div class="qr-console-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:22px;">
+    <div class="module" style="text-align:left;">
+      <h3>1. Code</h3>
+      <label for="tabzQrCodeInput">QR / redemption code</label>
+      <input id="tabzQrCodeInput" type="text" placeholder="Paste code here" style="width:100%;margin-top:8px;padding:13px;border-radius:14px;border:1px solid rgba(123,255,0,.28);background:rgba(0,0,0,.55);color:#fff;" />
+
+      <label for="tabzQrKindSelect" style="display:block;margin-top:14px;">Code type</label>
+      <select id="tabzQrKindSelect" style="width:100%;margin-top:8px;padding:13px;border-radius:14px;border:1px solid rgba(123,255,0,.28);background:#071007;color:#fff;">
+        <option value="drink">Drink QR</option>
+        <option value="freeboard">FreeBoard QR</option>
+        <option value="food">Food code</option>
+      </select>
+    </div>
+
+    <div class="module" style="text-align:left;">
+      <h3>2. Auth token</h3>
+      <label for="tabzQrBuyerTokenInput">Buyer token for FreeBoard/food checks</label>
+      <input id="tabzQrBuyerTokenInput" type="password" placeholder="Paste buyer JWT token" style="width:100%;margin-top:8px;padding:13px;border-radius:14px;border:1px solid rgba(123,255,0,.28);background:rgba(0,0,0,.55);color:#fff;" />
+
+      <label for="tabzQrStaffTokenInput" style="display:block;margin-top:14px;">Staff token for drink/food redemption</label>
+      <input id="tabzQrStaffTokenInput" type="password" placeholder="Paste staff JWT token" style="width:100%;margin-top:8px;padding:13px;border-radius:14px;border:1px solid rgba(123,255,0,.28);background:rgba(0,0,0,.55);color:#fff;" />
+    </div>
+
+    <div class="module" style="text-align:left;">
+      <h3>3. Action</h3>
+      <button id="tabzQrScanBtn" class="btn primary" type="button" style="width:100%;margin-top:8px;">Scan code</button>
+      <button id="tabzQrRedeemBtn" class="btn ghost-button" type="button" style="width:100%;margin-top:12px;">Redeem / claim</button>
+      <p style="margin-top:12px;color:rgba(255,255,255,.68);font-size:.9rem;">
+        Drink redemption requires staff token. FreeBoard claim uses buyer token. Food redeem requires staff token.
+      </p>
+    </div>
+  </div>
+
+  <pre id="tabzQrResultBox" style="white-space:pre-wrap;min-height:120px;margin-top:18px;padding:16px;border-radius:18px;border:1px solid rgba(123,255,0,.28);background:rgba(0,0,0,.72);color:#bfff74;overflow:auto;">Waiting for QR action...</pre>
+</section>
+
 </main>
 
     <footer>
@@ -1518,13 +1562,13 @@
           <p>Get updates on new features, drops, venue tools, and promotions.</p>
           <form class="email-box" onsubmit="event.preventDefault(); this.querySelector('input').value='';">
             <input aria-label="Email address" type="email" placeholder="Enter your email" />
-            <button aria-label="Submit">â†’</button>
+            <button aria-label="Submit">Ã¢â€ â€™</button>
           </form>
         </div>
       </div>
 
       <div class="shell copyright">
-        <span>Â© 2028 8TABZ. All rights reserved.</span>
+        <span>Ã‚Â© 2028 8TABZ. All rights reserved.</span>
         <span>Built for the night. Secured for everyone.</span>
       </div>
     </footer>
@@ -1651,7 +1695,7 @@
           const type = item.type || 'event';
           const status = item.status || 'unread';
           return '<article class="notification-item">' +
-            '<span>' + String(type).replace(/_/g, ' ') + ' · ' + status + '</span>' +
+            '<span>' + String(type).replace(/_/g, ' ') + ' Â· ' + status + '</span>' +
             '<strong>' + title + '</strong>' +
             '<p>' + body + '</p>' +
           '</article>';
@@ -1670,7 +1714,7 @@
         }
 
         try {
-          if (statusPill) statusPill.textContent = 'Loading live data…';
+          if (statusPill) statusPill.textContent = 'Loading live dataâ€¦';
 
           const headers = { Authorization: 'Bearer ' + token };
           const countRes = await fetch('/notifications/count', { headers });
@@ -1705,8 +1749,103 @@
       });
     })();
   </script>
+
+<script>
+(function () {
+  var codeInput = document.getElementById('tabzQrCodeInput');
+  var kindSelect = document.getElementById('tabzQrKindSelect');
+  var buyerTokenInput = document.getElementById('tabzQrBuyerTokenInput');
+  var staffTokenInput = document.getElementById('tabzQrStaffTokenInput');
+  var scanButton = document.getElementById('tabzQrScanBtn');
+  var redeemButton = document.getElementById('tabzQrRedeemBtn');
+  var resultBox = document.getElementById('tabzQrResultBox');
+
+  function writeResult(title, payload) {
+    if (!resultBox) return;
+    resultBox.textContent = title + '\n' + JSON.stringify(payload, null, 2);
+  }
+
+  function readInputs() {
+    return {
+      code: String(codeInput && codeInput.value || '').trim(),
+      kind: String(kindSelect && kindSelect.value || 'drink').trim(),
+      buyerToken: String(buyerTokenInput && buyerTokenInput.value || '').trim(),
+      staffToken: String(staffTokenInput && staffTokenInput.value || '').trim()
+    };
+  }
+
+  async function parseResponse(response) {
+    var text = await response.text();
+    var body;
+    try {
+      body = text ? JSON.parse(text) : null;
+    } catch (err) {
+      body = text;
+    }
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: body
+    };
+  }
+
+  if (scanButton) {
+    scanButton.addEventListener('click', async function () {
+      var input = readInputs();
+
+      if (!input.code) {
+        writeResult('SCAN BLOCKED', { error: 'Code is required.' });
+        return;
+      }
+
+      var apiKind = input.kind === 'food' ? 'foods' : input.kind;
+      var response = await fetch('/qr/scan?code=' + encodeURIComponent(input.code) + '&kind=' + encodeURIComponent(apiKind));
+      writeResult('SCAN RESULT', await parseResponse(response));
+    });
+  }
+
+  if (redeemButton) {
+    redeemButton.addEventListener('click', async function () {
+      var input = readInputs();
+
+      if (!input.code) {
+        writeResult('REDEEM BLOCKED', { error: 'Code is required.' });
+        return;
+      }
+
+      var url = '/qr/redeem';
+      var body = { code: input.code, kind: input.kind };
+      var token = input.kind === 'freeboard' ? input.buyerToken : input.staffToken;
+
+      if (input.kind === 'food') {
+        url = '/foods/redeem';
+        body = { redemptionCode: input.code };
+        token = input.staffToken;
+      }
+
+      if (!token) {
+        writeResult('REDEEM BLOCKED', { error: 'Required token is missing for ' + input.kind + '.' });
+        return;
+      }
+
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(body)
+      });
+
+      writeResult('REDEEM RESULT', await parseResponse(response));
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
+
 
 
 
