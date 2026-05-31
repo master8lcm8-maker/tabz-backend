@@ -97,6 +97,7 @@ async function bootstrap() {
     '/legal': 'legal.html',
     '/compliance': 'compliance.html',
     '/data-export': 'data-export.html',
+  '/account-delete': 'account-delete.html',
     '/safety/report': 'safety-report.html',
   };
 
@@ -114,3 +115,4 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
