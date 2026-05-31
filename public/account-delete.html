@@ -1,0 +1,154 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>8TABZ Account Deletion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Request account deletion for 8TABZ. Learn how to start deletion, confirm deletion, and contact support for privacy help." />
+  <style>
+    :root {
+      --bg: #030604;
+      --text: #f4fff7;
+      --muted: #b7c8bc;
+      --line: rgba(123, 255, 94, 0.28);
+      --accent: #7bff5e;
+      --panel: rgba(255,255,255,.045);
+      --danger: #ff7664;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, rgba(123,255,94,.16), transparent 34%), var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px 72px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-top: 32px;
+    }
+
+    p, li {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    a {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .back {
+      display: inline-flex;
+      margin-bottom: 20px;
+      text-decoration: none;
+    }
+
+    .notice {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--panel);
+      margin: 18px 0;
+    }
+
+    .danger {
+      border-color: rgba(255,118,100,.45);
+    }
+
+    .danger strong {
+      color: var(--danger);
+    }
+
+    code {
+      color: var(--text);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(123,255,94,.18);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">← Back to 8TABZ</a>
+
+    <section class="card">
+      <h1>Account Deletion</h1>
+      <p>
+        8TABZ users can request deletion of their account and personal account profile data.
+        Some records may be retained when required for fraud prevention, payment disputes,
+        legal compliance, accounting, security, or final-resolution audit obligations.
+      </p>
+
+      <div class="notice danger">
+        <strong>Important:</strong>
+        Account deletion is permanent after confirmation. Deleted accounts may lose access to
+        profile data, app access, venue/staff access, and user-facing account features.
+      </div>
+
+      <h2>How to request deletion</h2>
+      <ol>
+        <li>Sign in to your 8TABZ account in the app or website when account settings are available.</li>
+        <li>Open account/privacy settings and choose account deletion.</li>
+        <li>Confirm the request with your account password when prompted.</li>
+      </ol>
+
+      <h2>Direct support option</h2>
+      <p>
+        If you cannot access your account, email
+        <a href="mailto:master8lcm8@gmail.com">master8lcm8@gmail.com</a>
+        with the subject <strong>Account Deletion Request</strong>.
+      </p>
+
+      <p>Please include:</p>
+      <ul>
+        <li>The email address connected to your 8TABZ account.</li>
+        <li>Your role, such as user, venue owner, staff, or admin.</li>
+        <li>A short note confirming that you want to delete the account.</li>
+      </ul>
+
+      <h2>Protected deletion API</h2>
+      <p>
+        8TABZ also maintains protected deletion endpoints for authenticated accounts:
+        <code>POST /account-deletion/request</code> and
+        <code>POST /account-deletion/confirm</code>.
+        These endpoints require authentication and are not public unauthenticated deletion actions.
+      </p>
+
+      <h2>Related pages</h2>
+      <ul>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/support">Support</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/data-export">Data Export</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
