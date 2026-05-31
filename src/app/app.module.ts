@@ -27,6 +27,7 @@ import { FreeboardModule } from '../modules/freeboard/freeboard.module';
 import { QrModule } from '../modules/qr/qr.module';
 import { FoodsModule } from '../modules/foods/foods.module';
 import { EntitlementsModule } from '../modules/entitlements/entitlements.module';
+import { RedemptionsModule } from '../modules/redemptions/redemptions.module';
 
 @Module({
   providers: [AppService],
@@ -153,11 +154,13 @@ import { EntitlementsModule } from '../modules/entitlements/entitlements.module'
     QrModule,
     FoodsModule,
     EntitlementsModule,
+    RedemptionsModule,
     DevSeedModule,
     AccountDeletionModule,
   ],
 })
 export class AppModule {}
+
 
 
 
