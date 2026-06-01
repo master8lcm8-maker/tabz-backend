@@ -24,7 +24,25 @@ export class QrController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('redeem')
+    // QR_STAFF_QUEUE_FACADE_26O6
+  @Get('staff/queue')
+  staffQueue(@Req() req: AuthRequest) {
+    const user = (req as any).user || {};
+    return this.qrService.getStaffQueue({
+      role: user.role,
+      venueId: user.venueId,
+    });
+  }
+
+  @Get('queue')
+  queue(@Req() req: AuthRequest) {
+    const user = (req as any).user || {};
+    return this.qrService.getStaffQueue({
+      role: user.role,
+      venueId: user.venueId,
+    });
+  }
+@Post('redeem')
   redeem(@Req() req: AuthRequest, @Body() body: { code?: string; kind?: string }) {
     const user = req.user ?? {};
     const userId = Number(user.userId ?? user.id ?? user.sub ?? 0);
@@ -37,4 +55,5 @@ export class QrController {
     });
   }
 }
+
 

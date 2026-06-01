@@ -1,6 +1,7 @@
 ﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import { DrinksService } from '../drinks/drinks.service';
 import { FreeboardService } from '../freeboard/freeboard.service';
+import { StoreItemsService } from '../store-items/store-items.service';
 
 export type QrKind = 'drink' | 'freeboard';
 
@@ -9,6 +10,7 @@ export class QrService {
   constructor(
     private readonly drinksService: DrinksService,
     private readonly freeboardService: FreeboardService,
+    private readonly storeItemsService: StoreItemsService,
   ) {}
 
   scan(input: { code?: string; kind?: string }) {
@@ -101,4 +103,29 @@ export class QrService {
 
     return 'unsupported';
   }
+
+  // QR_STAFF_QUEUE_FACADE_26O6
+  async getStaffQueue(input: { role?: string; venueId?: unknown }) {
+    const role = String(input?.role || '').toLowerCase();
+    if (role !== 'staff') {
+      throw new BadRequestException('Only staff can view QR staff queue.');
+    }
+
+    const venueId = Number(input?.venueId);
+    if (!Number.isInteger(venueId) || venueId <= 0) {
+      throw new BadRequestException('Invalid venueId on staff token.');
+    }
+
+    const orders = await this.storeItemsService.findOrdersForStaff(venueId);
+
+    return {
+      ok: true,
+      source: 'store-items/staff/orders',
+      facade: 'qr/staff/queue',
+      venueId,
+      total: Array.isArray(orders) ? orders.length : 0,
+      value: orders,
+    };
+  }
 }
+
