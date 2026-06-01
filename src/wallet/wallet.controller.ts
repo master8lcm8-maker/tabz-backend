@@ -50,6 +50,91 @@ export class WalletController {
     throw new ForbiddenException('Invalid auth context: missing user id');
   }
 
+  // WALLET_ADMIN_CASHOUT_CONTROL_26K1V_B
+  private assertAdmin(req: any) {
+    const role = String(req?.user?.role || '').toLowerCase();
+    if (role !== 'admin') {
+      throw new ForbiddenException('admin_only');
+    }
+  }
+
+  @Get('admin/cashouts')
+  async adminListCashouts(@Req() req: any, @Query('status') status?: string) {
+    this.assertAdmin(req);
+
+    const normalized = String(status || 'ALL').toUpperCase();
+
+    if (normalized === 'PENDING' || normalized === 'COMPLETED' || normalized === 'FAILED') {
+      return {
+        ok: true,
+        scope: 'wallet_admin_cashouts',
+        status: normalized,
+        items: await this.walletService.getCashoutsByStatus(normalized as any),
+      };
+    }
+
+    const [pending, completed, failed] = await Promise.all([
+      this.walletService.getCashoutsByStatus('PENDING' as any),
+      this.walletService.getCashoutsByStatus('COMPLETED' as any),
+      this.walletService.getCashoutsByStatus('FAILED' as any),
+    ]);
+
+    return {
+      ok: true,
+      scope: 'wallet_admin_cashouts',
+      status: 'ALL',
+      items: [...pending, ...completed, ...failed],
+      byStatus: {
+        PENDING: pending.length,
+        COMPLETED: completed.length,
+        FAILED: failed.length,
+      },
+    };
+  }
+
+  @Post('admin/cashouts/:id/complete')
+  async adminCompleteCashoutRoute(@Req() req: any, @Param('id') id: string) {
+    this.assertAdmin(req);
+
+    const cashoutId = Number(id);
+    if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+      throw new BadRequestException('Invalid cashout id');
+    }
+
+    return this.walletService.adminCompleteCashout(cashoutId);
+  }
+
+  @Post('admin/cashouts/:id/fail')
+  async adminFailCashoutRoute(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() body: { failureReason?: string },
+  ) {
+    this.assertAdmin(req);
+
+    const cashoutId = Number(id);
+    if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+      throw new BadRequestException('Invalid cashout id');
+    }
+
+    return this.walletService.adminFailCashout(
+      cashoutId,
+      body?.failureReason ?? 'Cashout failed by admin',
+    );
+  }
+
+  @Post('admin/cashouts/:id/repair-refund')
+  async adminRepairFailedCashoutRefundRoute(@Req() req: any, @Param('id') id: string) {
+    this.assertAdmin(req);
+
+    const cashoutId = Number(id);
+    if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
+      throw new BadRequestException('Invalid cashout id');
+    }
+
+    return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+  }
+
   // --------------------------------------------------
   // BASIC SUMMARY
   // --------------------------------------------------
@@ -350,3 +435,4 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }
+
