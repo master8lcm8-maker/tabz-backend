@@ -31,10 +31,11 @@ import { RedemptionsModule } from '../modules/redemptions/redemptions.module';
 import { AdminHqOperationsController } from '../modules/admin-hq/admin-hq-operations.controller';
 import { AdminHqControlController } from '../modules/admin-hq/admin-hq-control.controller';
 import { StaffConvenienceController } from '../modules/staff/staff-convenience.controller';
+import { OwnerConvenienceController } from '../owner/owner-convenience.controller';
 
 @Module({
   providers: [AppService],
-  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController],
+  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
@@ -163,6 +164,7 @@ import { StaffConvenienceController } from '../modules/staff/staff-convenience.c
   ],
 })
 export class AppModule {}
+
 
 
 
