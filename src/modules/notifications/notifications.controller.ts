@@ -1,7 +1,10 @@
 ﻿import {
+  Body,
   Controller,
+  Delete,
   Get,
   Patch,
+  Post,
   Param,
   Query,
   Req,
@@ -52,4 +55,22 @@ export class NotificationsController {
   markAllRead(@Req() req: any) {
     return this.notificationsService.markAllRead(resolveUserId(req));
   }
+
+  // PUSH_TOKEN_REGISTRATION_26N9
+  @Post('push-token')
+  registerPushToken(@Req() req: any, @Body() body: any) {
+    return this.notificationsService.registerPushToken(resolveUserId(req), body);
+  }
+
+  @Get('push-token')
+  listPushTokens(@Req() req: any) {
+    return this.notificationsService.listPushTokens(resolveUserId(req));
+  }
+
+  @Delete('push-token/:id')
+  deactivatePushToken(@Req() req: any, @Param('id') id: string) {
+    return this.notificationsService.deactivatePushToken(resolveUserId(req), id);
+  }
 }
+
+
