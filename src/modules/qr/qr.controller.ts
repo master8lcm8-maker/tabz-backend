@@ -34,6 +34,7 @@ export class QrController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('queue')
   queue(@Req() req: AuthRequest) {
     const user = (req as any).user || {};
@@ -42,7 +43,8 @@ export class QrController {
       venueId: user.venueId,
     });
   }
-@Post('redeem')
+  @UseGuards(JwtAuthGuard)
+  @Post('redeem')
   redeem(@Req() req: AuthRequest, @Body() body: { code?: string; kind?: string }) {
     const user = req.user ?? {};
     const userId = Number(user.userId ?? user.id ?? user.sub ?? 0);
@@ -55,5 +57,6 @@ export class QrController {
     });
   }
 }
+
 
 
