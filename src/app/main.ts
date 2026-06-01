@@ -128,6 +128,15 @@ async function bootstrap() {
     '/owned-items': 'index.html',
     '/redeemables': 'index.html',
     '/wallet/entitlements': 'index.html',
+    // PHASE26_ROLE_PUBLIC_PAGE_ALIASES_26R2R
+    '/owner': 'index.html',
+    '/owner/dashboard': 'index.html',
+    '/owner/venue': 'index.html',
+    '/staff': 'index.html',
+    '/staff/dashboard': 'index.html',
+    '/admin': 'index.html',
+    '/admin-hq': 'index.html',
+    '/admin/dashboard': 'index.html',
   };
 
   for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
@@ -144,6 +153,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 
