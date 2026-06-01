@@ -122,6 +122,12 @@ async function bootstrap() {
     '/staff/qr': 'index.html',
     '/staff/redeem': 'index.html',
     '/owner/qr': 'index.html',
+    // PHASE26_ENTITLEMENT_PUBLIC_ALIASES_26P2R
+    '/my-entitlements': 'index.html',
+    '/my-items': 'index.html',
+    '/owned-items': 'index.html',
+    '/redeemables': 'index.html',
+    '/wallet/entitlements': 'index.html',
   };
 
   for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
@@ -138,6 +144,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 

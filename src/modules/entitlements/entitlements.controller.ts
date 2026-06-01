@@ -15,9 +15,7 @@ function getUserIdFromRequest(req: any): number {
 export class EntitlementsController {
   constructor(private readonly entitlementsService: EntitlementsService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('my')
-  async my(@Req() req: any) {
+  private async listForRequest(req: any) {
     const userId = getUserIdFromRequest(req);
 
     return {
@@ -25,4 +23,24 @@ export class EntitlementsController {
       items: await this.entitlementsService.listMine(userId),
     };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  async my(@Req() req: any) {
+    return this.listForRequest(req);
+  }
+
+  // ENTITLEMENTS_READ_ALIAS_26P2R
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async me(@Req() req: any) {
+    return this.listForRequest(req);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async root(@Req() req: any) {
+    return this.listForRequest(req);
+  }
 }
+
