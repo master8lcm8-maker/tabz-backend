@@ -14,7 +14,7 @@ import { Venue } from '../venues/venue.entity';
 import { ProfileService } from '../../profile/profile.service';
 
 // Roles we support in TABZ
-export type UserRole = 'buyer' | 'owner' | 'staff';
+export type UserRole = 'buyer' | 'owner' | 'staff' | 'admin';
 
 interface JwtPayload {
   sub: number;
@@ -108,6 +108,13 @@ export class AuthService {
     if (!Number.isFinite(uid) || uid <= 0) return 'buyer';
 
     const profiles = await this.profileService.listForUser(uid);
+
+    // ADMIN_AUTH_ROLE_RESOLUTION_26K1F
+    const hasAdmin = (profiles || []).some(
+      (p: any) => String(p?.type || '').toLowerCase() === 'admin',
+    );
+    if (hasAdmin) return 'admin';
+
     const hasOwner = (profiles || []).some(
       (p: any) => String(p?.type || '').toLowerCase() === 'owner',
     );
@@ -217,4 +224,17 @@ export class AuthService {
     const staff = await this.validateStaff(dto.email, dto.password);
     return this.signTokenFromUser(staff, 'staff', { venueId: staff.venueId });
   }
+
+  // ADMIN_AUTH_LOGIN_26K1F
+  async loginAdmin(dto: LoginDto): Promise<{ access_token: string }> {
+    const user = await this.validateUser(dto.email, dto.password);
+    const role = await this.resolveUserRoleFromProfiles(Number(user.id));
+
+    if (role !== 'admin') {
+      throw new UnauthorizedException('Admins only');
+    }
+
+    return this.signTokenFromUser(user, 'admin');
+  }
 }
+
