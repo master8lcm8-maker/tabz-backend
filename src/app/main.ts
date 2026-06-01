@@ -113,6 +113,15 @@ async function bootstrap() {
     '/alerts': 'index.html',
     '/badges': 'index.html',
     '/notification-settings': 'index.html',
+    // PHASE26_QR_REDEMPTION_PUBLIC_ALIASES_26O2
+    '/qr': 'index.html',
+    '/qr-scanner': 'index.html',
+    '/scan': 'index.html',
+    '/redeem': 'index.html',
+    '/redemption': 'index.html',
+    '/staff/qr': 'index.html',
+    '/staff/redeem': 'index.html',
+    '/owner/qr': 'index.html',
   };
 
   for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
@@ -129,6 +138,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 
