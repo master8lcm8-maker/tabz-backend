@@ -149,7 +149,9 @@ export class AdminHqControlController {
       [refundId, 'APPROVED', adminNote, adminUserId],
     );
 
-    if (!rows?.length) {
+    const normalizedRows = this.normalizeMutationRows(rows);
+
+    if (!normalizedRows.length) {
       throw new NotFoundException('Refund not found.');
     }
 
@@ -159,7 +161,7 @@ export class AdminHqControlController {
       action: 'refund_approve',
       status: 'APPROVED',
       id: refundId,
-      record: rows[0],
+      record: normalizedRows[0],
     };
   }
 
@@ -184,7 +186,9 @@ export class AdminHqControlController {
       [disputeId, 'RESOLVED', resolution, adminUserId],
     );
 
-    if (!rows?.length) {
+    const normalizedRows = this.normalizeMutationRows(rows);
+
+    if (!normalizedRows.length) {
       throw new NotFoundException('Dispute not found.');
     }
 
@@ -194,7 +198,7 @@ export class AdminHqControlController {
       action: 'dispute_resolve',
       status: 'RESOLVED',
       id: disputeId,
-      record: rows[0],
+      record: normalizedRows[0],
     };
   }
 
@@ -224,7 +228,9 @@ export class AdminHqControlController {
       [resolutionId, status, resolution, reason, adminNote, adminUserId],
     );
 
-    if (!rows?.length) {
+    const normalizedRows = this.normalizeMutationRows(rows);
+
+    if (!normalizedRows.length) {
       throw new NotFoundException('Final resolution record not found.');
     }
 
@@ -235,7 +241,7 @@ export class AdminHqControlController {
       status,
       resolution,
       id: resolutionId,
-      record: rows[0],
+      record: normalizedRows[0],
     };
   }
 
@@ -265,6 +271,19 @@ export class AdminHqControlController {
       reason,
       receivedBodyKeys: body && typeof body === 'object' ? Object.keys(body) : [],
     };
+  }
+
+  // ADMIN_HQ_MUTATION_ROW_NORMALIZER_26K2N
+  private normalizeMutationRows(result: any): any[] {
+    if (Array.isArray(result?.[0])) {
+      return result[0];
+    }
+
+    if (Array.isArray(result)) {
+      return result;
+    }
+
+    return [];
   }
 
   private requirePositiveId(raw: string, label: string): number {
@@ -363,4 +382,5 @@ export class AdminHqControlController {
     return `"${identifier}"`;
   }
 }
+
 
