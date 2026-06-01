@@ -55,6 +55,15 @@ export class DrinksController {
   @UseGuards(JwtAuthGuard)
   @Get('venue-orders')
   async getVenueOrders(@Req() req: Request) {
+    const user: any = (req as any).user || {};
+    const role = String(user.role || '').toLowerCase();
+
+    // DRINKS_VENUE_ORDERS_OWNER_ENFORCEMENT_26J1F
+    // Buyer/staff tokens must not access owner venue order visibility.
+    if (role !== 'owner') {
+      throw new ForbiddenException('Only owners can view venue drink orders.');
+    }
+
     const ownerId = getUserIdFromRequest(req);
     return this.drinksService.getOrdersForVenueOwner(ownerId);
   }
@@ -74,3 +83,4 @@ export class DrinksController {
     return this.drinksService.redeemOrderByCode(code);
   }
 }
+
