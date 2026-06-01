@@ -28,10 +28,11 @@ import { QrModule } from '../modules/qr/qr.module';
 import { FoodsModule } from '../modules/foods/foods.module';
 import { EntitlementsModule } from '../modules/entitlements/entitlements.module';
 import { RedemptionsModule } from '../modules/redemptions/redemptions.module';
+import { AdminHqOperationsController } from '../modules/admin-hq/admin-hq-operations.controller';
 
 @Module({
   providers: [AppService],
-  controllers: [AppController],
+  controllers: [AppController, AdminHqOperationsController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
@@ -160,6 +161,7 @@ import { RedemptionsModule } from '../modules/redemptions/redemptions.module';
   ],
 })
 export class AppModule {}
+
 
 
 
