@@ -1,4 +1,4 @@
-// src/dev-seed/dev-seed.controller.ts
+﻿// src/dev-seed/dev-seed.controller.ts
 import {
   Controller,
   Post,
@@ -19,7 +19,7 @@ import { ProfileService } from '../profile/profile.service';
 import { ProfileType } from '../profile/profile.types';
 import { Venue } from '../modules/venues/venue.entity';
 
-// ✅ ADD
+// âœ… ADD
 import { StoreItemsService } from '../modules/store-items/store-items.service';
 
 @UseGuards(DevEndpointGuard)
@@ -47,12 +47,12 @@ export class DevSeedController {
 
     private readonly profileService: ProfileService,
 
-    // ✅ ADD (comes from StoreItemsModule)
+    // âœ… ADD (comes from StoreItemsModule)
     private readonly storeItemsService: StoreItemsService,
   ) {}
 
   // ------------------------------------------------------------
-  // 🔒 Dev-seed access gate (minimal + explicit)
+  // ðŸ”’ Dev-seed access gate (minimal + explicit)
   // ------------------------------------------------------------
   private assertDevSeedAllowed(req: any) {
     const secret = String(process.env.DEV_SEED_SECRET || '').trim();
@@ -336,10 +336,10 @@ export class DevSeedController {
     this.assertDevSeedAllowed(req);
 
     const email = 'staff@tabz.app';
-    const password = 'password'; // ✅ match proofs
+    const password = 'password'; // âœ… match proofs
     const name = 'Demo Staff';
 
-    // ✅ Fix: never pick "first venue" (can point at legacy/bad rows).
+    // âœ… Fix: never pick "first venue" (can point at legacy/bad rows).
     // Always seed/ensure the real owner venue and FK to that.
     const venue = await this.ensureVenueForStaff(req);
     if (!venue?.id) {
@@ -390,7 +390,7 @@ export class DevSeedController {
   }
 
   // ------------------------------------------------------------
-  // ✅ MILESTONE 8 helper: ensure owner venue + a store item exists
+  // âœ… MILESTONE 8 helper: ensure owner venue + a store item exists
   // POST /dev-seed/owner-item
   //
   // Returns: { ok, venueId, venue, item }
@@ -536,6 +536,31 @@ export class DevSeedController {
   }
 
   // ------------------------------------------------------------
+  // ADMIN seed
+  // ------------------------------------------------------------
+  // DEV_SEED_ADMIN_26K1I
+  @Post('admin')
+  async seedAdmin(@Req() req: any) {
+    this.assertDevSeedAllowed(req);
+
+    const email = 'admin@tabz.app';
+    const password = 'password';
+    const displayName = 'Demo Admin';
+
+    const user = await this.ensureUser({ email, password, displayName });
+
+    if (user?.id) {
+      await this.ensureProfile({
+        userId: user.id,
+        displayName,
+        type: ProfileType.ADMIN,
+      });
+    }
+
+    return { ok: true, createdOrExists: true, email, userId: user?.id ?? null };
+  }
+
+  // ------------------------------------------------------------
   // Seed everything
   // ------------------------------------------------------------
   @Post('all')
@@ -546,7 +571,9 @@ export class DevSeedController {
     const owner = await this.seedOwner(req);
     const owner2 = await this.seedOwner2(req);
     const staff = await this.seedStaff(req);
+    const admin = await this.seedAdmin(req);
 
-    return { ok: true, buyer, owner, owner2, staff };
+    return { ok: true, buyer, owner, owner2, staff, admin };
   }
 }
+
