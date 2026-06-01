@@ -107,6 +107,12 @@ async function bootstrap() {
     '/referral': 'index.html',
     '/promos': 'index.html',
     '/promo': 'index.html',
+    // PHASE26_NOTIFICATION_CENTER_PUBLIC_ALIASES_26N3
+    '/notification-center': 'index.html',
+    '/notifications-center': 'index.html',
+    '/alerts': 'index.html',
+    '/badges': 'index.html',
+    '/notification-settings': 'index.html',
   };
 
   for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
@@ -123,6 +129,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 
