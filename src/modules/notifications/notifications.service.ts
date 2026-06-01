@@ -1,6 +1,7 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PushToken, PushTokenPlatform } from './push-token.entity';
 import {
   Notification,
   NotificationAudience,
@@ -24,6 +25,8 @@ export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationsRepo: Repository<Notification>,
+    @InjectRepository(PushToken)
+    private readonly pushTokensRepo: Repository<PushToken>,
   ) {}
 
   private assertPositiveInt(value: unknown, field: string): number {
