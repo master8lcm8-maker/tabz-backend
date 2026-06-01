@@ -136,4 +136,65 @@ export class NotificationsService {
 
     return { updated: result.affected || 0 };
   }
+
+  // PUSH_TOKEN_REGISTRATION_26N8
+  private normalizePushPlatform(input: unknown): PushTokenPlatform {
+    const value = String(input || 'unknown').toLowerCase();
+    if (value === 'ios' || value === 'android' || value === 'web') {
+      return value;
+    }
+    return 'unknown';
+  }
+
+  async registerPushToken(userIdInput: unknown, input: any): Promise<PushToken> {
+    const userId = this.assertPositiveInt(userIdInput, 'user_id_required');
+    const token = String(input?.token || '').trim();
+
+    if (!token || token.length < 12 || token.length > 512) {
+      throw new BadRequestException('valid_push_token_required');
+    }
+
+    const existing = await this.pushTokensRepo.findOne({ where: { token } });
+
+    const payload = {
+      userId,
+      token,
+      platform: this.normalizePushPlatform(input?.platform),
+      deviceId: input?.deviceId ? String(input.deviceId).slice(0, 160) : null,
+      isActive: true,
+      metadata: input?.metadata ?? null,
+    };
+
+    if (existing) {
+      Object.assign(existing, payload);
+      return this.pushTokensRepo.save(existing);
+    }
+
+    return this.pushTokensRepo.save(this.pushTokensRepo.create(payload));
+  }
+
+  async listPushTokens(userIdInput: unknown): Promise<{ total: number; items: PushToken[] }> {
+    const userId = this.assertPositiveInt(userIdInput, 'user_id_required');
+    const items = await this.pushTokensRepo.find({
+      where: { userId, isActive: true },
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
+
+    return { total: items.length, items };
+  }
+
+  async deactivatePushToken(userIdInput: unknown, idInput: unknown): Promise<PushToken> {
+    const userId = this.assertPositiveInt(userIdInput, 'user_id_required');
+    const id = this.assertPositiveInt(idInput, 'push_token_id_required');
+
+    const token = await this.pushTokensRepo.findOne({ where: { id, userId } });
+    if (!token) {
+      throw new NotFoundException('push_token_not_found');
+    }
+
+    token.isActive = false;
+    return this.pushTokensRepo.save(token);
+  }
 }
+
