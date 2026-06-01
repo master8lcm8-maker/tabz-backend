@@ -1,12 +1,23 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+﻿import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PromotionsService } from './promotions.service';
 
 @Controller('promotions')
 export class PromotionsController {
   constructor(private readonly promotionsService: PromotionsService) {}
 
+  // PROMOTION_WRITE_SECURITY_26M6
+  private assertPromotionWriter(req: any) {
+    const role = String(req?.user?.role || '').toLowerCase();
+    if (role !== 'admin' && role !== 'owner') {
+      throw new ForbiddenException('Only admins or owners can manage promotions.');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post()
-  createPromotion(@Body() body: any) {
+  createPromotion(@Req() req: any, @Body() body: any) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.createPromotion(body);
   }
 
@@ -20,41 +31,55 @@ export class PromotionsController {
     return this.promotionsService.getPromotion(Number(id));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/approve')
-  approvePromotion(@Param('id') id: string) {
+  approvePromotion(@Req() req: any, @Param('id') id: string) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.approvePromotion(Number(id));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/reject')
-  rejectPromotion(@Param('id') id: string, @Body() body: any) {
+  rejectPromotion(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.rejectPromotion(Number(id), body?.reason);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/activate')
-  activatePromotion(@Param('id') id: string) {
+  activatePromotion(@Req() req: any, @Param('id') id: string) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.activatePromotion(Number(id));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/complete')
-  completePromotion(@Param('id') id: string) {
+  completePromotion(@Req() req: any, @Param('id') id: string) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.completePromotion(Number(id));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
-  cancelPromotion(@Param('id') id: string) {
+  cancelPromotion(@Req() req: any, @Param('id') id: string) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.cancelPromotion(Number(id));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/billing-events')
-  recordBillingEvent(@Param('id') id: string, @Body() body: any) {
+  recordBillingEvent(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.recordBillingEvent({
       ...body,
       promotionId: Number(id),
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/revenue-events')
-  recordRevenueEvent(@Param('id') id: string, @Body() body: any) {
+  recordRevenueEvent(@Req() req: any, @Param('id') id: string, @Body() body: any) {
+    this.assertPromotionWriter(req);
     return this.promotionsService.recordRevenueEvent({
       ...body,
       promotionId: Number(id),
