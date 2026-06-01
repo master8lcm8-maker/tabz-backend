@@ -1,4 +1,4 @@
-﻿import { Body, Controller, ForbiddenException, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+﻿import { BadRequestException, Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -126,25 +126,117 @@ export class AdminHqControlController {
     });
   }
 
+  // ADMIN_HQ_REAL_MUTATIONS_26K2L
   @UseGuards(JwtAuthGuard)
   @Post('refunds/:id/approve')
   async approveRefund(@Req() req: any, @Param('id') id: string, @Body() body: any) {
     this.assertAdmin(req);
-    return this.notImplementedControl('refund_approve', id, body, 'No dedicated refunds approval service/table is wired yet.');
+
+    const refundId = this.requirePositiveId(id, 'refund id');
+    const adminUserId = this.adminUserId(req);
+    const adminNote = this.optionalText(body?.adminNote ?? body?.note ?? body?.reason);
+
+    const rows = await this.dataSource.query(
+      `UPDATE "refunds"
+       SET "status" = $2,
+           "adminNote" = COALESCE($3, "adminNote"),
+           "approvedByAdminUserId" = $4,
+           "approvedAt" = now(),
+           "resolvedAt" = now(),
+           "updatedAt" = now()
+       WHERE "id" = $1
+       RETURNING *`,
+      [refundId, 'APPROVED', adminNote, adminUserId],
+    );
+
+    if (!rows?.length) {
+      throw new NotFoundException('Refund not found.');
+    }
+
+    return {
+      ok: true,
+      scope: 'admin_refund_control',
+      action: 'refund_approve',
+      status: 'APPROVED',
+      id: refundId,
+      record: rows[0],
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('disputes/:id/resolve')
   async resolveDispute(@Req() req: any, @Param('id') id: string, @Body() body: any) {
     this.assertAdmin(req);
-    return this.notImplementedControl('dispute_resolve', id, body, 'No dedicated disputes resolution service/table is wired yet.');
+
+    const disputeId = this.requirePositiveId(id, 'dispute id');
+    const adminUserId = this.adminUserId(req);
+    const resolution = this.optionalText(body?.resolution ?? body?.reason) ?? 'ADMIN_RESOLVED';
+
+    const rows = await this.dataSource.query(
+      `UPDATE "disputes"
+       SET "status" = $2,
+           "resolution" = $3,
+           "resolvedByAdminUserId" = $4,
+           "resolvedAt" = now(),
+           "updatedAt" = now()
+       WHERE "id" = $1
+       RETURNING *`,
+      [disputeId, 'RESOLVED', resolution, adminUserId],
+    );
+
+    if (!rows?.length) {
+      throw new NotFoundException('Dispute not found.');
+    }
+
+    return {
+      ok: true,
+      scope: 'admin_dispute_control',
+      action: 'dispute_resolve',
+      status: 'RESOLVED',
+      id: disputeId,
+      record: rows[0],
+    };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('final-resolution/:id')
   async finalizeResolution(@Req() req: any, @Param('id') id: string, @Body() body: any) {
     this.assertAdmin(req);
-    return this.notImplementedControl('final_resolution', id, body, 'No dedicated final-resolution mutation service/table is wired yet.');
+
+    const resolutionId = this.requirePositiveId(id, 'final resolution id');
+    const adminUserId = this.adminUserId(req);
+    const resolution = this.optionalText(body?.resolution) ?? 'ADMIN_RESOLVED';
+    const status = this.optionalText(body?.status) ?? 'RESOLVED';
+    const reason = this.optionalText(body?.reason);
+    const adminNote = this.optionalText(body?.adminNote ?? body?.note);
+
+    const rows = await this.dataSource.query(
+      `UPDATE "final_resolutions"
+       SET "status" = $2,
+           "resolution" = $3,
+           "reason" = COALESCE($4, "reason"),
+           "adminNote" = COALESCE($5, "adminNote"),
+           "resolvedByAdminUserId" = $6,
+           "resolvedAt" = now(),
+           "updatedAt" = now()
+       WHERE "id" = $1
+       RETURNING *`,
+      [resolutionId, status, resolution, reason, adminNote, adminUserId],
+    );
+
+    if (!rows?.length) {
+      throw new NotFoundException('Final resolution record not found.');
+    }
+
+    return {
+      ok: true,
+      scope: 'admin_final_resolution_mutation',
+      action: 'final_resolution',
+      status,
+      resolution,
+      id: resolutionId,
+      record: rows[0],
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -173,6 +265,25 @@ export class AdminHqControlController {
       reason,
       receivedBodyKeys: body && typeof body === 'object' ? Object.keys(body) : [],
     };
+  }
+
+  private requirePositiveId(raw: string, label: string): number {
+    const id = Number(raw);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new BadRequestException(`Invalid ${label}.`);
+    }
+    return id;
+  }
+
+  private adminUserId(req: any): number | null {
+    const id = Number(req?.user?.sub ?? req?.user?.userId ?? req?.user?.id);
+    return Number.isFinite(id) && id > 0 ? id : null;
+  }
+
+  private optionalText(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed.slice(0, 2000) : null;
   }
 
   private async section(input: {
@@ -252,3 +363,4 @@ export class AdminHqControlController {
     return `"${identifier}"`;
   }
 }
+
