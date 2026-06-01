@@ -33,10 +33,11 @@ import { AdminHqControlController } from '../modules/admin-hq/admin-hq-control.c
 import { StaffConvenienceController } from '../modules/staff/staff-convenience.controller';
 import { OwnerConvenienceController } from '../owner/owner-convenience.controller';
 import { AdminConvenienceController } from '../modules/admin-hq/admin-convenience.controller';
+import { AdminHqConvenienceController } from '../modules/admin-hq/admin-hq-convenience.controller';
 
 @Module({
   providers: [AppService],
-  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController, AdminConvenienceController],
+  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController, AdminConvenienceController, AdminHqConvenienceController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
@@ -165,6 +166,7 @@ import { AdminConvenienceController } from '../modules/admin-hq/admin-convenienc
   ],
 })
 export class AppModule {}
+
 
 
 
