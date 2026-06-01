@@ -29,10 +29,11 @@ import { FoodsModule } from '../modules/foods/foods.module';
 import { EntitlementsModule } from '../modules/entitlements/entitlements.module';
 import { RedemptionsModule } from '../modules/redemptions/redemptions.module';
 import { AdminHqOperationsController } from '../modules/admin-hq/admin-hq-operations.controller';
+import { AdminHqControlController } from '../modules/admin-hq/admin-hq-control.controller';
 
 @Module({
   providers: [AppService],
-  controllers: [AppController, AdminHqOperationsController],
+  controllers: [AppController, AdminHqOperationsController, AdminHqControlController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
@@ -161,6 +162,7 @@ import { AdminHqOperationsController } from '../modules/admin-hq/admin-hq-operat
   ],
 })
 export class AppModule {}
+
 
 
 
