@@ -1,4 +1,4 @@
-// src/modules/store-items/store-items.owner.controller.ts
+﻿// src/modules/store-items/store-items.owner.controller.ts
 import {
   Controller,
   Get,
@@ -8,6 +8,7 @@ import {
   UseGuards,
   Req,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -24,7 +25,7 @@ export class StoreItemsOwnerController {
   ) {}
 
   // ==============================================================
-  // OWNER — ORDERS (LIVE)
+  // OWNER â€” ORDERS (LIVE)
   // ==============================================================
   @Get('owner/orders')
   async getOwnerOrdersLive(@Req() req: Request) {
@@ -39,7 +40,7 @@ export class StoreItemsOwnerController {
   }
 
   // ==============================================================
-  // OWNER — ORDER DETAIL (LIVE)
+  // OWNER â€” ORDER DETAIL (LIVE)
   // ==============================================================
   @Get('owner/orders/:orderId')
   async getOwnerOrderDetail(
@@ -105,7 +106,7 @@ export class StoreItemsOwnerController {
   }
 
   // --------------------------------------------------------------
-  // VENUE MENU — ITEMS FOR A VENUE
+  // VENUE MENU â€” ITEMS FOR A VENUE
   // --------------------------------------------------------------
   @Get('venue/:venueId/items')
   async getItemsForVenue(@Param('venueId') venueIdParam: string) {
@@ -124,7 +125,16 @@ export class StoreItemsOwnerController {
   // --------------------------------------------------------------
   @Get('owner/dashboard')
   async getOwnerDashboard(@Req() req: Request) {
-    const ownerId = (req as any).user?.sub;
+    const user = (req as any).user;
+    const role = String(user?.role || '').toLowerCase();
+
+    // OWNER_DASHBOARD_ROLE_ENFORCEMENT_26J1C
+    // Staff and buyer tokens must not access owner dashboard data.
+    if (role !== 'owner') {
+      throw new ForbiddenException('Only owners can view owner dashboard.');
+    }
+
+    const ownerId = user?.sub;
 
     if (!ownerId || ownerId <= 0) {
       throw new BadRequestException('Invalid ownerId from auth token.');
@@ -141,3 +151,4 @@ export class StoreItemsOwnerController {
     };
   }
 }
+
