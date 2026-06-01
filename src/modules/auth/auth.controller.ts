@@ -13,7 +13,7 @@ interface AuthRequest extends Request {
   user?: {
     sub: number;
     email: string;
-    role: 'owner' | 'buyer' | 'staff';
+    role: 'owner' | 'buyer' | 'staff' | 'admin';
     venueId?: number;
     id?: number;
     userId?: number;
@@ -47,6 +47,12 @@ export class AuthController {
     return this.authService.loginStaff(dto);
   }
 
+  // AUTH_CONTROLLER_LOGIN_ADMIN_26K1G
+  @Post('login-admin')
+  async loginAdmin(@Body() dto: LoginDto) {
+    return this.authService.loginAdmin(dto);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@Req() req: AuthRequest) {
@@ -76,6 +82,7 @@ export class AuthController {
     if (role === 'owner') desiredType = ProfileType.OWNER;
     if (role === 'buyer') desiredType = ProfileType.BUYER;
     if (role === 'staff') desiredType = ProfileType.STAFF;
+    if (role === 'admin') desiredType = ProfileType.ADMIN;
 
     // 2) Pick primary profile:
     //    - prefer role-matching active profile
@@ -116,4 +123,5 @@ export class AuthController {
     };
   }
 }
+
 
