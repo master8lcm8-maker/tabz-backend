@@ -100,6 +100,13 @@ async function bootstrap() {
   '/account-delete': 'account-delete.html',
     '/account/delete': 'account-delete.html',
     '/safety/report': 'safety-report.html',
+    // PHASE26_AFFILIATE_REFERRAL_PROMO_PUBLIC_ALIASES_26M10
+    '/affiliate': 'index.html',
+    '/affiliates': 'index.html',
+    '/referrals': 'index.html',
+    '/referral': 'index.html',
+    '/promos': 'index.html',
+    '/promo': 'index.html',
   };
 
   for (const [routePath, fileName] of Object.entries(publicCleanRoutes)) {
@@ -116,5 +123,6 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
