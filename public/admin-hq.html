@@ -884,6 +884,14 @@
       padding:7px 8px;
       background:rgba(0,0,0,.24);
     }
+      /* ADMIN-HQ-49 users/venues/staff/profile account operations */
+    .account-ops-block{
+      margin-top:10px;
+    }
+    .account-ops-table .ops-head,
+    .account-ops-table .ops-row{
+      grid-template-columns:.75fr .65fr 1.75fr .95fr;
+    }
   </style>
 </head>
 <body>
@@ -1187,6 +1195,7 @@
       try{
         var overview=await api('/admin/overview');
         var operations=await api('/admin-hq/operations');
+var accounts=await api('/admin-hq/accounts');
         var control=await api('/admin/control');
         var refunds=await api('/admin/refunds');
         var disputes=await api('/admin/disputes');
@@ -1252,6 +1261,7 @@ var referrals=await api('/referrals/admin/links?limit=25');
 renderCashoutOperations(cashoutItems);
 renderReferralOperations(referrals);
 renderWalletLedgerReconciliation(operations, payouts, cashoutItems);
+renderAccountOperations(accounts);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1530,6 +1540,94 @@ function renderWalletLedgerReconciliation(operationsPayload, payoutsPayload, cas
 
   box.innerHTML = html;
 }
+function accountSectionFromPayload(payload, key){
+  if(!payload || !Array.isArray(payload.sections)){ return null; }
+  return payload.sections.find(function(section){
+    return String(section.key || '').toLowerCase() === String(key || '').toLowerCase();
+  }) || null;
+}
+function accountRecentRows(payload, key){
+  var section = accountSectionFromPayload(payload, key);
+  if(section && Array.isArray(section.recent)){ return section.recent; }
+  return [];
+}
+function renderAccountOperations(accountsPayload){
+  var panel =
+    document.getElementById('accounts') ||
+    document.getElementById('users') ||
+    document.getElementById('venues') ||
+    document.getElementById('staff') ||
+    document.getElementById('system') ||
+    document.querySelector('main') ||
+    document.body;
+
+  if(!panel){ return; }
+
+  var box = document.getElementById('accountOpsRows');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'accountOpsRows';
+    box.className = 'ops-module-block account-ops-block';
+    panel.appendChild(box);
+  }
+
+  var totals = accountsPayload && accountsPayload.totals ? accountsPayload.totals : {};
+  var users = Number(totals.users || 0);
+  var venues = Number(totals.venues || 0);
+  var staff = Number(totals.staff || 0);
+  var profiles = Number(totals.profiles || 0);
+
+  var recentUsers = accountRecentRows(accountsPayload, 'users');
+  var recentVenues = accountRecentRows(accountsPayload, 'venues');
+  var recentStaff = accountRecentRows(accountsPayload, 'staff');
+  var recentProfiles = accountRecentRows(accountsPayload, 'profiles');
+
+  var rows = []
+    .concat(recentUsers.slice(0,3).map(function(x){ x.__type='User'; return x; }))
+    .concat(recentVenues.slice(0,3).map(function(x){ x.__type='Venue'; return x; }))
+    .concat(recentStaff.slice(0,3).map(function(x){ x.__type='Staff'; return x; }))
+    .concat(recentProfiles.slice(0,3).map(function(x){ x.__type='Profile'; return x; }));
+
+  var html = '';
+  html += '<div class="ops-title">Live Users / Venues / Staff / Profiles</div>';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Users</span><b>' + users + '</b></div>';
+  html += '<div><span>Venues</span><b>' + venues + '</b></div>';
+  html += '<div><span>Staff</span><b>' + staff + '</b></div>';
+  html += '<div><span>Profiles</span><b>' + profiles + '</b></div>';
+  html += '</div>';
+
+  html += '<div class="ops-table account-ops-table">';
+  html += '<div class="ops-head"><span>Type</span><span>ID</span><span>Name / Email</span><span>Status</span></div>';
+
+  if(!rows.length){
+    html += '<div class="ops-row"><span>Accounts</span><span>-</span><span>No recent account rows returned</span><span>VISIBLE</span></div>';
+  } else {
+    rows.slice(0,10).forEach(function(x){
+      var type = safeText(x.__type || x.type || 'Account');
+      var id = safeText(x.id || 'unknown');
+      var name = safeText(x.displayName || x.name || x.email || x.slug || 'account-visible');
+      var status = safeText(
+        x.isActive === false ? 'INACTIVE' :
+        x.isActive === true ? 'ACTIVE' :
+        x.role || x.type || 'VISIBLE'
+      );
+
+      html += '<div class="ops-row">';
+      html += '<span>' + type + '</span>';
+      html += '<span>#' + id + '</span>';
+      html += '<span>' + name + '</span>';
+      html += '<span>' + status + '</span>';
+      html += '</div>';
+    });
+  }
+
+  html += '</div>';
+  html += '<div class="ops-note">Admin-safe source: /admin-hq/accounts. This panel is read-only account visibility. Suspend, approve, ban, edit, and role-change actions must be separate audited controls before they can be marked GREEN.</div>';
+  html += '<button class="btn" data-command="ACCOUNTS_OPERATIONS">OPEN ACCOUNT OPERATIONS</button>';
+
+  box.innerHTML = html;
+}
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
@@ -1549,7 +1647,8 @@ function openCommandModal(title, body){
         'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.',
       'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.',
       'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.',
-      'WALLET_LEDGER_RECON_OPERATIONS':'Live Wallet/Ledger/Reconciliation is wired only to admin-safe JSON sources: /admin-hq/operations, /admin/payouts, and /wallet/admin/cashouts. User wallet routes are not used because they are owner/buyer scoped.'
+      'WALLET_LEDGER_RECON_OPERATIONS':'Live Wallet/Ledger/Reconciliation is wired only to admin-safe JSON sources: /admin-hq/operations, /admin/payouts, and /wallet/admin/cashouts. User wallet routes are not used because they are owner/buyer scoped.',
+      'ACCOUNTS_OPERATIONS':'Live Users/Venues/Staff/Profile account visibility is wired to /admin-hq/accounts. This is read-only operational visibility; account write actions require separate audited controls before GREEN.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1567,6 +1666,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
