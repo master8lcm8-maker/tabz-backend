@@ -892,6 +892,14 @@
     .account-ops-table .ops-row{
       grid-template-columns:.75fr .65fr 1.75fr .95fr;
     }
+      /* ADMIN-HQ-53 refunds/disputes/final resolution operations */
+    .refund-dispute-resolution-block{
+      margin-top:10px;
+    }
+    .refund-dispute-table .ops-head,
+    .refund-dispute-table .ops-row{
+      grid-template-columns:.8fr .65fr .95fr 1.75fr;
+    }
   </style>
 </head>
 <body>
@@ -1196,9 +1204,11 @@
         var overview=await api('/admin/overview');
         var operations=await api('/admin-hq/operations');
 var accounts=await api('/admin-hq/accounts');
+var refunds=await api('/admin/refunds');
+var disputes=await api('/admin/disputes');
+var finalResolution=await api('/admin/final-resolution');
+var stripeEvents=await api('/admin/stripe-events');
         var control=await api('/admin/control');
-        var refunds=await api('/admin/refunds');
-        var disputes=await api('/admin/disputes');
         var payouts=await api('/admin/payouts');
         var stripe=await api('/admin/stripe-events');
         var cashouts=await api('/wallet/admin/cashouts');
@@ -1262,6 +1272,7 @@ renderCashoutOperations(cashoutItems);
 renderReferralOperations(referrals);
 renderWalletLedgerReconciliation(operations, payouts, cashoutItems);
 renderAccountOperations(accounts);
+renderRefundDisputeResolution(refunds, disputes, finalResolution, stripeEvents);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1628,6 +1639,109 @@ function renderAccountOperations(accountsPayload){
 
   box.innerHTML = html;
 }
+function safeSectionTotal(section){
+  if(!section){ return 0; }
+  if(section.total !== undefined && section.total !== null){ return Number(section.total || 0); }
+  if(Array.isArray(section.recent)){ return section.recent.length; }
+  if(Array.isArray(section.items)){ return section.items.length; }
+  return 0;
+}
+function safeRecentRows(section){
+  if(section && Array.isArray(section.recent)){ return section.recent; }
+  if(section && Array.isArray(section.items)){ return section.items; }
+  return [];
+}
+function finalResolutionSections(payload){
+  if(payload && Array.isArray(payload.sections)){ return payload.sections; }
+  if(payload && payload.data && Array.isArray(payload.data.sections)){ return payload.data.sections; }
+  return [];
+}
+function renderRefundDisputeResolution(refundsPayload, disputesPayload, finalPayload, stripePayload){
+  var panel =
+    document.getElementById('refunds') ||
+    document.getElementById('disputes') ||
+    document.getElementById('risk') ||
+    document.getElementById('system') ||
+    document.querySelector('main') ||
+    document.body;
+
+  if(!panel){ return; }
+
+  var box = document.getElementById('refundDisputeResolutionRows');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'refundDisputeResolutionRows';
+    box.className = 'ops-module-block refund-dispute-resolution-block';
+    panel.appendChild(box);
+  }
+
+  var finalSections = finalResolutionSections(finalPayload);
+  var finalCashoutSection = finalSections.find(function(section){
+    var key = String(section.key || '').toLowerCase();
+    var label = String(section.label || '').toLowerCase();
+    return key.indexOf('cashout') >= 0 || label.indexOf('cashout') >= 0 || key.indexOf('final') >= 0 || label.indexOf('final') >= 0;
+  }) || finalSections[0] || null;
+
+  var refundTotal = safeSectionTotal(refundsPayload);
+  var disputeTotal = safeSectionTotal(disputesPayload);
+  var finalTotal = safeSectionTotal(finalCashoutSection);
+  var stripeTotal = safeSectionTotal(stripePayload);
+
+  var finalRows = safeRecentRows(finalCashoutSection);
+  var completed = finalRows.filter(function(x){ return String(x.status || '').toUpperCase() === 'COMPLETED'; }).length;
+  var failed = finalRows.filter(function(x){ return String(x.status || '').toUpperCase() === 'FAILED'; }).length;
+  var pending = finalRows.filter(function(x){ return String(x.status || '').toUpperCase() === 'PENDING'; }).length;
+
+  var html = '';
+  html += '<div class="ops-title">Live Refunds / Disputes / Final Resolution</div>';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Refunds</span><b>' + refundTotal + '</b></div>';
+  html += '<div><span>Disputes</span><b>' + disputeTotal + '</b></div>';
+  html += '<div><span>Final States</span><b>' + finalTotal + '</b></div>';
+  html += '<div><span>Stripe Events</span><b>' + stripeTotal + '</b></div>';
+  html += '</div>';
+
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Pending</span><b>' + pending + '</b></div>';
+  html += '<div><span>Completed</span><b>' + completed + '</b></div>';
+  html += '<div><span>Failed</span><b>' + failed + '</b></div>';
+  html += '<div><span>Open Tables</span><b>' + ((refundsPayload && refundsPayload.tableExists ? 1 : 0) + (disputesPayload && disputesPayload.tableExists ? 1 : 0) + (stripePayload && stripePayload.tableExists ? 1 : 0)) + '</b></div>';
+  html += '</div>';
+
+  html += '<div class="ops-table refund-dispute-table">';
+  html += '<div class="ops-head"><span>Source</span><span>ID</span><span>Status</span><span>Amount / Provider</span></div>';
+
+  var rows = [];
+  safeRecentRows(refundsPayload).slice(0,3).forEach(function(x){ x.__source='Refund'; rows.push(x); });
+  safeRecentRows(disputesPayload).slice(0,3).forEach(function(x){ x.__source='Dispute'; rows.push(x); });
+  finalRows.slice(0,8).forEach(function(x){ x.__source='Final'; rows.push(x); });
+
+  if(!rows.length){
+    html += '<div class="ops-row"><span>Control</span><span>-</span><span>No open refunds/disputes</span><span>Tables live</span></div>';
+  } else {
+    rows.slice(0,10).forEach(function(x){
+      var source = safeText(x.__source || x.sourceType || 'Record');
+      var id = safeText(x.id || x.sourceId || x.cashoutId || 'unknown');
+      var status = safeText(x.status || x.resolution || x.providerStatus || 'VISIBLE');
+      var amount = x.amountCents || x.amount || 0;
+      var provider = safeText(x.providerStatus || x.stripeTransferId || x.stripePayoutId || x.stripeEventId || x.sourceType || 'admin-visible');
+      var amountProvider = amount ? (moneyFromCents(amount) + ' / ' + provider) : provider;
+
+      html += '<div class="ops-row">';
+      html += '<span>' + source + '</span>';
+      html += '<span>#' + id + '</span>';
+      html += '<span>' + status + '</span>';
+      html += '<span>' + amountProvider + '</span>';
+      html += '</div>';
+    });
+  }
+
+  html += '</div>';
+  html += '<div class="ops-note">Admin-safe sources: /admin/refunds, /admin/disputes, /admin/final-resolution, and /admin/stripe-events. Dead routes such as /admin-hq/refunds, /payments/refunds, and /stripe/events are intentionally not used.</div>';
+  html += '<button class="btn" data-command="REFUNDS_DISPUTES_FINAL_RESOLUTION">OPEN FINAL RESOLUTION</button>';
+
+  box.innerHTML = html;
+}
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
@@ -1648,7 +1762,8 @@ function openCommandModal(title, body){
       'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.',
       'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.',
       'WALLET_LEDGER_RECON_OPERATIONS':'Live Wallet/Ledger/Reconciliation is wired only to admin-safe JSON sources: /admin-hq/operations, /admin/payouts, and /wallet/admin/cashouts. User wallet routes are not used because they are owner/buyer scoped.',
-      'ACCOUNTS_OPERATIONS':'Live Users/Venues/Staff/Profile account visibility is wired to /admin-hq/accounts. This is read-only operational visibility; account write actions require separate audited controls before GREEN.'
+      'ACCOUNTS_OPERATIONS':'Live Users/Venues/Staff/Profile account visibility is wired to /admin-hq/accounts. This is read-only operational visibility; account write actions require separate audited controls before GREEN.',
+      'REFUNDS_DISPUTES_FINAL_RESOLUTION':'Live Refunds/Disputes/Final Resolution visibility is wired to /admin/refunds, /admin/disputes, /admin/final-resolution, and /admin/stripe-events. Action controls must remain audited before GREEN.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1666,6 +1781,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
