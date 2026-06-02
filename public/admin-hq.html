@@ -749,6 +749,51 @@
         min-height:auto;
       }
     }
+      /* ADMIN-HQ-28 image-backed command globe asset */
+    .image-command-map{
+      position:relative;
+      min-height:318px;
+      overflow:hidden;
+      border:1px solid rgba(156,255,0,.30);
+      border-radius:12px;
+      background:#000;
+      box-shadow:
+        inset 0 0 86px rgba(156,255,0,.14),
+        0 0 26px rgba(156,255,0,.12);
+    }
+    .command-globe-img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center center;
+      filter:contrast(1.24) saturate(1.32) brightness(1.08);
+      z-index:1;
+    }
+    .image-map-glass{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 6%,rgba(255,255,255,.22),transparent 10%),
+        radial-gradient(circle at 50% 52%,transparent 0 44%,rgba(0,0,0,.16) 74%,rgba(0,0,0,.42) 100%),
+        linear-gradient(90deg,rgba(0,0,0,.24),transparent 18%,transparent 82%,rgba(0,0,0,.24));
+      box-shadow:inset 0 0 70px rgba(156,255,0,.14);
+    }
+    .image-map-base-ring{
+      position:absolute;
+      left:18%;
+      right:18%;
+      bottom:-14px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid rgba(156,255,0,.40);
+      box-shadow:0 0 30px rgba(156,255,0,.34),inset 0 0 18px rgba(156,255,0,.14);
+      z-index:3;
+      pointer-events:none;
+    }
   </style>
 </head>
 <body>
@@ -855,93 +900,11 @@
               </div>
             </div>
 
-            <div class="world-command-map premium-world-command-map" aria-label="8TABZ global command map">
-              <div class="world-glow"></div>
-              <svg class="world-svg premium-world-svg" viewBox="0 0 1400 760" role="img" aria-label="global operations map">
-                <defs>
-                  <radialGradient id="oceanGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="rgba(153,255,0,.18)"/>
-                    <stop offset="60%" stop-color="rgba(40,80,5,.14)"/>
-                    <stop offset="100%" stop-color="rgba(0,0,0,.05)"/>
-                  </radialGradient>
-                  <linearGradient id="landGradHQ25" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#edff9f"/>
-                    <stop offset="24%" stop-color="#c5ff4d"/>
-                    <stop offset="55%" stop-color="#84ff00"/>
-                    <stop offset="100%" stop-color="#2f7104"/>
-                  </linearGradient>
-                  <filter id="landGlowHQ25">
-                    <feGaussianBlur stdDeviation="3" result="blur"/>
-                    <feMerge>
-                      <feMergeNode in="blur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                  <filter id="nodeGlowHQ25">
-                    <feGaussianBlur stdDeviation="4" result="blur"/>
-                    <feMerge>
-                      <feMergeNode in="blur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-
-                <ellipse cx="700" cy="360" rx="500" ry="268" class="globe-outline premium-globe-outline"/>
-                <ellipse cx="700" cy="360" rx="500" ry="268" fill="url(#oceanGlow)" opacity=".7"/>
-
-                <g class="latlon premium-latlon">
-                  <ellipse cx="700" cy="360" rx="500" ry="268"/>
-                  <ellipse cx="700" cy="360" rx="420" ry="226"/>
-                  <ellipse cx="700" cy="360" rx="330" ry="178"/>
-                  <ellipse cx="700" cy="360" rx="230" ry="124"/>
-                  <ellipse cx="700" cy="360" rx="120" ry="64"/>
-                  <path d="M200 360 H1200"/>
-                  <path d="M700 92 V628"/>
-                  <path d="M420 110 C520 250 520 470 420 610"/>
-                  <path d="M980 110 C880 250 880 470 980 610"/>
-                  <path d="M278 210 C500 276 900 276 1122 210"/>
-                  <path d="M278 510 C500 444 900 444 1122 510"/>
-                </g>
-
-                <g class="continents premium-continents" filter="url(#landGlowHQ25)">
-                  <path d="M310 208 L352 176 L426 168 L498 196 L548 248 L540 302 L490 324 L452 314 L430 360 L382 356 L360 316 L326 298 L286 286 L278 246 Z"/>
-                  <path d="M430 360 L486 382 L518 438 L498 518 L446 590 L406 540 L394 468 Z"/>
-                  <path d="M578 222 L654 156 L760 156 L812 208 L796 268 L742 276 L706 250 L670 268 L632 254 Z"/>
-                  <path d="M744 286 L838 302 L914 356 L942 436 L888 544 L802 576 L758 522 L714 452 Z"/>
-                  <path d="M840 186 L954 150 L1082 174 L1154 248 L1128 334 L1032 326 L982 300 L914 284 L840 284 Z"/>
-                  <path d="M964 452 L1032 470 L1088 540 L1062 630 L998 610 L950 522 Z"/>
-                </g>
-
-                <g class="city-lights" filter="url(#nodeGlowHQ25)">
-                  <circle cx="394" cy="244" r="7"/>
-                  <circle cx="474" cy="302" r="6"/>
-                  <circle cx="696" cy="214" r="8"/>
-                  <circle cx="798" cy="346" r="7"/>
-                  <circle cx="986" cy="286" r="8"/>
-                  <circle cx="908" cy="518" r="7"/>
-                  <circle cx="462" cy="460" r="6"/>
-                  <circle cx="1110" cy="312" r="6"/>
-                  <circle cx="1150" cy="356" r="5"/>
-                </g>
-
-                <g class="nodes premium-nodes">
-                  <circle cx="394" cy="244" r="8"/>
-                  <circle cx="474" cy="302" r="7"/>
-                  <circle cx="696" cy="214" r="9"/>
-                  <circle cx="798" cy="346" r="8"/>
-                  <circle cx="986" cy="286" r="9"/>
-                  <circle cx="908" cy="518" r="8"/>
-                  <circle cx="462" cy="460" r="7"/>
-                  <path d="M394 244 C496 180 602 176 696 214"/>
-                  <path d="M696 214 C760 236 792 296 798 346"/>
-                  <path d="M798 346 C882 296 932 286 986 286"/>
-                  <path d="M798 346 C858 418 888 474 908 518"/>
-                  <path d="M474 302 C510 350 486 414 462 460"/>
-                </g>
-              </svg>
-              <div class="map-base-ring premium-map-base-ring"></div>
+            <div class="world-command-map image-command-map" aria-label="8TABZ global command map">
+              <img class="command-globe-img" src="/assets/admin-hq-command-globe.svg" alt="8TABZ live global command center globe" />
+              <div class="image-map-glass"></div>
+              <div class="image-map-base-ring"></div>
             </div>
-
             <div class="hq-telemetry-stack">
               <div class="telemetry-card">
                 <div class="telemetry-title">REAL-TIME TRANSACTIONS</div>
@@ -1281,6 +1244,7 @@
   </script>
 </body>
 </html>
+
 
 
 
