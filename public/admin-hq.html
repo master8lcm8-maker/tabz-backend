@@ -121,35 +121,75 @@
     .panel h2{margin:0 0 10px;font-size:15px;letter-spacing:.22em;text-transform:uppercase}
     .map{
       min-height:300px;
-      border:1px solid rgba(123,255,0,.18);
+      border:1px solid rgba(123,255,0,.24);
       border-radius:12px;
       background:
-        radial-gradient(ellipse at center,rgba(123,255,0,.28),rgba(5,25,3,.22) 34%,rgba(0,0,0,.9) 70%),
+        radial-gradient(ellipse at center,rgba(123,255,0,.20),rgba(5,25,3,.13) 35%,rgba(0,0,0,.94) 74%),
         repeating-linear-gradient(0deg,rgba(123,255,0,.06) 0 1px,transparent 1px 18px),
         repeating-linear-gradient(90deg,rgba(123,255,0,.06) 0 1px,transparent 1px 18px);
       display:flex;align-items:center;justify-content:center;
       position:relative;
       overflow:hidden;
+      box-shadow:inset 0 0 55px rgba(123,255,0,.18),0 0 26px rgba(123,255,0,.16);
     }
     .map:before{
-      content:"GLOBAL TABZ NETWORK";
+      content:"";
       position:absolute;
-      color:rgba(190,255,130,.18);
-      font-size:42px;
-      font-weight:900;
-      letter-spacing:.18em;
-      transform:rotate(-8deg);
-    }
-    .map-orb{
-      width:430px;height:210px;border-radius:50%;
-      border:1px solid rgba(123,255,0,.5);
-      box-shadow:0 0 46px rgba(123,255,0,.7), inset 0 0 60px rgba(123,255,0,.22);
+      inset:18px 34px;
+      border-radius:50%;
+      border:1px solid rgba(123,255,0,.45);
+      box-shadow:0 0 50px rgba(123,255,0,.48), inset 0 0 75px rgba(123,255,0,.20);
       background:
-        radial-gradient(circle at 30% 40%,rgba(123,255,0,.55),transparent 4%),
-        radial-gradient(circle at 65% 36%,rgba(123,255,0,.65),transparent 3%),
-        radial-gradient(circle at 45% 70%,rgba(123,255,0,.45),transparent 3%),
+        radial-gradient(circle at 23% 38%,rgba(185,255,93,.95) 0 1.8%,transparent 2.4%),
+        radial-gradient(circle at 31% 54%,rgba(185,255,93,.70) 0 1.3%,transparent 2%),
+        radial-gradient(circle at 47% 36%,rgba(185,255,93,.90) 0 1.7%,transparent 2.3%),
+        radial-gradient(circle at 59% 45%,rgba(185,255,93,.85) 0 1.5%,transparent 2.2%),
+        radial-gradient(circle at 70% 62%,rgba(185,255,93,.75) 0 1.3%,transparent 2%),
         linear-gradient(90deg,transparent,rgba(123,255,0,.08),transparent);
     }
+    .map:after{
+      content:"GLOBAL TABZ NETWORK";
+      position:absolute;
+      bottom:22px;
+      left:28px;
+      color:rgba(214,255,208,.72);
+      font-size:12px;
+      letter-spacing:.42em;
+    }
+    .map-orb{
+      width:76%;
+      max-width:620px;
+      height:210px;
+      border-radius:50%;
+      position:relative;
+      z-index:1;
+      opacity:.92;
+      background:
+        radial-gradient(ellipse at 24% 46%,rgba(123,255,0,.64) 0 4%,transparent 4.4%),
+        radial-gradient(ellipse at 34% 42%,rgba(123,255,0,.40) 0 7%,transparent 7.5%),
+        radial-gradient(ellipse at 47% 36%,rgba(123,255,0,.58) 0 5%,transparent 5.5%),
+        radial-gradient(ellipse at 57% 47%,rgba(123,255,0,.48) 0 7%,transparent 7.5%),
+        radial-gradient(ellipse at 67% 57%,rgba(123,255,0,.42) 0 6%,transparent 6.5%),
+        repeating-linear-gradient(0deg,rgba(123,255,0,.10) 0 1px,transparent 1px 19px),
+        repeating-linear-gradient(90deg,rgba(123,255,0,.10) 0 1px,transparent 1px 28px);
+      box-shadow:0 0 44px rgba(123,255,0,.72), inset 0 0 72px rgba(123,255,0,.18);
+      border:1px solid rgba(123,255,0,.42);
+    }
+    .command-modal{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      width:min(460px,92vw);
+      border:1px solid var(--lime);
+      border-radius:14px;
+      background:linear-gradient(180deg,rgba(8,22,4,.98),rgba(0,0,0,.98));
+      box-shadow:0 0 36px rgba(123,255,0,.42);
+      z-index:20;
+      padding:16px;
+    }
+    .command-modal h3{margin:0 0 8px;font-size:15px;letter-spacing:.18em}
+    .command-modal p{color:#dfffd2;font-size:12px;line-height:1.5;margin:0 0 12px}
+    .command-modal button{width:auto;padding:8px 14px}
     .mini-chart{
       height:70px;border-radius:8px;border:1px solid rgba(123,255,0,.18);
       background:
@@ -299,11 +339,11 @@
       </header>
 
       <section class="kpis">
-        <div class="kpi" id="users"><small>Total Users</small><strong id="kUsers">--</strong><span class="up">live/empty-state</span></div>
-        <div class="kpi" id="venues"><small>Active Venues</small><strong id="kVenues">--</strong><span class="up">live/empty-state</span></div>
-        <div class="kpi" id="wallets"><small>Total Wallets</small><strong id="kWallets">--</strong><span class="up">live/empty-state</span></div>
-        <div class="kpi"><small>Total Volume</small><strong id="kVolume">--</strong><span class="up">API wired</span></div>
-        <div class="kpi"><small>Gross Merch</small><strong id="kMerch">--</strong><span class="up">API wired</span></div>
+        <div class="kpi" id="users"><small>Total Users</small><strong id="kUsers">--</strong><span class="up">Connected state</span></div>
+        <div class="kpi" id="venues"><small>Active Venues</small><strong id="kVenues">--</strong><span class="up">Connected state</span></div>
+        <div class="kpi" id="wallets"><small>Total Wallets</small><strong id="kWallets">--</strong><span class="up">Connected state</span></div>
+        <div class="kpi"><small>Total Volume</small><strong id="kVolume">--</strong><span class="up">Connected</span></div>
+        <div class="kpi"><small>Gross Merch</small><strong id="kMerch">--</strong><span class="up">Connected</span></div>
         <div class="kpi"><small>Platform Take Rate</small><strong id="kTake">--</strong><span class="up">policy</span></div>
         <div class="kpi"><small>Disbursed</small><strong id="kDisbursed">--</strong><span class="up">cashouts</span></div>
         <div class="kpi"><small>System Health</small><strong id="kHealth">--</strong><span class="up">live</span></div>
@@ -312,7 +352,7 @@
       <section class="grid-top">
         <div class="panel">
           <h2>System Overview</h2>
-          <div class="map"><div class="map-orb"></div></div>
+          <div class="map"><div class="map-orb" aria-label="8TABZ global operations map"></div></div>
         </div>
         <div class="panel">
           <h2>Real-Time Transactions</h2>
@@ -399,8 +439,8 @@
       </section>
 
       <section class="grid-wide">
-        <div class="panel" id="compliance"><h2>Compliance / KYC</h2><div class="row"><span>Status</span><b id="complianceStatus">API pending</b></div></div>
-        <div class="panel" id="audit"><h2>Audit Logs</h2><div class="row"><span>Operational Audit</span><b id="auditStatus">API pending</b></div></div>
+        <div class="panel" id="compliance"><h2>Compliance / KYC</h2><div class="row"><span>Status</span><b id="complianceStatus">Requires API wiring</b></div></div>
+        <div class="panel" id="audit"><h2>Audit Logs</h2><div class="row"><span>Operational Audit</span><b id="auditStatus">Requires API wiring</b></div></div>
         <div class="panel" id="integrations"><h2>Integrations / Developer API</h2><div class="row"><span>Admin APIs</span><b id="apiStatus">Checking</b></div></div>
       </section>
 
@@ -410,6 +450,12 @@
         <span>8TABZ ADMIN HQ</span>
       </div>
     </main>
+  </div>
+
+  <div id="commandModal" class="command-modal hidden">
+    <h3 id="commandTitle">ADMIN HQ MODULE</h3>
+    <p id="commandBody">Module status will appear here.</p>
+    <button class="btn" onclick="closeCommandModal()">CLOSE</button>
   </div>
 
   <script>
@@ -502,9 +548,9 @@
         set('stripRisk','Live');
         set('stripRegions','3 Active');
 
-        set('walletBalances','API wired');
+        set('walletBalances','Connected');
         set('pendingPayouts', String((cashouts.items||[]).filter(function(x){return x.status==='PENDING'}).length));
-        set('reservedHolds','API wired');
+        set('reservedHolds','Connected');
         set('ledgerStatus','In Sync');
         set('disputesOpen', String(disputes.total || 0));
         set('txCount','Live');
@@ -528,21 +574,21 @@
           '<div class="row"><span>Affiliate Boost</span><b class="up">VISIBLE</b></div>';
 
         set('sponsorDeals','Visible');
-        set('sponsorValue','API pending');
-        set('sponsorImpressions','API pending');
-        set('affiliates','API pending');
-        set('referrals','API pending');
-        set('conversion','API pending');
-        set('commissions','API pending');
-        set('complianceStatus','Visible / API pending');
-        set('auditStatus','Visible / API pending');
+        set('sponsorValue','Requires API wiring');
+        set('sponsorImpressions','Requires API wiring');
+        set('affiliates','Requires API wiring');
+        set('referrals','Requires API wiring');
+        set('conversion','Requires API wiring');
+        set('commissions','Requires API wiring');
+        set('complianceStatus','Visible / Requires API wiring');
+        set('auditStatus','Visible / Requires API wiring');
 
         document.getElementById('readinessRows').innerHTML =
           '<div class="row"><span>Admin Unified Dashboard</span><b class="up">Visible</b></div>' +
           '<div class="row"><span>Financial Engine</span><b class="up">Connected</b></div>' +
           '<div class="row"><span>Payout Engine</span><b class="up">Connected</b></div>' +
           '<div class="row"><span>Fraud / Risk Engine</span><b class="up">Visible</b></div>' +
-          '<div class="row"><span>Compliance & KYC</span><b class="warn">Needs deeper API wiring</b></div>';
+          '<div class="row"><span>Compliance & KYC</span><b class="warn">Deeper API wiring required</b></div>';
         set('readinessPct','PARTIAL');
       }catch(err){
         set('systemStatus','ADMIN API ERROR');
@@ -550,7 +596,38 @@
       }
     }
 
+    function openCommandModal(title, body){
+      set('commandTitle', title);
+      set('commandBody', body);
+      var box=document.getElementById('commandModal');
+      if(box){ box.classList.remove('hidden'); }
+    }
+    function closeCommandModal(){
+      var box=document.getElementById('commandModal');
+      if(box){ box.classList.add('hidden'); }
+    }
+    function bindCommandButtons(){
+      var map = {
+        'MANAGE REGION CONTROL':'Region Control is visible now. Next GREEN layer requires live region config API wiring and editable admin controls.',
+        'VIEW ALL CAMPAIGNS':'Promotion campaigns are visible now. Next GREEN layer requires campaign list/detail API wiring and admin actions.',
+        'VIEW ALL DEALS':'Sponsored placements are visible now. Next GREEN layer requires sponsor/deal API wiring and approval controls.',
+        'VIEW RISK ENGINE':'Fraud and risk monitor is visible now. Next GREEN layer requires live risk event feed, rule triggers, and case actions.',
+        'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.'
+      };
+      Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
+        var label=(btn.textContent || '').trim();
+        if(map[label] && !btn.dataset.bound){
+          btn.dataset.bound='true';
+          btn.addEventListener('click',function(){
+            openCommandModal(label,map[label]);
+          });
+        }
+      });
+    }
+
+    bindCommandButtons();
     if(token){ showApp(); loadAdminHQ(); }
   </script>
 </body>
 </html>
+
