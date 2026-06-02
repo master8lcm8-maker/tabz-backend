@@ -524,6 +524,41 @@
         var payouts=await api('/admin/payouts');
         var stripe=await api('/admin/stripe-events');
         var cashouts=await api('/wallet/admin/cashouts');
+        var sections = Array.isArray(operations.sections) ? operations.sections : [];
+        function findSection(keys){
+          keys = Array.isArray(keys) ? keys : [keys];
+          return sections.find(function(s){
+            var key = String(s.key || '').toLowerCase();
+            var label = String(s.label || '').toLowerCase();
+            return keys.some(function(k){
+              k = String(k).toLowerCase();
+              return key === k || key.indexOf(k) >= 0 || label.indexOf(k) >= 0;
+            });
+          }) || null;
+        }
+        function sectionTotal(keys){
+          var s = findSection(keys);
+          return s ? Number(s.total || 0) : 0;
+        }
+        function statusCount(items,status){
+          return (items || []).filter(function(x){ return String(x.status || '').toUpperCase() === status; }).length;
+        }
+        var cashoutItems = Array.isArray(cashouts.items) ? cashouts.items : [];
+        var completedCashoutCents = cashoutItems.reduce(function(sum,x){
+          return sum + (String(x.status || '').toUpperCase() === 'COMPLETED' ? Number(x.amountCents || 0) : 0);
+        },0);
+        var pendingCashouts = statusCount(cashoutItems,'PENDING');
+        var completedCashouts = statusCount(cashoutItems,'COMPLETED');
+        var failedCashouts = statusCount(cashoutItems,'FAILED');
+        var freeboardTotal = sectionTotal(['freeboard']);
+        var walletTransactionTotal = sectionTotal(['wallet_transactions','wallet']);
+        var cashoutOpsTotal = sectionTotal(['cashout_requests','cashout']);
+        var referralLinksTotal = sectionTotal(['referral_links']);
+        var referralEventsTotal = sectionTotal(['referral_events']);
+        var refundsTotal = Number(refunds.total || 0);
+        var disputesTotal = Number(disputes.total || 0);
+        var stripeEventsTotal = Number(stripe.total || 0);
+        var operationsCount = sections.length;
 
         set('kHealth','98.7%');
         set('systemLoad','23.7%');
@@ -531,33 +566,33 @@
         set('kTake','2.45%');
         set('nodeCount','35 / 35');
 
-        set('kUsers','Live');
-        set('kVenues','Live');
-        set('kWallets','Live');
-        set('kVolume','API');
-        set('kMerch','API');
-        set('kDisbursed', money((cashouts.items||[]).reduce(function(s,x){return s + (x.status === 'COMPLETED' ? Number(x.amountCents||0) : 0)},0)));
+        set('kUsers', freeboardTotal ? String(freeboardTotal) : 'Source pending');
+        set('kVenues','Source pending');
+        set('kWallets', walletTransactionTotal ? String(walletTransactionTotal) : 'Source pending');
+        set('kVolume', cashoutOpsTotal ? String(cashoutOpsTotal) : String(cashoutItems.length));
+        set('kMerch', stripeEventsTotal ? String(stripeEventsTotal) : '0 events');
+        set('kDisbursed', money(completedCashoutCents));
         set('kHealth','98.7%');
 
-        set('stripUsers','Live');
-        set('stripVenues','Live');
-        set('stripStaff','Live');
-        set('stripWallets','Live');
-        set('stripPayouts', String((cashouts.items||[]).length));
-        set('stripDisputes', String(disputes.total || 0));
+        set('stripUsers', freeboardTotal ? String(freeboardTotal) : 'Pending');
+        set('stripVenues','Pending');
+        set('stripStaff','Pending');
+        set('stripWallets', walletTransactionTotal ? String(walletTransactionTotal) : 'Pending');
+        set('stripPayouts', String(cashoutItems.length));
+        set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
 
-        set('walletBalances','Connected');
-        set('pendingPayouts', String((cashouts.items||[]).filter(function(x){return x.status==='PENDING'}).length));
-        set('reservedHolds','Connected');
+        set('walletBalances', walletTransactionTotal ? String(walletTransactionTotal) + ' wallet txns' : 'Source pending');
+        set('pendingPayouts', String(pendingCashouts));
+        set('reservedHolds', String(failedCashouts) + ' failed cashouts');
         set('ledgerStatus','In Sync');
-        set('disputesOpen', String(disputes.total || 0));
-        set('txCount','Live');
+        set('disputesOpen', String(disputesTotal));
+        set('txCount', String(operationsCount) + ' sections');
         set('riskScore','23');
-        set('riskTx','Live');
-        set('flagged','Live');
-        set('blocked','Live');
+        set('riskTx', String(cashoutItems.length));
+        set('flagged', String(disputesTotal + refundsTotal));
+        set('blocked', String(failedCashouts));
 
         rows('refundRows',(refunds.recent||[]).map(function(x){return {label:x.id || 'refund', value:x.status || refunds.controlState}}),'No refund records');
         rows('disputeRows',(disputes.recent||[]).map(function(x){return {label:x.id || 'dispute', value:x.status || disputes.controlState}}),'No dispute records');
@@ -574,12 +609,12 @@
           '<div class="row"><span>Affiliate Boost</span><b class="up">VISIBLE</b></div>';
 
         set('sponsorDeals','Visible');
-        set('sponsorValue','Requires API wiring');
-        set('sponsorImpressions','Requires API wiring');
-        set('affiliates','Requires API wiring');
-        set('referrals','Requires API wiring');
-        set('conversion','Requires API wiring');
-        set('commissions','Requires API wiring');
+        set('sponsorValue','No source yet');
+        set('sponsorImpressions','No source yet');
+        set('affiliates', referralLinksTotal ? String(referralLinksTotal) : 'No source yet');
+        set('referrals', referralEventsTotal ? String(referralEventsTotal) : 'No source yet');
+        set('conversion','No source yet');
+        set('commissions','No source yet');
         set('complianceStatus','Visible / Requires API wiring');
         set('auditStatus','Visible / Requires API wiring');
 
@@ -630,4 +665,5 @@
   </script>
 </body>
 </html>
+
 
