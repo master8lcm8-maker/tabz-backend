@@ -495,35 +495,38 @@
       box-shadow:0 0 22px rgba(156,255,0,.18) !important;
       letter-spacing:.28em;
     }
-      /* ADMIN-HQ-22 real hero structure rebuild */
+      /* ADMIN-HQ-25 premium globe + telemetry hero */
     .system-overview-command{
       overflow:hidden;
-      min-height:356px;
+      min-height:372px;
       padding:12px 14px !important;
     }
     .hq-overview-hero{
       display:grid;
-      grid-template-columns:230px 1fr;
-      gap:14px;
-      min-height:300px;
+      grid-template-columns:232px minmax(520px,1fr) 230px;
+      gap:12px;
+      min-height:318px;
       align-items:stretch;
+    }
+    .premium-command-hero{
+      position:relative;
     }
     .hq-presence-stack{
       position:relative;
       z-index:2;
-      border:1px solid rgba(156,255,0,.22);
+      border:1px solid rgba(156,255,0,.26);
       border-radius:10px;
       padding:14px 13px;
       background:
-        linear-gradient(180deg,rgba(0,0,0,.62),rgba(5,18,0,.72)),
+        linear-gradient(180deg,rgba(0,0,0,.74),rgba(5,18,0,.76)),
         repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 13px);
-      box-shadow:inset 0 0 24px rgba(156,255,0,.08);
+      box-shadow:inset 0 0 22px rgba(156,255,0,.08),0 0 18px rgba(156,255,0,.08);
     }
     .presence-title{
       color:#eefbdc;
       font-size:10px;
-      letter-spacing:.25em;
-      margin-bottom:11px;
+      letter-spacing:.24em;
+      margin-bottom:10px;
     }
     .presence-big{
       color:#9cff00;
@@ -540,7 +543,7 @@
     .presence-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:12px;
+      gap:14px;
       margin-bottom:18px;
     }
     .presence-grid strong,
@@ -548,24 +551,22 @@
       display:block;
       color:#fff;
       font-size:26px;
-      letter-spacing:.05em;
-      text-shadow:0 0 12px rgba(255,255,255,.22),0 0 18px rgba(156,255,0,.20);
+      letter-spacing:.04em;
+      text-shadow:0 0 11px rgba(255,255,255,.22),0 0 16px rgba(156,255,0,.18);
     }
     .presence-grid span,
     .presence-venues span{
       display:block;
-      color:#c6d7b9;
+      color:#c8d8bc;
       font-size:11px;
     }
-    .presence-venues{
-      margin-bottom:15px;
-    }
+    .presence-venues{margin-bottom:16px}
     .activity-feed{
-      border:1px solid rgba(156,255,0,.28);
-      border-radius:8px;
-      padding:8px 9px;
-      background:rgba(0,0,0,.45);
-      box-shadow:inset 0 0 16px rgba(156,255,0,.08);
+      border:1px solid rgba(156,255,0,.24);
+      border-radius:10px;
+      padding:8px 10px;
+      background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(8,18,0,.48));
+      box-shadow:inset 0 0 16px rgba(156,255,0,.06);
     }
     .activity-feed div{
       display:grid;
@@ -573,97 +574,180 @@
       align-items:center;
       gap:5px;
       font-size:10px;
-      color:#e8f7d8;
-      padding:4px 0;
+      color:#edf9df;
+      padding:5px 0;
       border-bottom:1px solid rgba(156,255,0,.08);
     }
     .activity-feed div:last-child{border-bottom:0}
     .activity-feed b{
       color:#9cff00;
-      text-shadow:0 0 8px rgba(156,255,0,.7);
+      text-shadow:0 0 8px rgba(156,255,0,.72);
     }
-    .activity-feed .warn-dot{
-      color:#ff9c00;
-    }
+    .activity-feed .warn-dot{color:#ffb000}
     .activity-feed em{
-      color:#aebba3;
+      color:#afbaaa;
       font-style:normal;
       text-align:right;
     }
-    .world-command-map{
+
+    .premium-world-command-map{
       position:relative;
-      min-height:300px;
+      min-height:318px;
       border:1px solid rgba(156,255,0,.24);
       border-radius:12px;
       overflow:hidden;
       background:
-        radial-gradient(ellipse at center,rgba(156,255,0,.16),rgba(10,28,0,.08) 38%,rgba(0,0,0,.96) 76%),
-        radial-gradient(circle at 50% 42%,rgba(156,255,0,.13),transparent 36%),
-        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 16px),
-        repeating-linear-gradient(90deg,rgba(156,255,0,.032) 0 1px,transparent 1px 16px);
-      box-shadow:
-        inset 0 0 80px rgba(156,255,0,.16),
-        0 0 36px rgba(156,255,0,.15);
+        radial-gradient(circle at 50% 50%,rgba(156,255,0,.18),rgba(0,0,0,.06) 35%,rgba(0,0,0,.88) 78%),
+        radial-gradient(circle at 50% 55%,rgba(156,255,0,.08),transparent 42%),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.03) 0 1px,transparent 1px 16px),
+        repeating-linear-gradient(90deg,rgba(156,255,0,.03) 0 1px,transparent 1px 16px),
+        linear-gradient(180deg,#000 0%,#040b00 48%,#000 100%);
+      box-shadow:inset 0 0 90px rgba(156,255,0,.12),0 0 18px rgba(156,255,0,.08);
     }
     .world-glow{
       position:absolute;
-      inset:18px 20px 4px;
+      inset:18px 12px 8px;
       border-radius:50%;
-      background:radial-gradient(ellipse at center,rgba(156,255,0,.22),rgba(156,255,0,.05) 42%,transparent 70%);
+      background:radial-gradient(ellipse at center,rgba(156,255,0,.18),rgba(156,255,0,.02) 50%,transparent 70%);
       filter:blur(10px);
-      opacity:.82;
+      opacity:.86;
     }
-    .world-svg{
+    .premium-world-svg{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
       z-index:2;
     }
-    .globe-outline{
-      fill:rgba(0,12,0,.30);
-      stroke:rgba(156,255,0,.58);
-      stroke-width:1.8;
+    .premium-globe-outline{
+      fill:rgba(0,14,0,.18);
+      stroke:rgba(156,255,0,.56);
+      stroke-width:1.7;
     }
-    .latlon ellipse,
-    .latlon path{
+    .premium-latlon ellipse,
+    .premium-latlon path{
       fill:none;
-      stroke:rgba(156,255,0,.20);
-      stroke-width:1.2;
+      stroke:rgba(156,255,0,.18);
+      stroke-width:1.15;
     }
-    .continents path{
-      fill:url(#landGrad);
-      stroke:rgba(222,255,125,.82);
+    .premium-continents path{
+      fill:url(#landGradHQ25);
+      stroke:rgba(244,255,183,.82);
       stroke-width:2.2;
-      opacity:.88;
+      opacity:.95;
     }
-    .nodes circle{
-      fill:#dcff72;
+    .city-lights circle{
+      fill:#f4ffb1;
+      opacity:.96;
+    }
+    .premium-nodes circle{
+      fill:#e9ff93;
       stroke:#9cff00;
-      stroke-width:2;
-      filter:drop-shadow(0 0 8px rgba(156,255,0,.95));
+      stroke-width:1.8;
+      filter:drop-shadow(0 0 9px rgba(156,255,0,.9));
     }
-    .nodes path{
+    .premium-nodes path{
       fill:none;
-      stroke:rgba(156,255,0,.44);
-      stroke-width:1.4;
-      stroke-dasharray:6 8;
-      filter:drop-shadow(0 0 5px rgba(156,255,0,.55));
+      stroke:rgba(156,255,0,.40);
+      stroke-width:1.35;
+      stroke-dasharray:5 7;
+      filter:drop-shadow(0 0 5px rgba(156,255,0,.5));
     }
-    .map-base-ring{
+    .premium-map-base-ring{
       position:absolute;
       left:16%;
       right:16%;
-      bottom:-22px;
-      height:58px;
+      bottom:-18px;
+      height:54px;
       border-radius:50%;
-      border:1px solid rgba(156,255,0,.38);
-      box-shadow:0 0 34px rgba(156,255,0,.42),inset 0 0 24px rgba(156,255,0,.15);
+      border:1px solid rgba(156,255,0,.36);
+      box-shadow:0 0 30px rgba(156,255,0,.32),inset 0 0 18px rgba(156,255,0,.12);
       z-index:1;
     }
-    @media(max-width:1200px){
-      .hq-overview-hero{grid-template-columns:1fr}
-      .hq-presence-stack{min-height:auto}
+
+    .hq-telemetry-stack{
+      display:grid;
+      grid-template-rows:repeat(4,1fr);
+      gap:10px;
+      min-height:318px;
+    }
+    .telemetry-card{
+      border:1px solid rgba(156,255,0,.24);
+      border-radius:10px;
+      padding:12px 12px 10px;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.70),rgba(8,18,0,.62)),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.025) 0 1px,transparent 1px 12px);
+      box-shadow:inset 0 0 18px rgba(156,255,0,.05);
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+    }
+    .telemetry-title{
+      color:#ebfcd9;
+      font-size:10px;
+      letter-spacing:.18em;
+      margin-bottom:8px;
+    }
+    .telemetry-value{
+      color:#ffffff;
+      font-size:20px;
+      font-weight:800;
+      line-height:1;
+      text-shadow:0 0 9px rgba(255,255,255,.22),0 0 12px rgba(156,255,0,.18);
+      margin-bottom:6px;
+    }
+    .telemetry-sub{
+      color:#c7d9bc;
+      font-size:11px;
+      margin-bottom:8px;
+    }
+    .telemetry-chart{
+      position:relative;
+      flex:1;
+      min-height:42px;
+      border-top:1px solid rgba(156,255,0,.12);
+      margin-top:2px;
+      background-repeat:no-repeat;
+      background-size:100% 100%;
+    }
+    .line-up{
+      background-image:
+        linear-gradient(180deg,transparent 0 70%,rgba(156,255,0,.10) 100%),
+        linear-gradient(140deg,transparent 0 10%,rgba(156,255,0,.18) 10% 11%,transparent 11% 26%,rgba(156,255,0,.35) 26% 27%,transparent 27% 46%,rgba(156,255,0,.55) 46% 47%,transparent 47% 62%,rgba(156,255,0,.75) 62% 63%,transparent 63% 80%,rgba(156,255,0,.95) 80% 81%,transparent 81%);
+    }
+    .line-soft{
+      background-image:
+        linear-gradient(180deg,transparent 0 74%,rgba(156,255,0,.08) 100%),
+        linear-gradient(175deg,transparent 0 8%,rgba(156,255,0,.22) 8% 9%,transparent 9% 28%,rgba(156,255,0,.28) 28% 29%,transparent 29% 48%,rgba(156,255,0,.35) 48% 49%,transparent 49% 66%,rgba(156,255,0,.40) 66% 67%,transparent 67% 86%,rgba(156,255,0,.46) 86% 87%,transparent 87%);
+    }
+    .line-flat{
+      background-image:
+        linear-gradient(180deg,transparent 0 74%,rgba(156,255,0,.08) 100%),
+        linear-gradient(178deg,transparent 0 10%,rgba(156,255,0,.24) 10% 11%,transparent 11% 30%,rgba(156,255,0,.24) 30% 31%,transparent 31% 50%,rgba(156,255,0,.28) 50% 51%,transparent 51% 70%,rgba(156,255,0,.28) 70% 71%,transparent 71%);
+    }
+    .bars-rise{
+      background-image:
+        repeating-linear-gradient(90deg,transparent 0 3%,rgba(156,255,0,.18) 3% 5%,transparent 5% 10%),
+        linear-gradient(180deg,transparent 0 65%,rgba(156,255,0,.10) 100%);
+      mask-image:linear-gradient(90deg,rgba(0,0,0,.32) 0 10%,rgba(0,0,0,.48) 10% 20%,rgba(0,0,0,.56) 20% 30%,rgba(0,0,0,.64) 30% 40%,rgba(0,0,0,.70) 40% 50%,rgba(0,0,0,.78) 50% 60%,rgba(0,0,0,.84) 60% 70%,rgba(0,0,0,.92) 70% 80%,rgba(0,0,0,1) 80% 100%);
+      -webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.32) 0 10%,rgba(0,0,0,.48) 10% 20%,rgba(0,0,0,.56) 20% 30%,rgba(0,0,0,.64) 30% 40%,rgba(0,0,0,.70) 40% 50%,rgba(0,0,0,.78) 50% 60%,rgba(0,0,0,.84) 60% 70%,rgba(0,0,0,.92) 70% 80%,rgba(0,0,0,1) 80% 100%);
+    }
+
+    @media(max-width:1400px){
+      .hq-overview-hero{
+        grid-template-columns:220px minmax(420px,1fr) 208px;
+      }
+    }
+    @media(max-width:1240px){
+      .hq-overview-hero{
+        grid-template-columns:1fr;
+      }
+      .hq-telemetry-stack{
+        grid-template-columns:repeat(2,1fr);
+        grid-template-rows:auto auto;
+        min-height:auto;
+      }
     }
   </style>
 </head>
@@ -752,7 +836,7 @@
       <section class="grid-top">
         <div class="panel system-overview-command">
           <h2>System Overview</h2>
-          <div class="hq-overview-hero">
+          <div class="hq-overview-hero premium-command-hero">
             <div class="hq-presence-stack">
               <div class="presence-title">GLOBAL PRESENCE</div>
               <div class="presence-big" id="heroRegions">3</div>
@@ -771,64 +855,118 @@
               </div>
             </div>
 
-            <div class="world-command-map" aria-label="8TABZ global command map">
+            <div class="world-command-map premium-world-command-map" aria-label="8TABZ global command map">
               <div class="world-glow"></div>
-              <svg class="world-svg" viewBox="0 0 1200 560" role="img" aria-label="global operations map">
+              <svg class="world-svg premium-world-svg" viewBox="0 0 1400 760" role="img" aria-label="global operations map">
                 <defs>
-                  <filter id="mapGlow">
+                  <radialGradient id="oceanGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="rgba(153,255,0,.18)"/>
+                    <stop offset="60%" stop-color="rgba(40,80,5,.14)"/>
+                    <stop offset="100%" stop-color="rgba(0,0,0,.05)"/>
+                  </radialGradient>
+                  <linearGradient id="landGradHQ25" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#edff9f"/>
+                    <stop offset="24%" stop-color="#c5ff4d"/>
+                    <stop offset="55%" stop-color="#84ff00"/>
+                    <stop offset="100%" stop-color="#2f7104"/>
+                  </linearGradient>
+                  <filter id="landGlowHQ25">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feMerge>
+                      <feMergeNode in="blur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="nodeGlowHQ25">
                     <feGaussianBlur stdDeviation="4" result="blur"/>
                     <feMerge>
                       <feMergeNode in="blur"/>
                       <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                   </filter>
-                  <linearGradient id="landGrad" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#d7ff69"/>
-                    <stop offset="45%" stop-color="#83ff00"/>
-                    <stop offset="100%" stop-color="#215f05"/>
-                  </linearGradient>
                 </defs>
 
-                <ellipse cx="600" cy="282" rx="520" ry="232" class="globe-outline"/>
-                <g class="latlon">
-                  <ellipse cx="600" cy="282" rx="520" ry="232"/>
-                  <ellipse cx="600" cy="282" rx="430" ry="190"/>
-                  <ellipse cx="600" cy="282" rx="330" ry="146"/>
-                  <ellipse cx="600" cy="282" rx="205" ry="92"/>
-                  <path d="M80 282 H1120"/>
-                  <path d="M600 52 V512"/>
-                  <path d="M300 78 C390 220 390 344 300 486"/>
-                  <path d="M900 78 C810 220 810 344 900 486"/>
-                  <path d="M170 168 C410 230 790 230 1030 168"/>
-                  <path d="M170 396 C410 334 790 334 1030 396"/>
+                <ellipse cx="700" cy="360" rx="500" ry="268" class="globe-outline premium-globe-outline"/>
+                <ellipse cx="700" cy="360" rx="500" ry="268" fill="url(#oceanGlow)" opacity=".7"/>
+
+                <g class="latlon premium-latlon">
+                  <ellipse cx="700" cy="360" rx="500" ry="268"/>
+                  <ellipse cx="700" cy="360" rx="420" ry="226"/>
+                  <ellipse cx="700" cy="360" rx="330" ry="178"/>
+                  <ellipse cx="700" cy="360" rx="230" ry="124"/>
+                  <ellipse cx="700" cy="360" rx="120" ry="64"/>
+                  <path d="M200 360 H1200"/>
+                  <path d="M700 92 V628"/>
+                  <path d="M420 110 C520 250 520 470 420 610"/>
+                  <path d="M980 110 C880 250 880 470 980 610"/>
+                  <path d="M278 210 C500 276 900 276 1122 210"/>
+                  <path d="M278 510 C500 444 900 444 1122 510"/>
                 </g>
 
-                <g class="continents" filter="url(#mapGlow)">
-                  <path d="M178 176 L226 140 L292 133 L352 159 L390 204 L366 250 L308 260 L280 305 L228 300 L201 254 L162 240 Z"/>
-                  <path d="M310 305 L365 324 L398 367 L384 435 L346 488 L309 455 L292 386 Z"/>
-                  <path d="M470 166 L530 126 L617 130 L670 163 L653 211 L578 222 L529 204 L474 224 L430 201 Z"/>
-                  <path d="M604 223 L676 216 L752 247 L792 316 L759 386 L695 407 L651 359 L613 302 Z"/>
-                  <path d="M710 148 L806 115 L935 139 L1015 208 L985 276 L875 265 L800 228 L715 225 Z"/>
-                  <path d="M825 330 L890 352 L930 398 L909 458 L846 438 L811 386 Z"/>
+                <g class="continents premium-continents" filter="url(#landGlowHQ25)">
+                  <path d="M310 208 L352 176 L426 168 L498 196 L548 248 L540 302 L490 324 L452 314 L430 360 L382 356 L360 316 L326 298 L286 286 L278 246 Z"/>
+                  <path d="M430 360 L486 382 L518 438 L498 518 L446 590 L406 540 L394 468 Z"/>
+                  <path d="M578 222 L654 156 L760 156 L812 208 L796 268 L742 276 L706 250 L670 268 L632 254 Z"/>
+                  <path d="M744 286 L838 302 L914 356 L942 436 L888 544 L802 576 L758 522 L714 452 Z"/>
+                  <path d="M840 186 L954 150 L1082 174 L1154 248 L1128 334 L1032 326 L982 300 L914 284 L840 284 Z"/>
+                  <path d="M964 452 L1032 470 L1088 540 L1062 630 L998 610 L950 522 Z"/>
                 </g>
 
-                <g class="nodes">
-                  <circle cx="240" cy="190" r="8"/>
-                  <circle cx="330" cy="238" r="6"/>
-                  <circle cx="514" cy="166" r="8"/>
-                  <circle cx="660" cy="250" r="7"/>
-                  <circle cx="780" cy="180" r="7"/>
-                  <circle cx="920" cy="230" r="6"/>
-                  <circle cx="850" cy="396" r="7"/>
-                  <circle cx="372" cy="360" r="6"/>
-                  <path d="M240 190 C360 120 470 130 514 166"/>
-                  <path d="M514 166 C610 205 655 235 660 250"/>
-                  <path d="M660 250 C735 170 780 172 780 180"/>
-                  <path d="M780 180 C840 205 880 218 920 230"/>
-                  <path d="M660 250 C760 312 825 360 850 396"/>
+                <g class="city-lights" filter="url(#nodeGlowHQ25)">
+                  <circle cx="394" cy="244" r="7"/>
+                  <circle cx="474" cy="302" r="6"/>
+                  <circle cx="696" cy="214" r="8"/>
+                  <circle cx="798" cy="346" r="7"/>
+                  <circle cx="986" cy="286" r="8"/>
+                  <circle cx="908" cy="518" r="7"/>
+                  <circle cx="462" cy="460" r="6"/>
+                  <circle cx="1110" cy="312" r="6"/>
+                  <circle cx="1150" cy="356" r="5"/>
+                </g>
+
+                <g class="nodes premium-nodes">
+                  <circle cx="394" cy="244" r="8"/>
+                  <circle cx="474" cy="302" r="7"/>
+                  <circle cx="696" cy="214" r="9"/>
+                  <circle cx="798" cy="346" r="8"/>
+                  <circle cx="986" cy="286" r="9"/>
+                  <circle cx="908" cy="518" r="8"/>
+                  <circle cx="462" cy="460" r="7"/>
+                  <path d="M394 244 C496 180 602 176 696 214"/>
+                  <path d="M696 214 C760 236 792 296 798 346"/>
+                  <path d="M798 346 C882 296 932 286 986 286"/>
+                  <path d="M798 346 C858 418 888 474 908 518"/>
+                  <path d="M474 302 C510 350 486 414 462 460"/>
                 </g>
               </svg>
-              <div class="map-base-ring"></div>
+              <div class="map-base-ring premium-map-base-ring"></div>
+            </div>
+
+            <div class="hq-telemetry-stack">
+              <div class="telemetry-card">
+                <div class="telemetry-title">REAL-TIME TRANSACTIONS</div>
+                <div class="telemetry-value" id="heroTxCount">12,458</div>
+                <div class="telemetry-sub">TXNS (Last 60s)</div>
+                <div class="telemetry-chart line-up"></div>
+              </div>
+
+              <div class="telemetry-card">
+                <div class="telemetry-title">SUCCESS RATE</div>
+                <div class="telemetry-value" id="heroSuccessRate">98.72%</div>
+                <div class="telemetry-chart line-soft"></div>
+              </div>
+
+              <div class="telemetry-card">
+                <div class="telemetry-title">AVG. CONFIRM TIME</div>
+                <div class="telemetry-value" id="heroConfirmTime">1.24s</div>
+                <div class="telemetry-chart line-flat"></div>
+              </div>
+
+              <div class="telemetry-card">
+                <div class="telemetry-title">SYSTEM LOAD</div>
+                <div class="telemetry-value" id="heroSystemLoad">23.7%</div>
+                <div class="telemetry-chart bars-rise"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1143,6 +1281,7 @@
   </script>
 </body>
 </html>
+
 
 
 
