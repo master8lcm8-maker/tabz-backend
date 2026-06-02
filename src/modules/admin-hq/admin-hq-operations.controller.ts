@@ -1,4 +1,14 @@
-﻿import { Controller, ForbiddenException, Get, Req, UseGuards } from '@nestjs/common';
+﻿import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -570,7 +580,125 @@ export class AdminHqOperationsController {
       },
     };
   }
+
+  private adminHq73String(value: any, fallback = '') {
+    return String(value ?? fallback).trim();
+  }
+
+  private async adminHq73TableColumns(tableName: string): Promise<Set<string>> {
+    try {
+      const rows = await this.dataSource.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+        [tableName],
+      );
+      return new Set((rows || []).map((row: any) => String(row.column_name || row.columnName || '').trim()).filter(Boolean));
+    } catch {
+      return new Set<string>();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('account-deletion/:id/action')
+  async adminHq73AccountDeletionAction(
+    @Req() req: any,
+    @Param('id') idParam: string,
+    @Body() body: any,
+  ) {
+    this.assertAdmin(req);
+
+    const id = Number(idParam);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new BadRequestException('invalid_account_deletion_request_id');
+    }
+
+    const action = this.adminHq73String(body?.action).toLowerCase();
+    const adminNote = this.adminHq73String(body?.adminNote || body?.note || body?.reason, 'Admin action');
+
+    if (action !== 'reject') {
+      throw new BadRequestException('unsupported_account_deletion_admin_action');
+    }
+
+    const columns = await this.adminHq73TableColumns('account_deletion_requests');
+    if (!columns.has('id') || !columns.has('status')) {
+      throw new BadRequestException('account_deletion_requests_schema_not_ready');
+    }
+
+    const existingRows = await this.dataSource.query(
+      `SELECT * FROM account_deletion_requests WHERE id = $1 LIMIT 1`,
+      [id],
+    );
+    const existing = existingRows?.[0];
+
+    if (!existing) {
+      throw new BadRequestException('account_deletion_request_not_found');
+    }
+
+    const currentStatus = String(existing.status || '').toLowerCase();
+
+    if (currentStatus === 'completed') {
+      throw new BadRequestException('completed_account_deletion_cannot_be_changed');
+    }
+
+    if (currentStatus === 'rejected') {
+      return {
+        ok: true,
+        id,
+        status: 'rejected',
+        alreadyRejected: true,
+        action: 'reject',
+        protectedBy: 'JwtAuthGuard + admin role',
+      };
+    }
+
+    if (currentStatus !== 'pending' && currentStatus !== 'confirmed') {
+      throw new BadRequestException('unsupported_account_deletion_status_transition');
+    }
+
+    const adminUserId = Number(req?.user?.sub ?? req?.user?.id ?? req?.user?.userId ?? 0) || null;
+    const updateParts = [`status = $2`];
+    const values: any[] = [id, 'rejected'];
+
+    if (columns.has('reason')) {
+      values.push(`ADMIN_REJECTED: ${adminNote}`);
+      updateParts.push(`reason = $${values.length}`);
+    }
+
+    if (columns.has('resolvedAt')) {
+      updateParts.push(`"resolvedAt" = NOW()`);
+    } else if (columns.has('resolved_at')) {
+      updateParts.push(`resolved_at = NOW()`);
+    }
+
+    if (columns.has('updatedAt')) {
+      updateParts.push(`"updatedAt" = NOW()`);
+    } else if (columns.has('updated_at')) {
+      updateParts.push(`updated_at = NOW()`);
+    }
+
+    const updatedRows = await this.dataSource.query(
+      `UPDATE account_deletion_requests SET ${updateParts.join(', ')} WHERE id = $1 RETURNING *`,
+      values,
+    );
+    const updated = updatedRows?.[0] || null;
+
+    return {
+      ok: true,
+      id,
+      action: 'reject',
+      status: updated?.status ?? 'rejected',
+      previousStatus: currentStatus,
+      adminUserId,
+      adminNoteStored: columns.has('reason'),
+      resolvedAtUpdated: columns.has('resolvedAt') || columns.has('resolved_at'),
+      updatedAtUpdated: columns.has('updatedAt') || columns.has('updated_at'),
+      protectedBy: 'JwtAuthGuard + admin role',
+      limitation: 'This endpoint only rejects pending/confirmed account deletion requests. It does not approve or execute deletion.',
+      item: this.adminHq61ProjectDeletion(updated),
+    };
+  }
 }
+
+
 
 
 
