@@ -1196,6 +1196,28 @@
       return data;
     }
 
+
+    async function apiPost(path,payload){
+      var res=await fetch(API_BASE + path,{
+        method:'POST',
+        headers:{
+          Authorization:'Bearer ' + token,
+          'Cache-Control':'no-cache',
+          'Content-Type':'application/json',
+          'Accept':'application/json'
+        },
+        body:JSON.stringify(payload || {})
+      });
+      var txt=await res.text();
+      var data;
+      try{ data=JSON.parse(txt); }catch(e){ data={raw:txt}; }
+      if(!res.ok){
+        var message=data && data.message ? data.message : (path + ' failed ' + res.status);
+        throw new Error(message);
+      }
+      return data;
+    }
+
     function rows(target,items,empty){
       var el=document.getElementById(target);
       if(!el) return;
@@ -1835,7 +1857,14 @@ function renderRiskTrustCompliance(payload){
       var id = safeText(x.id || 'record');
       var status = safeText(x.status || x.action || x.reason || 'VISIBLE');
       var target = safeText(x.targetType || x.targetId || x.userId || x.blockedUserId || x.createdAt || x.requestedAt || 'admin-visible');
-      html += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + '</span></div>';
+      var accountDeletionAction = '';
+      var rowSource = String(x.__source || '').toLowerCase();
+      var rowStatus = String(x.status || '').toLowerCase();
+      var rowId = String(x.id || '');
+      if(rowSource === 'account delete' && (rowStatus === 'pending' || rowStatus === 'confirmed') && /^\d+$/.test(rowId)){
+        accountDeletionAction = ' <button class="btn account-deletion-reject-btn" data-account-deletion-reject-id="' + safeText(rowId) + '">REJECT REQUEST</button>';
+      }
+      html += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + accountDeletionAction + '</span></div>';
     });
   }
 
@@ -1867,7 +1896,14 @@ function renderRiskTrustCompliance(payload){
         var id = safeText(x.id || 'record');
         var status = safeText(x.status || x.action || x.reason || 'VISIBLE');
         var target = safeText(x.targetType || x.targetId || x.userId || x.blockedUserId || x.createdAt || x.requestedAt || 'admin-visible');
-        riskHtml += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + '</span></div>';
+        var visibleAccountDeletionAction = '';
+        var visibleRowSource = String(x.__source || '').toLowerCase();
+        var visibleRowStatus = String(x.status || '').toLowerCase();
+        var visibleRowId = String(x.id || '');
+        if(visibleRowSource === 'account delete' && (visibleRowStatus === 'pending' || visibleRowStatus === 'confirmed') && /^\d+$/.test(visibleRowId)){
+          visibleAccountDeletionAction = ' <button class="btn account-deletion-reject-btn" data-account-deletion-reject-id="' + safeText(visibleRowId) + '">REJECT REQUEST</button>';
+        }
+        riskHtml += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + visibleAccountDeletionAction + '</span></div>';
       });
     }
     riskHtml += '</div>';
@@ -1891,6 +1927,45 @@ function renderRiskTrustCompliance(payload){
     complianceRowsTarget.innerHTML = '<div class="ops-row"><span>Compliance</span><span>Public pages visible</span><span>Account deletion JSON live</span></div>';
   }
 }
+function rejectAccountDeletionRequest(id){
+  /* ADMIN_HQ_80F_ACCOUNT_DELETION_REJECT_UI: reject only; no approve/delete execution */
+  var safeId = String(id || '').trim();
+  if(!/^\d+$/.test(safeId)){
+    openCommandModal('Reject blocked','Invalid account-deletion request id.');
+    return;
+  }
+
+  var ok = window.confirm('Reject account-deletion request #' + safeId + '? This does NOT approve deletion and does NOT delete/anonymize the user.');
+  if(!ok){ return; }
+
+  set('apiStatus','Rejecting account-deletion request #' + safeId);
+
+  apiPost('/admin-hq/account-deletion/' + encodeURIComponent(safeId) + '/action',{
+    action:'reject',
+    adminNote:'Rejected from Admin HQ UI'
+  }).then(function(result){
+    openCommandModal(
+      'Account deletion request rejected',
+      'Request #' + safeId + ' returned status ' + safeText(result.status || 'rejected') + '. This did not approve or execute deletion.'
+    );
+    return loadAdminHQ();
+  }).then(function(){
+    set('apiStatus','Account-deletion reject action complete');
+  }).catch(function(err){
+    openCommandModal('Reject failed', safeText(err && err.message ? err.message : err));
+    set('apiStatus','Reject failed');
+  });
+}
+
+document.addEventListener('click',function(ev){
+  var target = ev.target;
+  if(!target || !target.closest){ return; }
+  var btn = target.closest('[data-account-deletion-reject-id]');
+  if(!btn){ return; }
+  ev.preventDefault();
+  rejectAccountDeletionRequest(btn.getAttribute('data-account-deletion-reject-id'));
+});
+
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
