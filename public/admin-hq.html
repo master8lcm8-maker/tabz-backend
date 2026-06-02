@@ -848,6 +848,24 @@
     .ops-row:last-child{
       border-bottom:0;
     }
+      /* ADMIN-HQ-35 affiliate/referrals operational module */
+    .ops-module-block{
+      margin-top:8px;
+      padding-top:8px;
+      border-top:1px solid rgba(156,255,0,.18);
+    }
+    .ops-title{
+      color:#eaffd0;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      margin:0 0 7px;
+      text-shadow:0 0 8px rgba(156,255,0,.35);
+    }
+    .referral-ops-table .ops-head,
+    .referral-ops-table .ops-row{
+      grid-template-columns:.8fr .8fr 1.6fr .9fr;
+    }
   </style>
 </head>
 <body>
@@ -1157,6 +1175,7 @@
         var payouts=await api('/admin/payouts');
         var stripe=await api('/admin/stripe-events');
         var cashouts=await api('/wallet/admin/cashouts');
+var referrals=await api('/referrals');
         var sections = Array.isArray(operations.sections) ? operations.sections : [];
         function findSection(keys){
           keys = Array.isArray(keys) ? keys : [keys];
@@ -1213,6 +1232,7 @@
         set('stripWallets', walletTransactionTotal ? String(walletTransactionTotal) : 'Pending');
         set('stripPayouts', String(cashoutItems.length));
 renderCashoutOperations(cashoutItems);
+renderReferralOperations(referrals);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1318,6 +1338,80 @@ function renderCashoutOperations(cashoutItems){
   html += '<button class="btn" data-command="PAYOUTS_CASHOUTS_OPERATIONS">OPEN PAYOUT OPERATIONS</button>';
   rows.innerHTML = html;
 }
+function referralArrayFromPayload(payload){
+  if(Array.isArray(payload)){ return payload; }
+  if(payload && Array.isArray(payload.items)){ return payload.items; }
+  if(payload && Array.isArray(payload.referrals)){ return payload.referrals; }
+  if(payload && payload.data && Array.isArray(payload.data.items)){ return payload.data.items; }
+  if(payload && payload.data && Array.isArray(payload.data)){ return payload.data; }
+  return [];
+}
+function renderReferralOperations(referralPayload){
+  var panel = document.getElementById('affiliate');
+  if(!panel){ return; }
+
+  var box = document.getElementById('referralOpsRows');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'referralOpsRows';
+    box.className = 'ops-module-block';
+    panel.appendChild(box);
+  }
+
+  var items = referralArrayFromPayload(referralPayload);
+  var total = items.length;
+
+  var active = items.filter(function(x){
+    var s = String(x.status || x.state || '').toUpperCase();
+    return s === 'ACTIVE' || s === 'APPROVED' || s === 'CONNECTED' || s === 'LIVE';
+  }).length;
+
+  var pending = items.filter(function(x){
+    var s = String(x.status || x.state || '').toUpperCase();
+    return s === 'PENDING' || s === 'REVIEW' || s === 'WAITING';
+  }).length;
+
+  var credited = items.filter(function(x){
+    return x.rewardCents || x.commissionCents || x.creditCents || x.amountCents || x.totalCents;
+  }).length;
+
+  var html = '';
+  html += '<div class="ops-title">Live Affiliate / Referral Operations</div>';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Total</span><b>' + total + '</b></div>';
+  html += '<div><span>Active</span><b>' + active + '</b></div>';
+  html += '<div><span>Pending</span><b>' + pending + '</b></div>';
+  html += '<div><span>Rewarded</span><b>' + credited + '</b></div>';
+  html += '</div>';
+
+  if(!items.length){
+    html += '<div class="row"><span>No referral records returned</span><b>0</b></div>';
+    box.innerHTML = html;
+    return;
+  }
+
+  html += '<div class="ops-table referral-ops-table">';
+  html += '<div class="ops-head"><span>ID</span><span>Status</span><span>Code/User</span><span>Reward</span></div>';
+
+  items.slice(0,8).forEach(function(x){
+    var id = safeText(x.id || x.referralId || x.code || x.slug || 'unknown');
+    var status = safeText(x.status || x.state || 'LIVE');
+    var code = safeText(x.referralCode || x.code || x.userEmail || x.email || x.ownerEmail || x.referrerId || 'tracked');
+    var cents = x.rewardCents || x.commissionCents || x.creditCents || x.amountCents || x.totalCents || 0;
+    var reward = moneyFromCents(cents);
+
+    html += '<div class="ops-row">';
+    html += '<span>#' + id + '</span>';
+    html += '<span>' + status + '</span>';
+    html += '<span>' + code + '</span>';
+    html += '<span>' + reward + '</span>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  html += '<button class="btn" data-command="AFFILIATE_REFERRALS_OPERATIONS">OPEN REFERRAL OPERATIONS</button>';
+  box.innerHTML = html;
+}
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
@@ -1335,7 +1429,8 @@ function openCommandModal(title, body){
         'VIEW ALL DEALS':'Sponsored placements are visible now. Next GREEN layer requires sponsor/deal API wiring and approval controls.',
         'VIEW RISK ENGINE':'Fraud and risk monitor is visible now. Next GREEN layer requires live risk event feed, rule triggers, and case actions.',
         'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.',
-      'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.'
+      'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.',
+      'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals. Review tracked referral records, status, codes, and reward/commission visibility before scaling TABZ growth campaigns.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1353,6 +1448,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
