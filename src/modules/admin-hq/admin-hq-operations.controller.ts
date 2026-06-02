@@ -418,6 +418,159 @@ export class AdminHqOperationsController {
       },
     };
   }
+
+  private adminHq61ProjectReport(row: any) {
+    return {
+      id: row?.id ?? null,
+      reporterUserId: row?.reporterUserId ?? row?.reporter_user_id ?? null,
+      targetType: row?.targetType ?? row?.target_type ?? null,
+      targetId: row?.targetId ?? row?.target_id ?? null,
+      reason: row?.reason ?? null,
+      status: row?.status ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq61ProjectBlock(row: any) {
+    return {
+      id: row?.id ?? null,
+      blockerUserId: row?.blockerUserId ?? row?.blocker_user_id ?? null,
+      blockedUserId: row?.blockedUserId ?? row?.blocked_user_id ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq61ProjectAudit(row: any) {
+    return {
+      id: row?.id ?? null,
+      actorUserId: row?.actorUserId ?? row?.actor_user_id ?? row?.userId ?? row?.user_id ?? null,
+      action: row?.action ?? row?.eventType ?? row?.event_type ?? null,
+      targetType: row?.targetType ?? row?.target_type ?? null,
+      targetId: row?.targetId ?? row?.target_id ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq61ProjectDeletion(row: any) {
+    return {
+      id: row?.id ?? null,
+      userId: row?.userId ?? row?.user_id ?? null,
+      email: row?.email ?? null,
+      status: row?.status ?? null,
+      reason: row?.reason ?? null,
+      requestedAt: row?.requestedAt ?? row?.requested_at ?? row?.createdAt ?? row?.created_at ?? null,
+      confirmedAt: row?.confirmedAt ?? row?.confirmed_at ?? null,
+      resolvedAt: row?.resolvedAt ?? row?.resolved_at ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('risk-trust-compliance')
+  async adminHqRiskTrustCompliance(@Req() req: any) {
+    this.assertAdmin(req);
+    const adminUserId =
+      Number(req?.user?.sub ?? req?.user?.id ?? req?.user?.userId ?? 0) || null;
+    const adminRole = String(req?.user?.role ?? 'admin');
+
+    const [
+      reportsTotal,
+      blocksTotal,
+      auditTotal,
+      accountDeletionTotal,
+      recentReportsRaw,
+      recentBlocksRaw,
+      recentAuditRaw,
+      recentDeletionRaw,
+    ] = await Promise.all([
+      this.adminHq46Count('user_reports'),
+      this.adminHq46Count('user_blocks'),
+      this.adminHq46Count('audit_events'),
+      this.adminHq46Count('account_deletion_requests'),
+      this.adminHq46Recent('user_reports', 10),
+      this.adminHq46Recent('user_blocks', 10),
+      this.adminHq46Recent('audit_events', 10),
+      this.adminHq46Recent('account_deletion_requests', 10),
+    ]);
+
+    const reports = recentReportsRaw.map((row: any) =>
+      this.adminHq61ProjectReport(row),
+    );
+    const blocks = recentBlocksRaw.map((row: any) =>
+      this.adminHq61ProjectBlock(row),
+    );
+    const audit = recentAuditRaw.map((row: any) =>
+      this.adminHq61ProjectAudit(row),
+    );
+    const accountDeletionRequests = recentDeletionRaw.map((row: any) =>
+      this.adminHq61ProjectDeletion(row),
+    );
+
+    return {
+      ok: true,
+      scope: 'admin_hq_risk_trust_compliance',
+      protectedBy: 'JwtAuthGuard + admin role',
+      adminUserId,
+      adminRole,
+      totals: {
+        reports: reportsTotal,
+        blockedUsers: blocksTotal,
+        auditEvents: auditTotal,
+        accountDeletionRequests: accountDeletionTotal,
+      },
+      sections: [
+        {
+          key: 'reports',
+          label: 'Safety reports',
+          table: 'user_reports',
+          tableExists: reportsTotal !== null,
+          total: reportsTotal,
+          recent: reports,
+        },
+        {
+          key: 'blocks',
+          label: 'Blocked users',
+          table: 'user_blocks',
+          tableExists: blocksTotal !== null,
+          total: blocksTotal,
+          recent: blocks,
+        },
+        {
+          key: 'audit',
+          label: 'Audit events',
+          table: 'audit_events',
+          tableExists: auditTotal !== null,
+          total: auditTotal,
+          recent: audit,
+        },
+        {
+          key: 'account_deletion',
+          label: 'Account deletion requests',
+          table: 'account_deletion_requests',
+          tableExists: accountDeletionTotal !== null,
+          total: accountDeletionTotal,
+          recent: accountDeletionRequests,
+        },
+      ],
+      publicCompliancePages: [
+        { key: 'safety_report', path: '/safety/report', type: 'public_html' },
+        { key: 'compliance', path: '/compliance', type: 'public_html' },
+        { key: 'data_export', path: '/data-export', type: 'public_html' },
+        { key: 'account_delete', path: '/account-delete', type: 'public_html' },
+      ],
+      limitations: {
+        writeActions:
+          'Read-only Admin HQ risk/trust/compliance visibility. Case actions, report resolution, account deletion approval, bans, and policy controls require separate audited admin write endpoints before GREEN.',
+        publicPages:
+          'Public compliance HTML pages are listed for operational awareness only and are not used as Admin HQ JSON sources.',
+      },
+    };
+  }
 }
+
 
 
