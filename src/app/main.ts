@@ -135,7 +135,7 @@ async function bootstrap() {
     '/staff': 'index.html',
     '/staff/dashboard': 'index.html',
     '/admin': 'index.html',
-    '/admin-hq': 'index.html',
+    '/admin-hq': 'admin-hq.html',
     '/admin/dashboard': 'index.html',
   };
 
@@ -153,6 +153,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 
