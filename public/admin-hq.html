@@ -495,6 +495,176 @@
       box-shadow:0 0 22px rgba(156,255,0,.18) !important;
       letter-spacing:.28em;
     }
+      /* ADMIN-HQ-22 real hero structure rebuild */
+    .system-overview-command{
+      overflow:hidden;
+      min-height:356px;
+      padding:12px 14px !important;
+    }
+    .hq-overview-hero{
+      display:grid;
+      grid-template-columns:230px 1fr;
+      gap:14px;
+      min-height:300px;
+      align-items:stretch;
+    }
+    .hq-presence-stack{
+      position:relative;
+      z-index:2;
+      border:1px solid rgba(156,255,0,.22);
+      border-radius:10px;
+      padding:14px 13px;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.62),rgba(5,18,0,.72)),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 13px);
+      box-shadow:inset 0 0 24px rgba(156,255,0,.08);
+    }
+    .presence-title{
+      color:#eefbdc;
+      font-size:10px;
+      letter-spacing:.25em;
+      margin-bottom:11px;
+    }
+    .presence-big{
+      color:#9cff00;
+      font-size:40px;
+      font-weight:900;
+      line-height:.9;
+      text-shadow:0 0 18px rgba(156,255,0,.95);
+    }
+    .presence-label{
+      color:#d8e9cb;
+      font-size:12px;
+      margin:4px 0 18px;
+    }
+    .presence-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .presence-grid strong,
+    .presence-venues strong{
+      display:block;
+      color:#fff;
+      font-size:26px;
+      letter-spacing:.05em;
+      text-shadow:0 0 12px rgba(255,255,255,.22),0 0 18px rgba(156,255,0,.20);
+    }
+    .presence-grid span,
+    .presence-venues span{
+      display:block;
+      color:#c6d7b9;
+      font-size:11px;
+    }
+    .presence-venues{
+      margin-bottom:15px;
+    }
+    .activity-feed{
+      border:1px solid rgba(156,255,0,.28);
+      border-radius:8px;
+      padding:8px 9px;
+      background:rgba(0,0,0,.45);
+      box-shadow:inset 0 0 16px rgba(156,255,0,.08);
+    }
+    .activity-feed div{
+      display:grid;
+      grid-template-columns:16px 1fr 42px;
+      align-items:center;
+      gap:5px;
+      font-size:10px;
+      color:#e8f7d8;
+      padding:4px 0;
+      border-bottom:1px solid rgba(156,255,0,.08);
+    }
+    .activity-feed div:last-child{border-bottom:0}
+    .activity-feed b{
+      color:#9cff00;
+      text-shadow:0 0 8px rgba(156,255,0,.7);
+    }
+    .activity-feed .warn-dot{
+      color:#ff9c00;
+    }
+    .activity-feed em{
+      color:#aebba3;
+      font-style:normal;
+      text-align:right;
+    }
+    .world-command-map{
+      position:relative;
+      min-height:300px;
+      border:1px solid rgba(156,255,0,.24);
+      border-radius:12px;
+      overflow:hidden;
+      background:
+        radial-gradient(ellipse at center,rgba(156,255,0,.16),rgba(10,28,0,.08) 38%,rgba(0,0,0,.96) 76%),
+        radial-gradient(circle at 50% 42%,rgba(156,255,0,.13),transparent 36%),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 16px),
+        repeating-linear-gradient(90deg,rgba(156,255,0,.032) 0 1px,transparent 1px 16px);
+      box-shadow:
+        inset 0 0 80px rgba(156,255,0,.16),
+        0 0 36px rgba(156,255,0,.15);
+    }
+    .world-glow{
+      position:absolute;
+      inset:18px 20px 4px;
+      border-radius:50%;
+      background:radial-gradient(ellipse at center,rgba(156,255,0,.22),rgba(156,255,0,.05) 42%,transparent 70%);
+      filter:blur(10px);
+      opacity:.82;
+    }
+    .world-svg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:2;
+    }
+    .globe-outline{
+      fill:rgba(0,12,0,.30);
+      stroke:rgba(156,255,0,.58);
+      stroke-width:1.8;
+    }
+    .latlon ellipse,
+    .latlon path{
+      fill:none;
+      stroke:rgba(156,255,0,.20);
+      stroke-width:1.2;
+    }
+    .continents path{
+      fill:url(#landGrad);
+      stroke:rgba(222,255,125,.82);
+      stroke-width:2.2;
+      opacity:.88;
+    }
+    .nodes circle{
+      fill:#dcff72;
+      stroke:#9cff00;
+      stroke-width:2;
+      filter:drop-shadow(0 0 8px rgba(156,255,0,.95));
+    }
+    .nodes path{
+      fill:none;
+      stroke:rgba(156,255,0,.44);
+      stroke-width:1.4;
+      stroke-dasharray:6 8;
+      filter:drop-shadow(0 0 5px rgba(156,255,0,.55));
+    }
+    .map-base-ring{
+      position:absolute;
+      left:16%;
+      right:16%;
+      bottom:-22px;
+      height:58px;
+      border-radius:50%;
+      border:1px solid rgba(156,255,0,.38);
+      box-shadow:0 0 34px rgba(156,255,0,.42),inset 0 0 24px rgba(156,255,0,.15);
+      z-index:1;
+    }
+    @media(max-width:1200px){
+      .hq-overview-hero{grid-template-columns:1fr}
+      .hq-presence-stack{min-height:auto}
+    }
   </style>
 </head>
 <body>
@@ -580,9 +750,87 @@
       </section>
 
       <section class="grid-top">
-        <div class="panel">
+        <div class="panel system-overview-command">
           <h2>System Overview</h2>
-          <div class="map"><div class="map-orb" aria-label="8TABZ global operations map"></div></div>
+          <div class="hq-overview-hero">
+            <div class="hq-presence-stack">
+              <div class="presence-title">GLOBAL PRESENCE</div>
+              <div class="presence-big" id="heroRegions">3</div>
+              <div class="presence-label">Active Regions</div>
+              <div class="presence-grid">
+                <div><strong id="heroCountries">18</strong><span>Countries</span></div>
+                <div><strong id="heroCities">125</strong><span>Cities</span></div>
+              </div>
+              <div class="presence-venues"><strong id="heroVenues">2,457</strong><span>Venues Live</span></div>
+              <div class="activity-feed">
+                <div><b>△</b><span>New venue onboarded in Miami, FL</span><em>2m ago</em></div>
+                <div><b>△</b><span>Payout executed: $49,210.00</span><em>3m ago</em></div>
+                <div><b>△</b><span>Dispute resolved: OP-9822-11</span><em>5m ago</em></div>
+                <div><b class="warn-dot">△</b><span>High risk transaction blocked</span><em>11m ago</em></div>
+                <div><b>△</b><span>New sponsorship deal activated</span><em>11m ago</em></div>
+              </div>
+            </div>
+
+            <div class="world-command-map" aria-label="8TABZ global command map">
+              <div class="world-glow"></div>
+              <svg class="world-svg" viewBox="0 0 1200 560" role="img" aria-label="global operations map">
+                <defs>
+                  <filter id="mapGlow">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge>
+                      <feMergeNode in="blur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="landGrad" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#d7ff69"/>
+                    <stop offset="45%" stop-color="#83ff00"/>
+                    <stop offset="100%" stop-color="#215f05"/>
+                  </linearGradient>
+                </defs>
+
+                <ellipse cx="600" cy="282" rx="520" ry="232" class="globe-outline"/>
+                <g class="latlon">
+                  <ellipse cx="600" cy="282" rx="520" ry="232"/>
+                  <ellipse cx="600" cy="282" rx="430" ry="190"/>
+                  <ellipse cx="600" cy="282" rx="330" ry="146"/>
+                  <ellipse cx="600" cy="282" rx="205" ry="92"/>
+                  <path d="M80 282 H1120"/>
+                  <path d="M600 52 V512"/>
+                  <path d="M300 78 C390 220 390 344 300 486"/>
+                  <path d="M900 78 C810 220 810 344 900 486"/>
+                  <path d="M170 168 C410 230 790 230 1030 168"/>
+                  <path d="M170 396 C410 334 790 334 1030 396"/>
+                </g>
+
+                <g class="continents" filter="url(#mapGlow)">
+                  <path d="M178 176 L226 140 L292 133 L352 159 L390 204 L366 250 L308 260 L280 305 L228 300 L201 254 L162 240 Z"/>
+                  <path d="M310 305 L365 324 L398 367 L384 435 L346 488 L309 455 L292 386 Z"/>
+                  <path d="M470 166 L530 126 L617 130 L670 163 L653 211 L578 222 L529 204 L474 224 L430 201 Z"/>
+                  <path d="M604 223 L676 216 L752 247 L792 316 L759 386 L695 407 L651 359 L613 302 Z"/>
+                  <path d="M710 148 L806 115 L935 139 L1015 208 L985 276 L875 265 L800 228 L715 225 Z"/>
+                  <path d="M825 330 L890 352 L930 398 L909 458 L846 438 L811 386 Z"/>
+                </g>
+
+                <g class="nodes">
+                  <circle cx="240" cy="190" r="8"/>
+                  <circle cx="330" cy="238" r="6"/>
+                  <circle cx="514" cy="166" r="8"/>
+                  <circle cx="660" cy="250" r="7"/>
+                  <circle cx="780" cy="180" r="7"/>
+                  <circle cx="920" cy="230" r="6"/>
+                  <circle cx="850" cy="396" r="7"/>
+                  <circle cx="372" cy="360" r="6"/>
+                  <path d="M240 190 C360 120 470 130 514 166"/>
+                  <path d="M514 166 C610 205 655 235 660 250"/>
+                  <path d="M660 250 C735 170 780 172 780 180"/>
+                  <path d="M780 180 C840 205 880 218 920 230"/>
+                  <path d="M660 250 C760 312 825 360 850 396"/>
+                </g>
+              </svg>
+              <div class="map-base-ring"></div>
+            </div>
+          </div>
         </div>
         <div class="panel">
           <h2>Real-Time Transactions</h2>
@@ -895,6 +1143,7 @@
   </script>
 </body>
 </html>
+
 
 
 
