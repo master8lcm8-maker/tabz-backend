@@ -1175,7 +1175,7 @@
         var payouts=await api('/admin/payouts');
         var stripe=await api('/admin/stripe-events');
         var cashouts=await api('/wallet/admin/cashouts');
-var referrals=await api('/referrals');
+var referrals=await api('/referrals/admin/links?limit=25');
         var sections = Array.isArray(operations.sections) ? operations.sections : [];
         function findSection(keys){
           keys = Array.isArray(keys) ? keys : [keys];
@@ -1430,7 +1430,7 @@ function openCommandModal(title, body){
         'VIEW RISK ENGINE':'Fraud and risk monitor is visible now. Next GREEN layer requires live risk event feed, rule triggers, and case actions.',
         'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.',
       'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.',
-      'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals. Review tracked referral records, status, codes, and reward/commission visibility before scaling TABZ growth campaigns.'
+      'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1448,6 +1448,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
