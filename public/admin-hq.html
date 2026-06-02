@@ -1845,6 +1845,42 @@ function renderRiskTrustCompliance(payload){
 
   box.innerHTML = html;
 
+  /* ADMIN_HQ_68_VISIBLE_RISK_TRUST_MOUNT: write directly into existing visible risk/compliance panels */
+  var riskPanelTarget = document.getElementById('risk');
+  if(riskPanelTarget){
+    var riskHtml = '';
+    riskHtml += '<h2>Fraud & Risk Monitor</h2>';
+    riskHtml += '<div class="ops-title">Live Risk / Trust / Compliance</div>';
+    riskHtml += '<div class="ops-mini-grid">';
+    riskHtml += '<div><span>Safety Reports</span><b>' + reportsTotal + '</b></div>';
+    riskHtml += '<div><span>Blocked Users</span><b>' + blocksTotal + '</b></div>';
+    riskHtml += '<div><span>Audit Events</span><b>' + auditTotal + '</b></div>';
+    riskHtml += '<div><span>Deletion Requests</span><b>' + deletionTotal + '</b></div>';
+    riskHtml += '</div>';
+    riskHtml += '<div class="ops-table risk-trust-table">';
+    riskHtml += '<div class="ops-head"><span>Source</span><span>ID</span><span>Status / Action</span><span>Target / Date</span></div>';
+    if(!rows.length){
+      riskHtml += '<div class="ops-row"><span>Risk/Trust</span><span>-</span><span>No live rows returned</span><span>Visibility source live</span></div>';
+    } else {
+      rows.slice(0,8).forEach(function(x){
+        var source = safeText(x.__source || 'Risk');
+        var id = safeText(x.id || 'record');
+        var status = safeText(x.status || x.action || x.reason || 'VISIBLE');
+        var target = safeText(x.targetType || x.targetId || x.userId || x.blockedUserId || x.createdAt || x.requestedAt || 'admin-visible');
+        riskHtml += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + '</span></div>';
+      });
+    }
+    riskHtml += '</div>';
+    riskHtml += '<div class="ops-note">Source /admin-hq/risk-trust-compliance is live. Missing table means that live DB table is not present; do not fake-green it. Case actions, bans, report resolution, and policy controls require separate audited write controls before GREEN.</div>';
+    riskHtml += '<button class="btn" data-command="RISK_TRUST_COMPLIANCE_OPERATIONS">OPEN RISK / TRUST / COMPLIANCE</button>';
+    riskPanelTarget.innerHTML = riskHtml;
+  }
+
+  var compliancePanelTarget = document.getElementById('compliance');
+  if(compliancePanelTarget){
+    compliancePanelTarget.innerHTML = '<h2>Compliance / KYC</h2><div class="row"><span>Status</span><b>Risk/Trust JSON live</b></div><div class="row"><span>Account deletion requests</span><b>' + deletionTotal + '</b></div><div class="row"><span>Safety reports</span><b>' + reportsTotal + '</b></div><div class="row"><span>Audit events</span><b>' + auditTotal + '</b></div><div class="ops-note">Compliance visibility is live through /admin-hq/risk-trust-compliance. Write actions still require separate audited admin controls.</div>';
+  }
+
   var riskRowsTarget = document.getElementById('riskRows');
   if(riskRowsTarget){
     riskRowsTarget.innerHTML = '<div class="ops-row"><span>Risk/Trust</span><span>Source live</span><span>Deletion requests ' + deletionTotal + '</span></div><div class="ops-note">Risk/Trust/Compliance source is live. Missing tables must remain visible as missing, not fake-green.</div>';
@@ -1895,6 +1931,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
