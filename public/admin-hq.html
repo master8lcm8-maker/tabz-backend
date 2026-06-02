@@ -794,6 +794,60 @@
       z-index:3;
       pointer-events:none;
     }
+      /* ADMIN-HQ-32 payouts/cashouts operational module */
+    .ops-mini-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:6px;
+      margin:6px 0 8px;
+    }
+    .ops-mini-grid div{
+      border:1px solid rgba(156,255,0,.25);
+      border-radius:7px;
+      padding:7px 8px;
+      background:rgba(0,0,0,.35);
+      box-shadow:inset 0 0 12px rgba(156,255,0,.05);
+    }
+    .ops-mini-grid span{
+      display:block;
+      color:#aebfa3;
+      font-size:9px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .ops-mini-grid b{
+      display:block;
+      color:#f6ffe9;
+      font-size:15px;
+      margin-top:2px;
+    }
+    .ops-table{
+      border:1px solid rgba(156,255,0,.22);
+      border-radius:8px;
+      overflow:hidden;
+      margin-top:8px;
+      background:rgba(0,0,0,.28);
+    }
+    .ops-head,.ops-row{
+      display:grid;
+      grid-template-columns:1.1fr .9fr .9fr 1.3fr;
+      gap:6px;
+      padding:6px 8px;
+      border-bottom:1px solid rgba(156,255,0,.12);
+      font-size:10px;
+    }
+    .ops-head{
+      color:#9cff00;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      background:rgba(156,255,0,.06);
+    }
+    .ops-row{
+      color:#edf9df;
+    }
+    .ops-row:last-child{
+      border-bottom:0;
+    }
   </style>
 </head>
 <body>
@@ -1158,6 +1212,7 @@
         set('stripStaff','Pending');
         set('stripWallets', walletTransactionTotal ? String(walletTransactionTotal) : 'Pending');
         set('stripPayouts', String(cashoutItems.length));
+renderCashoutOperations(cashoutItems);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1210,7 +1265,60 @@
       }
     }
 
-    function openCommandModal(title, body){
+    function moneyFromCents(cents){
+  var n = Number(cents || 0);
+  return '$' + (n / 100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function safeText(v){
+  return String(v === undefined || v === null ? '' : v)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+function renderCashoutOperations(cashoutItems){
+  var rows = document.getElementById('cashoutRows');
+  if(!rows){ return; }
+
+  var items = Array.isArray(cashoutItems) ? cashoutItems : [];
+  var pending = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'PENDING'; }).length;
+  var completed = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'COMPLETED'; }).length;
+  var failed = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'FAILED'; }).length;
+
+  var html = '';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Pending</span><b>' + pending + '</b></div>';
+  html += '<div><span>Completed</span><b>' + completed + '</b></div>';
+  html += '<div><span>Failed</span><b>' + failed + '</b></div>';
+  html += '<div><span>Total</span><b>' + items.length + '</b></div>';
+  html += '</div>';
+
+  if(!items.length){
+    html += '<div class="row"><span>No cashout records returned</span><b>0</b></div>';
+    rows.innerHTML = html;
+    return;
+  }
+
+  html += '<div class="ops-table">';
+  html += '<div class="ops-head"><span>ID</span><span>Status</span><span>Amount</span><span>Created</span></div>';
+
+  items.slice(0,8).forEach(function(x){
+    var id = safeText(x.id || x.cashoutId || x.requestId || 'unknown');
+    var status = safeText(x.status || 'UNKNOWN');
+    var amount = moneyFromCents(x.amountCents || x.amount || 0);
+    var created = safeText(x.createdAt || x.created_at || x.updatedAt || '');
+    html += '<div class="ops-row">';
+    html += '<span>#' + id + '</span>';
+    html += '<span>' + status + '</span>';
+    html += '<span>' + amount + '</span>';
+    html += '<span>' + created + '</span>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  html += '<button class="btn" data-command="PAYOUTS_CASHOUTS_OPERATIONS">OPEN PAYOUT OPERATIONS</button>';
+  rows.innerHTML = html;
+}
+function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
       var box=document.getElementById('commandModal');
@@ -1226,7 +1334,8 @@
         'VIEW ALL CAMPAIGNS':'Promotion campaigns are visible now. Next GREEN layer requires campaign list/detail API wiring and admin actions.',
         'VIEW ALL DEALS':'Sponsored placements are visible now. Next GREEN layer requires sponsor/deal API wiring and approval controls.',
         'VIEW RISK ENGINE':'Fraud and risk monitor is visible now. Next GREEN layer requires live risk event feed, rule triggers, and case actions.',
-        'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.'
+        'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.',
+      'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1244,6 +1353,7 @@
   </script>
 </body>
 </html>
+
 
 
 
