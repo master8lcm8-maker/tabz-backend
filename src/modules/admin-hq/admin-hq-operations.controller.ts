@@ -235,4 +235,189 @@ export class AdminHqOperationsController {
 
     return `"${identifier}"`;
   }
+
+  private async adminHq46TableExists(tableName: string): Promise<boolean> {
+    const rows = await this.dataSource.query(
+      `
+        SELECT EXISTS (
+          SELECT 1
+          FROM information_schema.tables
+          WHERE table_schema = 'public'
+            AND table_name = $1
+        ) AS "exists"
+      `,
+      [tableName],
+    );
+
+    return rows?.[0]?.exists === true || rows?.[0]?.exists === 'true';
+  }
+
+  private async adminHq46Count(tableName: string): Promise<number | null> {
+    if (!(await this.adminHq46TableExists(tableName))) return null;
+
+    const rows = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS total FROM "${tableName}"`,
+    );
+
+    return Number(rows?.[0]?.total ?? 0);
+  }
+
+  private async adminHq46Recent(tableName: string, limit = 10): Promise<any[]> {
+    if (!(await this.adminHq46TableExists(tableName))) return [];
+
+    const safeLimit = Math.max(1, Math.min(Number(limit || 10), 25));
+
+    return this.dataSource.query(
+      `SELECT * FROM "${tableName}" ORDER BY id DESC LIMIT ${safeLimit}`,
+    );
+  }
+
+  private adminHq46ProjectUser(row: any) {
+    return {
+      id: row?.id ?? null,
+      email: row?.email ?? null,
+      displayName: row?.displayName ?? row?.display_name ?? null,
+      role: row?.role ?? null,
+      isActive: row?.isActive ?? row?.is_active ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq46ProjectVenue(row: any) {
+    return {
+      id: row?.id ?? null,
+      ownerId: row?.ownerId ?? row?.owner_id ?? null,
+      ownerProfileId: row?.ownerProfileId ?? row?.owner_profile_id ?? null,
+      slug: row?.slug ?? null,
+      name: row?.name ?? null,
+      city: row?.city ?? null,
+      state: row?.state ?? null,
+      country: row?.country ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq46ProjectStaff(row: any) {
+    return {
+      id: row?.id ?? null,
+      venueId: row?.venueId ?? row?.venue_id ?? null,
+      name: row?.name ?? null,
+      email: row?.email ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  private adminHq46ProjectProfile(row: any) {
+    return {
+      id: row?.id ?? null,
+      userId: row?.userId ?? row?.user_id ?? null,
+      type: row?.type ?? null,
+      displayName: row?.displayName ?? row?.display_name ?? null,
+      slug: row?.slug ?? null,
+      isActive: row?.isActive ?? row?.is_active ?? null,
+      createdAt: row?.createdAt ?? row?.created_at ?? null,
+      updatedAt: row?.updatedAt ?? row?.updated_at ?? null,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('accounts')
+  async adminHqAccounts(@Req() req: any) {
+    this.assertAdmin(req);
+    const adminUserId =
+      Number(req?.user?.sub ?? req?.user?.id ?? req?.user?.userId ?? 0) || null;
+    const adminRole = String(req?.user?.role ?? 'admin');
+
+    const [
+      usersTotal,
+      venuesTotal,
+      staffTotal,
+      profilesTotal,
+      recentUsersRaw,
+      recentVenuesRaw,
+      recentStaffRaw,
+      recentProfilesRaw,
+    ] = await Promise.all([
+      this.adminHq46Count('users'),
+      this.adminHq46Count('venues'),
+      this.adminHq46Count('staff'),
+      this.adminHq46Count('profiles'),
+      this.adminHq46Recent('users', 10),
+      this.adminHq46Recent('venues', 10),
+      this.adminHq46Recent('staff', 10),
+      this.adminHq46Recent('profiles', 10),
+    ]);
+
+    const recentUsers = recentUsersRaw.map((row: any) =>
+      this.adminHq46ProjectUser(row),
+    );
+    const recentVenues = recentVenuesRaw.map((row: any) =>
+      this.adminHq46ProjectVenue(row),
+    );
+    const recentStaff = recentStaffRaw.map((row: any) =>
+      this.adminHq46ProjectStaff(row),
+    );
+    const recentProfiles = recentProfilesRaw.map((row: any) =>
+      this.adminHq46ProjectProfile(row),
+    );
+
+    return {
+      ok: true,
+      scope: 'admin_hq_accounts_operations',
+      protectedBy: 'JwtAuthGuard + admin role',
+      adminUserId,
+      adminRole,
+      totals: {
+        users: usersTotal,
+        venues: venuesTotal,
+        staff: staffTotal,
+        profiles: profilesTotal,
+      },
+      sections: [
+        {
+          key: 'users',
+          label: 'Users',
+          table: 'users',
+          tableExists: usersTotal !== null,
+          total: usersTotal,
+          recent: recentUsers,
+        },
+        {
+          key: 'venues',
+          label: 'Venues',
+          table: 'venues',
+          tableExists: venuesTotal !== null,
+          total: venuesTotal,
+          recent: recentVenues,
+        },
+        {
+          key: 'staff',
+          label: 'Staff',
+          table: 'staff',
+          tableExists: staffTotal !== null,
+          total: staffTotal,
+          recent: recentStaff,
+        },
+        {
+          key: 'profiles',
+          label: 'Profiles',
+          table: 'profiles',
+          tableExists: profilesTotal !== null,
+          total: profilesTotal,
+          recent: recentProfiles,
+        },
+      ],
+      limitations: {
+        writeActions:
+          'Read-only Admin HQ account operations endpoint for Phase 26. Suspend/approve/ban/edit actions must be added as separate audited admin actions before being marked GREEN.',
+        passwordHash:
+          'Password hashes are intentionally not returned.',
+      },
+    };
+  }
 }
+
+
