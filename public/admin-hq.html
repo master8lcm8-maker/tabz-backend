@@ -1741,6 +1741,28 @@ function renderRefundDisputeResolution(refundsPayload, disputesPayload, finalPay
   html += '<button class="btn" data-command="REFUNDS_DISPUTES_FINAL_RESOLUTION">OPEN FINAL RESOLUTION</button>';
 
   box.innerHTML = html;
+
+  /* ADMIN_HQ_57_VISIBLE_MOUNT: write proven refund/dispute/final data into the existing visible dashboard rows */
+  var refundRowsTarget = document.getElementById('refundRows');
+  if(refundRowsTarget){
+    var refundRows = safeRecentRows(refundsPayload);
+    refundRowsTarget.innerHTML = refundRows.length
+      ? refundRows.slice(0,5).map(function(x){
+          return '<div class="ops-row"><span>#' + safeText(x.id || 'refund') + '</span><span>' + safeText(x.status || 'VISIBLE') + '</span><span>' + moneyFromCents(x.amountCents || x.amount || 0) + '</span></div>';
+        }).join('')
+      : '<div class="ops-row"><span>Refund Control</span><span>Table live</span><span>Total ' + refundTotal + '</span></div><div class="ops-note">Admin source /admin/refunds is live. No open refund records.</div>';
+  }
+
+  var disputeRowsTarget = document.getElementById('disputeRows');
+  if(disputeRowsTarget){
+    var disputeRows = safeRecentRows(disputesPayload);
+    var finalSummary = '<div class="ops-row"><span>Final Resolution</span><span>' + finalTotal + ' final states</span><span>Pending ' + pending + ' / Completed ' + completed + ' / Failed ' + failed + '</span></div>';
+    disputeRowsTarget.innerHTML = disputeRows.length
+      ? disputeRows.slice(0,5).map(function(x){
+          return '<div class="ops-row"><span>#' + safeText(x.id || 'dispute') + '</span><span>' + safeText(x.status || 'VISIBLE') + '</span><span>' + safeText(x.reason || x.providerStatus || 'admin-visible') + '</span></div>';
+        }).join('') + finalSummary
+      : '<div class="ops-row"><span>Dispute Control</span><span>Table live</span><span>Total ' + disputeTotal + '</span></div>' + finalSummary + '<div class="ops-note">Admin sources /admin/disputes and /admin/final-resolution are live.</div>';
+  }
 }
 function openCommandModal(title, body){
       set('commandTitle', title);
@@ -1781,6 +1803,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
