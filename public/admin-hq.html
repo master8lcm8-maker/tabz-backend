@@ -866,6 +866,24 @@
     .referral-ops-table .ops-row{
       grid-template-columns:.8fr .8fr 1.6fr .9fr;
     }
+      /* ADMIN-HQ-42 wallet/ledger/reconciliation operational module */
+    .wallet-ledger-recon-block{
+      margin-top:10px;
+    }
+    .wallet-recon-table .ops-head,
+    .wallet-recon-table .ops-row{
+      grid-template-columns:.75fr .85fr .85fr 1.75fr;
+    }
+    .ops-note{
+      margin-top:8px;
+      color:#a8bca3;
+      font-size:10px;
+      line-height:1.45;
+      border:1px solid rgba(156,255,0,.18);
+      border-radius:8px;
+      padding:7px 8px;
+      background:rgba(0,0,0,.24);
+    }
   </style>
 </head>
 <body>
@@ -1233,6 +1251,7 @@ var referrals=await api('/referrals/admin/links?limit=25');
         set('stripPayouts', String(cashoutItems.length));
 renderCashoutOperations(cashoutItems);
 renderReferralOperations(referrals);
+renderWalletLedgerReconciliation(operations, payouts, cashoutItems);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1412,6 +1431,105 @@ function renderReferralOperations(referralPayload){
   html += '<button class="btn" data-command="AFFILIATE_REFERRALS_OPERATIONS">OPEN REFERRAL OPERATIONS</button>';
   box.innerHTML = html;
 }
+function payloadSections(payload){
+  if(payload && Array.isArray(payload.sections)){ return payload.sections; }
+  if(payload && payload.data && Array.isArray(payload.data.sections)){ return payload.data.sections; }
+  return [];
+}
+function sectionByKeyOrLabel(payload, keys){
+  keys = Array.isArray(keys) ? keys : [keys];
+  var sections = payloadSections(payload);
+  return sections.find(function(section){
+    var key = String(section.key || '').toLowerCase();
+    var label = String(section.label || '').toLowerCase();
+    return keys.some(function(k){
+      k = String(k).toLowerCase();
+      return key === k || key.indexOf(k) >= 0 || label.indexOf(k) >= 0;
+    });
+  }) || null;
+}
+function recentRowsFromSection(section){
+  if(section && Array.isArray(section.recent)){ return section.recent; }
+  if(section && Array.isArray(section.items)){ return section.items; }
+  return [];
+}
+function renderWalletLedgerReconciliation(operationsPayload, payoutsPayload, cashoutItems){
+  var panel = document.getElementById('wallets') ||
+    document.getElementById('wallet') ||
+    document.getElementById('ledger') ||
+    document.getElementById('payouts');
+
+  if(!panel){ return; }
+
+  var box = document.getElementById('walletLedgerReconRows');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'walletLedgerReconRows';
+    box.className = 'ops-module-block wallet-ledger-recon-block';
+    panel.appendChild(box);
+  }
+
+  var cashoutSection = sectionByKeyOrLabel(payoutsPayload, ['cashout_requests','cashout payout records','cashout']);
+  var walletTxnSection = sectionByKeyOrLabel(operationsPayload, ['wallet_transactions','wallet transactions','wallet']);
+  var finalSection = sectionByKeyOrLabel(operationsPayload, ['final_resolution','final resolution','cashout final states']);
+  var stripeSection = sectionByKeyOrLabel(operationsPayload, ['stripe_events','stripe/payment events','stripe']);
+
+  var cashouts = Array.isArray(cashoutItems) ? cashoutItems : [];
+  var pending = cashouts.filter(function(x){ return String(x.status || '').toUpperCase() === 'PENDING'; }).length;
+  var completed = cashouts.filter(function(x){ return String(x.status || '').toUpperCase() === 'COMPLETED'; }).length;
+  var failed = cashouts.filter(function(x){ return String(x.status || '').toUpperCase() === 'FAILED'; }).length;
+
+  var cashoutTotal = Number(cashoutSection && cashoutSection.total !== undefined ? cashoutSection.total : cashouts.length);
+  var walletTxnTotal = Number(walletTxnSection && walletTxnSection.total !== undefined ? walletTxnSection.total : 0);
+  var finalTotal = Number(finalSection && finalSection.total !== undefined ? finalSection.total : cashoutTotal);
+  var stripeTotal = Number(stripeSection && stripeSection.total !== undefined ? stripeSection.total : 0);
+
+  var completedCents = cashouts.reduce(function(sum,x){
+    return sum + (String(x.status || '').toUpperCase() === 'COMPLETED' ? Number(x.amountCents || 0) : 0);
+  },0);
+
+  var html = '';
+  html += '<div class="ops-title">Live Wallet / Ledger / Reconciliation</div>';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Cashout Records</span><b>' + cashoutTotal + '</b></div>';
+  html += '<div><span>Wallet Txns</span><b>' + (walletTxnTotal || 'Visible') + '</b></div>';
+  html += '<div><span>Final States</span><b>' + finalTotal + '</b></div>';
+  html += '<div><span>Completed Value</span><b>' + moneyFromCents(completedCents) + '</b></div>';
+  html += '</div>';
+
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Pending</span><b>' + pending + '</b></div>';
+  html += '<div><span>Completed</span><b>' + completed + '</b></div>';
+  html += '<div><span>Failed</span><b>' + failed + '</b></div>';
+  html += '<div><span>Stripe Events</span><b>' + stripeTotal + '</b></div>';
+  html += '</div>';
+
+  var rows = recentRowsFromSection(cashoutSection);
+  if(!rows.length){ rows = cashouts; }
+
+  html += '<div class="ops-table wallet-recon-table">';
+  html += '<div class="ops-head"><span>ID</span><span>Status</span><span>Amount</span><span>Provider / Ledger</span></div>';
+
+  rows.slice(0,8).forEach(function(x){
+    var id = safeText(x.id || x.cashoutId || x.requestId || 'unknown');
+    var status = safeText(x.status || x.providerStatus || 'VISIBLE');
+    var amount = moneyFromCents(x.amountCents || x.amount || 0);
+    var provider = safeText(x.providerStatus || x.stripeTransferId || x.stripePayoutId || x.destinationLast4 || x.table || 'ledger-visible');
+
+    html += '<div class="ops-row">';
+    html += '<span>#' + id + '</span>';
+    html += '<span>' + status + '</span>';
+    html += '<span>' + amount + '</span>';
+    html += '<span>' + provider + '</span>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  html += '<div class="ops-note">Admin-safe sources: /admin-hq/operations + /admin/payouts + /wallet/admin/cashouts. User wallet routes are intentionally not used because they are owner/buyer scoped.</div>';
+  html += '<button class="btn" data-command="WALLET_LEDGER_RECON_OPERATIONS">OPEN LEDGER RECON</button>';
+
+  box.innerHTML = html;
+}
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
@@ -1430,7 +1548,8 @@ function openCommandModal(title, body){
         'VIEW RISK ENGINE':'Fraud and risk monitor is visible now. Next GREEN layer requires live risk event feed, rule triggers, and case actions.',
         'VIEW READINESS REPORT':'Readiness is intentionally PARTIAL until every Admin HQ module has live functional proof.',
       'PAYOUTS_CASHOUTS_OPERATIONS':'Live payout/cashout operations are wired to /wallet/admin/cashouts. Review pending, completed, and failed cashouts here before approving venue/user financial operations.',
-      'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.'
+      'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.',
+      'WALLET_LEDGER_RECON_OPERATIONS':'Live Wallet/Ledger/Reconciliation is wired only to admin-safe JSON sources: /admin-hq/operations, /admin/payouts, and /wallet/admin/cashouts. User wallet routes are not used because they are owner/buyer scoped.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1448,6 +1567,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
