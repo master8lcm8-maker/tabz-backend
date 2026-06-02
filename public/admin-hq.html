@@ -900,6 +900,14 @@
     .refund-dispute-table .ops-row{
       grid-template-columns:.8fr .65fr .95fr 1.75fr;
     }
+      /* ADMIN-HQ-64R risk/trust/compliance operations */
+    .risk-trust-compliance-block{
+      margin-top:10px;
+    }
+    .risk-trust-table .ops-head,
+    .risk-trust-table .ops-row{
+      grid-template-columns:.85fr .65fr 1.2fr 1.55fr;
+    }
   </style>
 </head>
 <body>
@@ -1208,6 +1216,7 @@ var refunds=await api('/admin/refunds');
 var disputes=await api('/admin/disputes');
 var finalResolution=await api('/admin/final-resolution');
 var stripeEvents=await api('/admin/stripe-events');
+var riskTrustCompliance=await api('/admin-hq/risk-trust-compliance');
         var control=await api('/admin/control');
         var payouts=await api('/admin/payouts');
         var stripe=await api('/admin/stripe-events');
@@ -1273,6 +1282,7 @@ renderReferralOperations(referrals);
 renderWalletLedgerReconciliation(operations, payouts, cashoutItems);
 renderAccountOperations(accounts);
 renderRefundDisputeResolution(refunds, disputes, finalResolution, stripeEvents);
+renderRiskTrustCompliance(riskTrustCompliance);
         set('stripDisputes', String(disputesTotal));
         set('stripRisk','Live');
         set('stripRegions','3 Active');
@@ -1764,6 +1774,87 @@ function renderRefundDisputeResolution(refundsPayload, disputesPayload, finalPay
       : '<div class="ops-row"><span>Dispute Control</span><span>Table live</span><span>Total ' + disputeTotal + '</span></div>' + finalSummary + '<div class="ops-note">Admin sources /admin/disputes and /admin/final-resolution are live.</div>';
   }
 }
+function riskTrustSection(payload, key){
+  if(!payload || !Array.isArray(payload.sections)){ return null; }
+  return payload.sections.find(function(section){ return String(section.key || '').toLowerCase() === String(key || '').toLowerCase(); }) || null;
+}
+function riskTrustTotal(section){
+  if(!section){ return 'N/A'; }
+  if(section.total === null || section.total === undefined){ return 'Missing table'; }
+  return Number(section.total || 0);
+}
+function riskTrustRows(section){
+  if(section && Array.isArray(section.recent)){ return section.recent; }
+  return [];
+}
+function renderRiskTrustCompliance(payload){
+  var panel = document.getElementById('risk') || document.getElementById('compliance') || document.querySelector('main') || document.body;
+  if(!panel){ return; }
+
+  var box = document.getElementById('riskTrustComplianceRows');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'riskTrustComplianceRows';
+    box.className = 'ops-module-block risk-trust-compliance-block';
+    panel.appendChild(box);
+  }
+
+  var reports = riskTrustSection(payload, 'reports');
+  var blocks = riskTrustSection(payload, 'blocks');
+  var audit = riskTrustSection(payload, 'audit');
+  var deletion = riskTrustSection(payload, 'account_deletion');
+
+  var reportsTotal = riskTrustTotal(reports);
+  var blocksTotal = riskTrustTotal(blocks);
+  var auditTotal = riskTrustTotal(audit);
+  var deletionTotal = riskTrustTotal(deletion);
+
+  var rows = [];
+  riskTrustRows(reports).slice(0,3).forEach(function(x){ x.__source='Report'; rows.push(x); });
+  riskTrustRows(blocks).slice(0,3).forEach(function(x){ x.__source='Block'; rows.push(x); });
+  riskTrustRows(audit).slice(0,3).forEach(function(x){ x.__source='Audit'; rows.push(x); });
+  riskTrustRows(deletion).slice(0,5).forEach(function(x){ x.__source='Account Delete'; rows.push(x); });
+
+  var html = '';
+  html += '<div class="ops-title">Live Risk / Trust / Compliance</div>';
+  html += '<div class="ops-mini-grid">';
+  html += '<div><span>Safety Reports</span><b>' + reportsTotal + '</b></div>';
+  html += '<div><span>Blocked Users</span><b>' + blocksTotal + '</b></div>';
+  html += '<div><span>Audit Events</span><b>' + auditTotal + '</b></div>';
+  html += '<div><span>Deletion Requests</span><b>' + deletionTotal + '</b></div>';
+  html += '</div>';
+
+  html += '<div class="ops-table risk-trust-table">';
+  html += '<div class="ops-head"><span>Source</span><span>ID</span><span>Status / Action</span><span>Target / Date</span></div>';
+
+  if(!rows.length){
+    html += '<div class="ops-row"><span>Risk/Trust</span><span>-</span><span>No live rows returned</span><span>Visibility source live</span></div>';
+  } else {
+    rows.slice(0,10).forEach(function(x){
+      var source = safeText(x.__source || 'Risk');
+      var id = safeText(x.id || 'record');
+      var status = safeText(x.status || x.action || x.reason || 'VISIBLE');
+      var target = safeText(x.targetType || x.targetId || x.userId || x.blockedUserId || x.createdAt || x.requestedAt || 'admin-visible');
+      html += '<div class="ops-row"><span>' + source + '</span><span>#' + id + '</span><span>' + status + '</span><span>' + target + '</span></div>';
+    });
+  }
+
+  html += '</div>';
+  html += '<div class="ops-note">Admin-safe source: /admin-hq/risk-trust-compliance. Reports/blocks/audit may show Missing table when the live DB table is not present. Account deletion currently has live records. Case actions, bans, report resolution, and policy controls remain separate audited write work before GREEN.</div>';
+  html += '<button class="btn" data-command="RISK_TRUST_COMPLIANCE_OPERATIONS">OPEN RISK / TRUST / COMPLIANCE</button>';
+
+  box.innerHTML = html;
+
+  var riskRowsTarget = document.getElementById('riskRows');
+  if(riskRowsTarget){
+    riskRowsTarget.innerHTML = '<div class="ops-row"><span>Risk/Trust</span><span>Source live</span><span>Deletion requests ' + deletionTotal + '</span></div><div class="ops-note">Risk/Trust/Compliance source is live. Missing tables must remain visible as missing, not fake-green.</div>';
+  }
+
+  var complianceRowsTarget = document.getElementById('complianceRows');
+  if(complianceRowsTarget){
+    complianceRowsTarget.innerHTML = '<div class="ops-row"><span>Compliance</span><span>Public pages visible</span><span>Account deletion JSON live</span></div>';
+  }
+}
 function openCommandModal(title, body){
       set('commandTitle', title);
       set('commandBody', body);
@@ -1785,7 +1876,8 @@ function openCommandModal(title, body){
       'AFFILIATE_REFERRALS_OPERATIONS':'Live affiliate/referral operations are wired to /referrals/admin/links. Review tracked referral links, status, codes, click/signup/conversion counts, and reward policy visibility before scaling TABZ growth campaigns.',
       'WALLET_LEDGER_RECON_OPERATIONS':'Live Wallet/Ledger/Reconciliation is wired only to admin-safe JSON sources: /admin-hq/operations, /admin/payouts, and /wallet/admin/cashouts. User wallet routes are not used because they are owner/buyer scoped.',
       'ACCOUNTS_OPERATIONS':'Live Users/Venues/Staff/Profile account visibility is wired to /admin-hq/accounts. This is read-only operational visibility; account write actions require separate audited controls before GREEN.',
-      'REFUNDS_DISPUTES_FINAL_RESOLUTION':'Live Refunds/Disputes/Final Resolution visibility is wired to /admin/refunds, /admin/disputes, /admin/final-resolution, and /admin/stripe-events. Action controls must remain audited before GREEN.'
+      'REFUNDS_DISPUTES_FINAL_RESOLUTION':'Live Refunds/Disputes/Final Resolution visibility is wired to /admin/refunds, /admin/disputes, /admin/final-resolution, and /admin/stripe-events. Action controls must remain audited before GREEN.',
+      'RISK_TRUST_COMPLIANCE_OPERATIONS':'Live Risk/Trust/Compliance visibility is wired to /admin-hq/risk-trust-compliance. This is read-only operational visibility. Report resolution, bans, compliance approvals, account-deletion approvals, and case actions require separate audited write controls before GREEN.'
       };
       Array.prototype.forEach.call(document.querySelectorAll('.btn'),function(btn){
         var label=(btn.textContent || '').trim();
@@ -1803,6 +1895,7 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
 
 
 
