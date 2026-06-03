@@ -1,21 +1,40 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BankInfo } from './bank-info.entity';
+import { OwnerBankInfo } from '../owner/owner-bank-info.entity';
 
 @Injectable()
 export class BankInfoService {
   constructor(
     @InjectRepository(BankInfo)
     private readonly bankInfoRepo: Repository<BankInfo>,
+    @InjectRepository(OwnerBankInfo)
+    private readonly ownerBankInfoRepo: Repository<OwnerBankInfo>,
   ) {}
 
   /**
    * Get bank info for a user. Returns null if not found.
    */
   async getForUser(userId: number): Promise<BankInfo | null> {
+    // ADMIN_HQ_PHASE_02Q_R2B_R10_R2_BANKINFO_FALLBACK_TO_OWNER_BANK_INFOS
     const info = await this.bankInfoRepo.findOne({ where: { userId } });
-    return info ?? null;
+    if (info) return info;
+
+    const ownerBankInfo = await this.ownerBankInfoRepo.findOne({ where: { userId } });
+    if (!ownerBankInfo) return null;
+
+    return {
+      id: ownerBankInfo.id,
+      userId: ownerBankInfo.userId,
+      bankNameEnc: ownerBankInfo.bankNameEnc,
+      accountHolderNameEnc: ownerBankInfo.accountHolderNameEnc,
+      routingNumberEnc: ownerBankInfo.routingNumberEnc,
+      accountNumberEnc: ownerBankInfo.accountNumberEnc,
+      accountLast4: ownerBankInfo.accountLast4,
+      createdAt: ownerBankInfo.createdAt,
+      updatedAt: ownerBankInfo.updatedAt,
+    } as BankInfo;
   }
 
   /**
@@ -59,3 +78,4 @@ export class BankInfoService {
     return this.bankInfoRepo.save(info);
   }
 }
+
