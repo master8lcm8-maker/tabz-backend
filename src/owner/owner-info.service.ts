@@ -108,11 +108,11 @@ export class OwnerInfoService {
       }
 
       const status =
-        (record.status as 'verified' | 'pending' | 'missing') || 'pending';
+        'pending';
 
       return {
-        bankName: record.bankName || 'Not set',
-        last4: record.last4 || '',
+        bankName: record.bankNameEnc || 'Not set',
+        last4: record.accountLast4 || '',
         status,
       };
     } catch {
@@ -134,32 +134,30 @@ export class OwnerInfoService {
     let record = await this.bankRepo.findOne({ where: { ownerId: userId } });
 
     if (!record) {
+      // ADMIN_HQ_PHASE_02Q_R2B_R8F_R2_R1_OWNER_BANK_SERVICE_SCHEMA_ALIGNED
       record = this.bankRepo.create({
         ownerId: userId,
-        bankName: bankName || null,
-        last4: last4 || null,
-        // ADMIN_HQ_PHASE_02Q_R2B_R5_OWNER_BANKINFO_ENTITY_MATCH
-        status: 'pending',
+        bankNameEnc: bankName || 'Not set',
+        accountLast4: last4 || '',
       });
     } else {
       if (bankName) {
-        record.bankName = bankName;
+        record.bankNameEnc = bankName;
       }
       if (last4) {
-        record.last4 = last4;
+        record.accountLast4 = last4;
       }
-      // whenever bank info changes, force bank status back to pending
-      record.status = 'pending';
+      // Existing owner_bank_infos migration has no status column; return pending from service.
     }
 
     await this.bankRepo.save(record);
 
     const status =
-      (record.status as 'verified' | 'pending' | 'missing') || 'pending';
+      'pending';
 
     return {
-      bankName: record.bankName || 'Not set',
-      last4: record.last4 || '',
+      bankName: record.bankNameEnc || 'Not set',
+      last4: record.accountLast4 || '',
       status,
     };
   }
@@ -179,6 +177,7 @@ export class OwnerInfoService {
     return { status: 'verified' };
   }
 }
+
 
 
 

@@ -1,4 +1,4 @@
-// src/owner/owner-bank-info.entity.ts
+﻿// src/owner/owner-bank-info.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -17,15 +17,14 @@ export class OwnerBankInfo {
   @Column({ type: 'int' })
   ownerId: number;
 
-  @Column({ type: 'varchar', length: 120 })
-  bankName: string;
+  // ADMIN_HQ_PHASE_02Q_R2B_R8F_R2_R1_OWNER_BANK_ENTITY_SCHEMA_ALIGNED
+  // Existing migration uses bankNameEnc and accountLast4.
+  // DEV/TEST only: store plain display test value in bankNameEnc.
+  @Column({ type: 'text' })
+  bankNameEnc: string;
 
   @Column({ type: 'varchar', length: 4 })
-  last4: string;
-
-  // 'pending' | 'verified' | 'missing' (we treat 'missing' in code)
-  @Column({ type: 'varchar', length: 20, default: 'pending' })
-  status: string;
+  accountLast4: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -33,3 +32,4 @@ export class OwnerBankInfo {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
