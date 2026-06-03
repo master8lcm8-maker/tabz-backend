@@ -1,4 +1,4 @@
-﻿// src/owner/owner-bank-info.entity.ts
+// src/owner/owner-bank-info.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -35,6 +35,20 @@ export class OwnerBankInfo {
 
   @Column({ type: 'varchar', length: 4 })
   accountLast4: string;
+
+  // ADMIN_HQ_MONEY_FLOW_PATCH_09A_R1_STRIPE_CONNECT_FIELDS
+  // Stripe connected account readiness; TABZ does not custody payout funds.
+  @Column({ type: 'varchar', nullable: true })
+  stripeAccountId: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  stripeDetailsSubmitted: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  stripeChargesEnabled: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  stripePayoutsEnabled: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
