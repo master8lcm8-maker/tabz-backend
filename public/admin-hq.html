@@ -1728,7 +1728,26 @@ function renderWalletLedgerReconciliation(operationsPayload, payoutsPayload, cas
 
   html += '</div>';
   html += '<div class="ops-note">Admin-safe sources: /admin-hq/operations + /admin/payouts + /wallet/admin/cashouts. User wallet routes are intentionally not used because they are owner/buyer scoped.</div>';
-  html += '<button class="btn" data-command="WALLET_LEDGER_RECON_OPERATIONS">OPEN LEDGER RECON</button>';
+  
+  // ADMIN_HQ_PHASE_02M_R2_VISIBLE_CASHOUT_REVIEW_BUTTONS
+  html += '<div class="ops-note">Admin HQ Phase 02M: use REVIEW to open the safe cashout drawer. Only PENDING cashouts expose the Fail Pending Cashout action inside the drawer.</div>';
+  html += '<div class="ops-table cashout-visible-review-table">';
+  html += '<div class="ops-head"><span>Review</span><span>Status</span><span>Amount</span><span>Provider / Ledger</span></div>';
+  cashouts.slice(0,8).forEach(function(x){
+    var reviewId = safeText(x.id || x.cashoutId || x.requestId || 'unknown');
+    var reviewStatus = safeText(x.status || 'UNKNOWN');
+    var reviewAmount = moneyFromCents(x.amountCents || x.amount || 0);
+    var reviewProvider = safeText(x.destinationLast4 || x.provider || x.ledger || x.providerLedger || 'not provided');
+    html += '<div class="ops-row">';
+    html += '<span><button class="btn cashout-review-btn" data-cashout-review-id="' + reviewId + '">REVIEW #' + reviewId + '</button></span>';
+    html += '<span>' + reviewStatus + '</span>';
+    html += '<span>' + reviewAmount + '</span>';
+    html += '<span>' + reviewProvider + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+html += '<button class="btn" data-command="WALLET_LEDGER_RECON_OPERATIONS">OPEN LEDGER RECON</button>';
 
   box.innerHTML = html;
 }
