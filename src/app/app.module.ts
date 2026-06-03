@@ -21,6 +21,7 @@ import { DevSeedModule } from '../dev-seed/dev-seed.module';
 
 import { VenuesModule } from '../modules/venues/venues.module';
 import { IdentityModule } from '../identity/identity.module';
+import { OwnerInfoModule } from '../owner/owner-info.module';
 import { HealthModule } from '../health/health.module';
 import { DrinksModule } from '../modules/drinks/drinks.module';
 import { FreeboardModule } from '../modules/freeboard/freeboard.module';
@@ -154,6 +155,7 @@ import { AdminHqConvenienceController } from '../modules/admin-hq/admin-hq-conve
     NotificationsModule,
     VenuesModule,
     IdentityModule,
+    OwnerInfoModule, // ADMIN_HQ_PHASE_02Q_R2B_R7_OWNERINFO_MODULE_REGISTERED
     HealthModule,
     DrinksModule,
     FreeboardModule,
@@ -166,6 +168,7 @@ import { AdminHqConvenienceController } from '../modules/admin-hq/admin-hq-conve
   ],
 })
 export class AppModule {}
+
 
 
 
