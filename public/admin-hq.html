@@ -1473,7 +1473,21 @@ function openCashoutReadonlyReview(id){
   body += '<div class="ops-row"><span>Retry of cashout</span><b>' + retryOf + '</b></div>';
   body += '<div class="ops-row"><span>Created</span><b>' + createdAt + '</b></div>';
   body += '</div>';
-  body += '<div class="ops-note">Next GREEN layer requires audited action endpoints with admin reason, confirmation, success UI, failure UI, and proof. This drawer only lets Admin inspect the record safely.</div>';
+  body += '<div class="ops-note">Next GREEN layer requires audited action endpoints with admin reason, confirmation, success UI, failure UI, and proof. This drawer lets Admin inspect the record safely.</div>';
+  if(String(status).toUpperCase() === 'PENDING'){
+    body += '<div class="ops-module-block admin-cashout-fail-panel">';
+    body += '<div class="ops-title">Fail Pending Cashout</div>';
+    body += '<div class="ops-note">ADMIN_HQ_PHASE_02J_FAIL_PENDING_CASHOUT_UI: This is the only enabled cashout action. It requires a typed reason and confirmation, then calls the audited backend fail route.</div>';
+    body += '<label class="field-label">Failure reason</label>';
+    body += '<textarea id="cashoutFailReason" class="ops-input" rows="3" placeholder="Type the admin failure reason. Minimum 8 characters."></textarea>';
+    body += '<label class="field-label">Confirmation</label>';
+    body += '<input id="cashoutFailConfirm" class="ops-input" placeholder="Type FAIL CASHOUT #' + cashoutId + '">';
+    body += '<button class="btn danger" data-cashout-fail-id="' + cashoutId + '" data-cashout-fail-confirm="FAIL CASHOUT #' + cashoutId + '">FAIL CASHOUT #' + cashoutId + '</button>';
+    body += '<div id="cashoutFailStatus" class="ops-note">No action has been submitted.</div>';
+    body += '</div>';
+  } else {
+    body += '<div class="ops-note">Fail action hidden because this cashout is not PENDING.</div>';
+  }
   body += '</div>';
 
   var commandBody = document.getElementById('commandBody');
@@ -1486,12 +1500,72 @@ function openCashoutReadonlyReview(id){
 document.addEventListener('click',function(ev){
   var target = ev.target;
   if(!target || !target.closest){ return; }
+
+  var failBtn = target.closest('[data-cashout-fail-id]');
+  if(failBtn){
+    ev.preventDefault();
+    handleCashoutFailSubmit(failBtn);
+    return;
+  }
+
   var btn = target.closest('[data-cashout-review-id]');
   if(!btn){ return; }
   ev.preventDefault();
   openCashoutReadonlyReview(btn.getAttribute('data-cashout-review-id'));
 });
 
+async function handleCashoutFailSubmit(btn){
+  var id = btn.getAttribute('data-cashout-fail-id');
+  var confirmText = btn.getAttribute('data-cashout-fail-confirm');
+  var reasonEl = document.getElementById('cashoutFailReason');
+  var confirmEl = document.getElementById('cashoutFailConfirm');
+  var statusEl = document.getElementById('cashoutFailStatus');
+
+  var reason = reasonEl ? String(reasonEl.value || '').trim() : '';
+  var typed = confirmEl ? String(confirmEl.value || '').trim() : '';
+
+  function failStatus(msg){
+    if(statusEl){ statusEl.innerHTML = safeText(msg); }
+  }
+
+  if(!id){
+    failStatus('Blocked: missing cashout id.');
+    return;
+  }
+
+  var cashout = findAdminHqCashoutById(id);
+  if(!cashout || String(cashout.status || '').toUpperCase() !== 'PENDING'){
+    failStatus('Blocked: cashout is not PENDING.');
+    return;
+  }
+
+  if(reason.length < 8){
+    failStatus('Blocked: failure reason must be at least 8 characters.');
+    return;
+  }
+
+  if(typed !== confirmText){
+    failStatus('Blocked: type exactly "' + confirmText + '" to confirm.');
+    return;
+  }
+
+  btn.disabled = true;
+  failStatus('Submitting fail action...');
+
+  try{
+    var result = await apiPost('/wallet/admin/cashouts/' + encodeURIComponent(id) + '/fail', {
+      failureReason: reason
+    });
+
+    failStatus('Success: cashout #' + safeText(result.id || id) + ' is now ' + safeText(result.status || 'FAILED') + '. Refreshing Admin HQ data...');
+    await loadAdminHQ();
+  }catch(err){
+    btn.disabled = false;
+    failStatus('Fail action failed: ' + safeText(err && err.message ? err.message : err));
+  }
+}
+
+// ADMIN_HQ_PHASE_02J_FAIL_PENDING_CASHOUT_UI
 // ADMIN_HQ_PHASE_02D_CASHOUT_READONLY_DETAIL_DRAWER
 function renderReferralOperations(referralPayload){
   var panel = document.getElementById('affiliate');
