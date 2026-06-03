@@ -95,25 +95,33 @@ export class OwnerInfoService {
   }
 
   async getOwnerBank(userId: number): Promise<OwnerBankResponse> {
-    const record = await this.bankRepo.findOne({ where: { ownerId: userId } });
+    // ADMIN_HQ_PHASE_02Q_R2B_R8D_OWNER_BANK_READ_RESILIENCE
+    try {
+      const record = await this.bankRepo.findOne({ where: { ownerId: userId } });
 
-    if (!record) {
-      // No bank on file
+      if (!record) {
+        return {
+          bankName: 'Not set',
+          last4: '',
+          status: 'missing',
+        };
+      }
+
+      const status =
+        (record.status as 'verified' | 'pending' | 'missing') || 'pending';
+
+      return {
+        bankName: record.bankName || 'Not set',
+        last4: record.last4 || '',
+        status,
+      };
+    } catch {
       return {
         bankName: 'Not set',
         last4: '',
         status: 'missing',
       };
     }
-
-    const status =
-      (record.status as 'verified' | 'pending' | 'missing') || 'pending';
-
-    return {
-      bankName: record.bankName || 'Not set',
-      last4: record.last4 || '',
-      status,
-    };
   }
 
   async updateOwnerBank(
@@ -171,5 +179,6 @@ export class OwnerInfoService {
     return { status: 'verified' };
   }
 }
+
 
 
