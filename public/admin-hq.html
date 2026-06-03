@@ -1372,6 +1372,7 @@ function renderCashoutOperations(cashoutItems){
   if(!rows){ return; }
 
   var items = Array.isArray(cashoutItems) ? cashoutItems : [];
+  window.ADMIN_HQ_CASHOUT_ITEMS = items; // ADMIN_HQ_PHASE_02D_CASHOUT_READONLY_DETAIL_DRAWER
   var pending = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'PENDING'; }).length;
   var completed = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'COMPLETED'; }).length;
   var failed = items.filter(function(x){ return String(x.status || '').toUpperCase() === 'FAILED'; }).length;
@@ -1407,7 +1408,23 @@ function renderCashoutOperations(cashoutItems){
   });
 
   html += '</div>';
-  html += '<button class="btn" data-command="PAYOUTS_CASHOUTS_OPERATIONS">OPEN PAYOUT OPERATIONS</button>';
+    html += '<div class="ops-note">ADMIN HQ PHASE 02D: cashout review is read-only. Money actions remain blocked until audited action routes, admin reason, and browser proof are built.</div>';
+  html += '<div class="ops-table cashout-readonly-review-table">';
+  html += '<div class="ops-head"><span>Review</span><span>Status</span><span>Amount</span><span>Destination</span></div>';
+  items.slice(0,8).forEach(function(x){
+    var reviewId = safeText(x.id || x.cashoutId || x.requestId || 'unknown');
+    var reviewStatus = safeText(x.status || 'UNKNOWN');
+    var reviewAmount = moneyFromCents(x.amountCents || x.amount || 0);
+    var reviewDestination = safeText(x.destinationLast4 ? ('**** ' + x.destinationLast4) : 'not provided');
+    html += '<div class="ops-row">';
+    html += '<span><button class="btn cashout-review-btn" data-cashout-review-id="' + reviewId + '">REVIEW #' + reviewId + '</button></span>';
+    html += '<span>' + reviewStatus + '</span>';
+    html += '<span>' + reviewAmount + '</span>';
+    html += '<span>' + reviewDestination + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+html += '<button class="btn" data-command="PAYOUTS_CASHOUTS_OPERATIONS">OPEN PAYOUT OPERATIONS</button>';
   rows.innerHTML = html;
 }
 function referralArrayFromPayload(payload){
@@ -1418,6 +1435,64 @@ function referralArrayFromPayload(payload){
   if(payload && payload.data && Array.isArray(payload.data)){ return payload.data; }
   return [];
 }
+function findAdminHqCashoutById(id){
+  var items = Array.isArray(window.ADMIN_HQ_CASHOUT_ITEMS) ? window.ADMIN_HQ_CASHOUT_ITEMS : [];
+  var target = String(id || '');
+  return items.find(function(x){
+    return String(x.id || x.cashoutId || x.requestId || '') === target;
+  }) || null;
+}
+
+function openCashoutReadonlyReview(id){
+  var x = findAdminHqCashoutById(id);
+  if(!x){
+    openCommandModal('Cashout review unavailable','This cashout was not found in the loaded /wallet/admin/cashouts data. Refresh Admin HQ and try again.');
+    return;
+  }
+
+  var cashoutId = safeText(x.id || x.cashoutId || x.requestId || 'unknown');
+  var status = safeText(x.status || 'UNKNOWN');
+  var amount = moneyFromCents(x.amountCents || x.amount || 0);
+  var destination = safeText(x.destinationLast4 ? ('**** ' + x.destinationLast4) : 'not provided');
+  var failureReason = safeText(x.failureReason || 'none');
+  var retryOf = safeText(x.retryOfCashoutId || 'none');
+  var createdAt = safeText(x.createdAt || 'not provided');
+
+  set('commandTitle','Read-only cashout review #' + cashoutId);
+
+  var body = '';
+  body += '<div class="ops-module-block">';
+  body += '<div class="ops-title">Cashout Review Drawer</div>';
+  body += '<div class="ops-note">ADMIN HQ PHASE 02D read-only drawer. No approve, reject, complete, fail, retry, repair, or provider mutation is performed here.</div>';
+  body += '<div class="ops-table">';
+  body += '<div class="ops-row"><span>Cashout ID</span><b>#' + cashoutId + '</b></div>';
+  body += '<div class="ops-row"><span>Status</span><b>' + status + '</b></div>';
+  body += '<div class="ops-row"><span>Amount</span><b>' + amount + '</b></div>';
+  body += '<div class="ops-row"><span>Destination</span><b>' + destination + '</b></div>';
+  body += '<div class="ops-row"><span>Failure reason</span><b>' + failureReason + '</b></div>';
+  body += '<div class="ops-row"><span>Retry of cashout</span><b>' + retryOf + '</b></div>';
+  body += '<div class="ops-row"><span>Created</span><b>' + createdAt + '</b></div>';
+  body += '</div>';
+  body += '<div class="ops-note">Next GREEN layer requires audited action endpoints with admin reason, confirmation, success UI, failure UI, and proof. This drawer only lets Admin inspect the record safely.</div>';
+  body += '</div>';
+
+  var commandBody = document.getElementById('commandBody');
+  if(commandBody){ commandBody.innerHTML = body; }
+
+  var box=document.getElementById('commandModal');
+  if(box){ box.classList.remove('hidden'); }
+}
+
+document.addEventListener('click',function(ev){
+  var target = ev.target;
+  if(!target || !target.closest){ return; }
+  var btn = target.closest('[data-cashout-review-id]');
+  if(!btn){ return; }
+  ev.preventDefault();
+  openCashoutReadonlyReview(btn.getAttribute('data-cashout-review-id'));
+});
+
+// ADMIN_HQ_PHASE_02D_CASHOUT_READONLY_DETAIL_DRAWER
 function renderReferralOperations(referralPayload){
   var panel = document.getElementById('affiliate');
   if(!panel){ return; }
@@ -2006,6 +2081,8 @@ function openCommandModal(title, body){
   </script>
 </body>
 </html>
+
+
 
 
 
