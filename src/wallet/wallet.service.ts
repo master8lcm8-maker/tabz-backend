@@ -462,6 +462,10 @@ export class WalletService {
       }
 
       // ✅ FIX: avoid bigint-string concat/implicit types
+      // ADMIN_HQ_PHASE_02H_R10_CASHOUT_BALANCE_INVARIANT
+      // Cashout request moves value out of wallet balance into pending external payout.
+      // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
+      wallet.balanceCents = Number(wallet.balanceCents) - amountCents;
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amountCents;
       const savedWallet = await walletRepo.save(wallet);
 
@@ -704,6 +708,10 @@ export class WalletService {
       const amount = Number(cashout.amountCents);
 
       // ✅ FIX: avoid bigint-string concat
+      // ADMIN_HQ_PHASE_02H_R10_CASHOUT_FAIL_REFUND_INVARIANT
+      // Admin fail refunds the pending cashout value back into wallet balance and cashout-available value.
+      // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
+      wallet.balanceCents = Number(wallet.balanceCents) + amount;
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
