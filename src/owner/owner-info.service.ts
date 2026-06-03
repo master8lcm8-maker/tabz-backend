@@ -97,7 +97,7 @@ export class OwnerInfoService {
   async getOwnerBank(userId: number): Promise<OwnerBankResponse> {
     // ADMIN_HQ_PHASE_02Q_R2B_R8D_OWNER_BANK_READ_RESILIENCE
     try {
-      const record = await this.bankRepo.findOne({ where: { ownerId: userId } });
+      const record = await this.bankRepo.findOne({ where: { userId } });
 
       if (!record) {
         return {
@@ -131,12 +131,15 @@ export class OwnerInfoService {
     const bankName = (dto.bankName ?? '').trim();
     const last4 = this.normalizeLast4(dto.last4);
 
-    let record = await this.bankRepo.findOne({ where: { ownerId: userId } });
+    let record = await this.bankRepo.findOne({ where: { userId } });
 
     if (!record) {
-      // ADMIN_HQ_PHASE_02Q_R2B_R8F_R2_R1_OWNER_BANK_SERVICE_SCHEMA_ALIGNED
+      // ADMIN_HQ_PHASE_02Q_R2B_R8F_R6_R1_OWNER_BANK_SERVICE_USERID_REQUIRED_FIELDS
       record = this.bankRepo.create({
-        ownerId: userId,
+        userId,
+        accountHolderNameEnc: 'DEV_TEST_ACCOUNT_HOLDER',
+        routingNumberEnc: 'DEV_TEST_ROUTING',
+        accountNumberEnc: 'DEV_TEST_ACCOUNT',
         bankNameEnc: bankName || 'Not set',
         accountLast4: last4 || '',
       });
@@ -177,6 +180,9 @@ export class OwnerInfoService {
     return { status: 'verified' };
   }
 }
+
+
+
 
 
 

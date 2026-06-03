@@ -13,13 +13,23 @@ export class OwnerBankInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
+  // ADMIN_HQ_PHASE_02Q_R2B_R8F_R6_R1_OWNER_BANK_ENTITY_FULL_MIGRATION_ALIGNMENT
+  // Existing migration uses userId, not ownerId.
   @Index()
   @Column({ type: 'int' })
-  ownerId: number;
+  userId: number;
 
-  // ADMIN_HQ_PHASE_02Q_R2B_R8F_R2_R1_OWNER_BANK_ENTITY_SCHEMA_ALIGNED
-  // Existing migration uses bankNameEnc and accountLast4.
-  // DEV/TEST only: store plain display test value in bankNameEnc.
+  // Existing migration requires these encrypted fields as NOT NULL.
+  // DEV/TEST only: placeholders are used until real payout/KYC encryption is wired.
+  @Column({ type: 'text' })
+  accountHolderNameEnc: string;
+
+  @Column({ type: 'text' })
+  routingNumberEnc: string;
+
+  @Column({ type: 'text' })
+  accountNumberEnc: string;
+
   @Column({ type: 'text' })
   bankNameEnc: string;
 
@@ -32,4 +42,5 @@ export class OwnerBankInfo {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
 
