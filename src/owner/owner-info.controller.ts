@@ -1,4 +1,4 @@
-// src/owner/owner-info.controller.ts
+﻿// src/owner/owner-info.controller.ts
 import {
   Body,
   Controller,
@@ -21,12 +21,17 @@ type JwtUserPayload = {
   email?: string;
 };
 
+// ADMIN_HQ_PHASE_02Q_R2B_R5_AUTH_REQUEST_TYPING
+type AuthenticatedOwnerRequest = Request & {
+  user?: JwtUserPayload;
+};
+
 @Controller('owner')
 @UseGuards(AuthGuard('jwt'))
 export class OwnerInfoController {
   constructor(private readonly ownerInfoService: OwnerInfoService) {}
 
-  private getUserFromRequest(req: Request): { userId: number; email: string } {
+  private getUserFromRequest(req: AuthenticatedOwnerRequest): { userId: number; email: string } {
     const user = (req.user || {}) as JwtUserPayload;
 
     const userId = user.userId ?? user.sub;
@@ -42,14 +47,14 @@ export class OwnerInfoController {
   // -------- PROFILE --------
 
   @Get('profile')
-  async getProfile(@Req() req: Request) {
+  async getProfile(@Req() req: AuthenticatedOwnerRequest) {
     const { userId, email } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerProfile(userId, email);
   }
 
   @Post('profile/update')
   async updateProfile(
-    @Req() req: Request,
+    @Req() req: AuthenticatedOwnerRequest,
     @Body() dto: UpdateOwnerProfileDto,
   ) {
     const { userId, email } = this.getUserFromRequest(req);
@@ -59,13 +64,13 @@ export class OwnerInfoController {
   // -------- BANK INFO --------
 
   @Get('bank')
-  async getBank(@Req() req: Request) {
+  async getBank(@Req() req: AuthenticatedOwnerRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerBank(userId);
   }
 
   @Post('bank/update')
-  async updateBank(@Req() req: Request, @Body() dto: UpdateOwnerBankDto) {
+  async updateBank(@Req() req: AuthenticatedOwnerRequest, @Body() dto: UpdateOwnerBankDto) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.updateOwnerBank(userId, dto);
   }
@@ -73,14 +78,15 @@ export class OwnerInfoController {
   // -------- IDENTITY VERIFICATION --------
 
   @Get('verification')
-  async getVerification(@Req() req: Request) {
+  async getVerification(@Req() req: AuthenticatedOwnerRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.getOwnerVerification(userId);
   }
 
   @Post('verification/start')
-  async startVerification(@Req() req: Request) {
+  async startVerification(@Req() req: AuthenticatedOwnerRequest) {
     const { userId } = this.getUserFromRequest(req);
     return this.ownerInfoService.startOwnerVerification(userId);
   }
 }
+

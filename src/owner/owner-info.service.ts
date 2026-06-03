@@ -1,4 +1,4 @@
-// src/owner/owner-info.service.ts
+﻿// src/owner/owner-info.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -130,8 +130,8 @@ export class OwnerInfoService {
         ownerId: userId,
         bankName: bankName || null,
         last4: last4 || null,
+        // ADMIN_HQ_PHASE_02Q_R2B_R5_OWNER_BANKINFO_ENTITY_MATCH
         status: 'pending',
-        verificationStatus: 'required',
       });
     } else {
       if (bankName) {
@@ -171,3 +171,4 @@ export class OwnerInfoService {
     return { status: 'verified' };
   }
 }
+
