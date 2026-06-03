@@ -1,4 +1,4 @@
-// src/wallet/wallet.service.ts
+﻿// src/wallet/wallet.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -18,7 +18,7 @@ export type WalletSummary = {
   userId: number;
   balanceCents: number;
 
-  // 🔒 M35: spendable is what remains after cashoutAvailable is reserved.
+  // ðŸ”’ M35: spendable is what remains after cashoutAvailable is reserved.
   // The invariant we lock/prove at the API boundary:
   //    balance = spendable + cashoutAvailable
   spendableBalanceCents: number;
@@ -28,7 +28,7 @@ export type WalletSummary = {
   // Informational only: derived from PENDING cashouts (does NOT participate in invariant)
   pendingHeldCents: number;
 
-  // ✅ M35 lock: server-side invariant assertion (balance = spendable + cashoutAvailable AND spendable non-negative)
+  // âœ… M35 lock: server-side invariant assertion (balance = spendable + cashoutAvailable AND spendable non-negative)
   ok: boolean;
 
   createdAt: Date;
@@ -47,7 +47,7 @@ export type CashoutDto = {
   failureReason: string | null;
   destinationLast4: string | null;
   createdAt: string;
-  retryOfCashoutId: number | null; // ✅ ADDED
+  retryOfCashoutId: number | null; // âœ… ADDED
 };
 
 export type CashoutListResponse = {
@@ -111,7 +111,7 @@ export class WalletService {
     const wallet = await this.getOrCreateWallet(userId);
 
     // Informational: pending-held is the sum of PENDING cashouts (does NOT participate in invariant)
-    // ✅ FIX: do NOT reference raw FK column name; join relation so TypeORM resolves correct physical column (walletid vs "walletId")
+    // âœ… FIX: do NOT reference raw FK column name; join relation so TypeORM resolves correct physical column (walletid vs "walletId")
     const raw = await this.cashoutRepo
       .createQueryBuilder('c')
       .innerJoin('c.wallet', 'w')
@@ -125,7 +125,7 @@ export class WalletService {
     const balanceCents = Number(wallet.balanceCents);
     const cashoutAvailableCents = Number(wallet.cashoutAvailableCents);
 
-    // 🔒 M35 invariant (locked): balance = spendable + cashoutAvailable
+    // ðŸ”’ M35 invariant (locked): balance = spendable + cashoutAvailable
     // Spendable is derived as the remainder after reserving cashoutAvailable.
     // NOTE: We do NOT trust stored wallet.spendableBalanceCents here because it can drift
     // if not updated in every flow. The API boundary must remain conserved.
@@ -244,7 +244,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient funds');
       }
 
-      // ✅ FIX: avoid bigint-string concat/implicit types
+      // âœ… FIX: avoid bigint-string concat/implicit types
       buyerWallet.balanceCents = Number(buyerWallet.balanceCents) - amountCents;
       buyerWallet.spendableBalanceCents = Number(buyerWallet.spendableBalanceCents) - amountCents;
       buyerWallet = await walletRepo.save(buyerWallet);
@@ -278,7 +278,7 @@ export class WalletService {
         });
       }
 
-      // ✅ FIX: avoid bigint-string concat
+      // âœ… FIX: avoid bigint-string concat
       ownerWallet.balanceCents = Number(ownerWallet.balanceCents) + payoutCents;
       ownerWallet.cashoutAvailableCents = Number(ownerWallet.cashoutAvailableCents) + payoutCents;
 
@@ -346,7 +346,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient funds');
       }
 
-      // ✅ FIX: avoid bigint-string concat/implicit types
+      // âœ… FIX: avoid bigint-string concat/implicit types
       senderWallet.balanceCents = Number(senderWallet.balanceCents) - amountCents;
       senderWallet.spendableBalanceCents = Number(senderWallet.spendableBalanceCents) - amountCents;
       senderWallet = await walletRepo.save(senderWallet);
@@ -370,7 +370,7 @@ export class WalletService {
         });
       }
 
-      // ✅ FIX: avoid bigint-string concat
+      // âœ… FIX: avoid bigint-string concat
       receiverWallet.balanceCents = Number(receiverWallet.balanceCents) + amountCents;
       receiverWallet.spendableBalanceCents = Number(receiverWallet.spendableBalanceCents) + amountCents;
       receiverWallet = await walletRepo.save(receiverWallet);
@@ -407,7 +407,7 @@ export class WalletService {
       throw new BadRequestException('Insufficient cashout balance');
     }
 
-    // ✅ FIX: avoid bigint-string concat/implicit types
+    // âœ… FIX: avoid bigint-string concat/implicit types
     wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amountCents;
     wallet.spendableBalanceCents = Number(wallet.spendableBalanceCents) + amountCents;
 
@@ -449,7 +449,7 @@ export class WalletService {
       const wallet = await walletRepo.findOne({ where: { userId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
-      // ✅ HARD GATE: only 1 PENDING cashout allowed per wallet
+      // âœ… HARD GATE: only 1 PENDING cashout allowed per wallet
       const pendingCount = await cashoutRepo.count({
         where: { wallet: { id: wallet.id }, status: 'PENDING' as any } as any,
       });
@@ -461,7 +461,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient cashout balance');
       }
 
-      // ✅ FIX: avoid bigint-string concat/implicit types
+      // âœ… FIX: avoid bigint-string concat/implicit types
       // ADMIN_HQ_PHASE_02H_R10_CASHOUT_BALANCE_INVARIANT
       // Cashout request moves value out of wallet balance into pending external payout.
       // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
@@ -537,7 +537,7 @@ export class WalletService {
   }
 
   // ==================================================
-  // M6: Cashouts — canonical listing (status filter + normalized output)
+  // M6: Cashouts â€” canonical listing (status filter + normalized output)
   // ==================================================
   private normalizeCashoutStatus(input?: string | null): CashoutStatusCanonical | 'ALL' {
     const v = String(input || '').trim().toLowerCase();
@@ -548,7 +548,7 @@ export class WalletService {
     return 'ALL';
   }
 
-  // ✅ HARDEN: prevent RangeError ("Invalid time value") from legacy/invalid createdAt values
+  // âœ… HARDEN: prevent RangeError ("Invalid time value") from legacy/invalid createdAt values
   private safeIsoDate(value: any): string {
     try {
       if (!value) return new Date().toISOString();
@@ -606,7 +606,7 @@ export class WalletService {
 
     let wallet = await this.getOrCreateWallet(userId);
 
-    // ✅ FIX: avoid bigint-string concat
+    // âœ… FIX: avoid bigint-string concat
     wallet.balanceCents = Number(wallet.balanceCents) + amountCents;
     wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amountCents;
 
@@ -629,24 +629,63 @@ export class WalletService {
   // ADMIN: Complete / Fail
   // ==================================================
   async adminCompleteCashout(cashoutId: number): Promise<CashoutRequest> {
-    const cashout = await this.cashoutRepo.findOne({
-      where: { id: cashoutId },
-      relations: ['wallet'],
+    // ADMIN_HQ_PHASE_02Q_R1_SAFE_COMPLETE_CASHOUT_GUARD
+    // Complete is a manual/dev settlement marker only until provider payout settlement is integrated/proven.
+    // Safety rules:
+    // - COMPLETED is idempotent.
+    // - FAILED can never become COMPLETED.
+    // - Only PENDING can transition to COMPLETED.
+    // - Atomic PENDING -> COMPLETED update prevents double-complete races.
+    const saved = await this.dataSource.transaction(async (manager) => {
+      const cashoutRepo = manager.getRepository(CashoutRequest);
+
+      const existing = await cashoutRepo.findOne({ where: { id: cashoutId } });
+      if (!existing) throw new NotFoundException('Cashout not found');
+
+      if (existing.status === 'COMPLETED') {
+        return existing;
+      }
+
+      if (existing.status === 'FAILED') {
+        throw new BadRequestException('Cannot complete a failed cashout');
+      }
+
+      if (existing.status !== 'PENDING') {
+        throw new BadRequestException('Only pending cashouts can be completed');
+      }
+
+      const res = await cashoutRepo.update(
+        { id: cashoutId, status: 'PENDING' as any },
+        { status: 'COMPLETED' as any, failureReason: null },
+      );
+
+      if (!res.affected) {
+        const fresh = await cashoutRepo.findOne({ where: { id: cashoutId } });
+        if (!fresh) throw new NotFoundException('Cashout not found');
+
+        if (fresh.status === 'COMPLETED') {
+          return fresh;
+        }
+
+        if (fresh.status === 'FAILED') {
+          throw new BadRequestException('Cannot complete a failed cashout');
+        }
+
+        throw new BadRequestException('Only pending cashouts can be completed');
+      }
+
+      const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
+      if (!updated) throw new NotFoundException('Cashout not found');
+
+      return updated;
     });
 
-    if (!cashout) throw new NotFoundException('Cashout not found');
-    if (cashout.status === 'COMPLETED') return cashout;
-
-    cashout.status = 'COMPLETED';
-    cashout.failureReason = null;
-
-    const saved = await this.cashoutRepo.save(cashout);
     this.websocketGateway.emitCashoutUpdated(saved);
 
     return saved;
   }
 
-  // ✅ UPDATED (PATCH): explicit QueryRunner txn to eliminate TransactionNotStartedError under concurrency (SQLite)
+  // âœ… UPDATED (PATCH): explicit QueryRunner txn to eliminate TransactionNotStartedError under concurrency (SQLite)
   async adminFailCashout(cashoutId: number, failureReason: string): Promise<CashoutRequest> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -707,7 +746,7 @@ export class WalletService {
 
       const amount = Number(cashout.amountCents);
 
-      // ✅ FIX: avoid bigint-string concat
+      // âœ… FIX: avoid bigint-string concat
       // ADMIN_HQ_PHASE_02H_R10_CASHOUT_FAIL_REFUND_INVARIANT
       // Admin fail refunds the pending cashout value back into wallet balance and cashout-available value.
       // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
@@ -715,7 +754,7 @@ export class WalletService {
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
-      // ✅ Ledger refund entry
+      // âœ… Ledger refund entry
       await txRepo.save(
         txRepo.create({
           walletId: wallet.id,
@@ -806,7 +845,7 @@ export class WalletService {
       const wallet = await walletRepo.findOne({ where: { id: cashout.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
-      // ✅ FIX: avoid bigint-string concat
+      // âœ… FIX: avoid bigint-string concat
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
@@ -838,7 +877,7 @@ export class WalletService {
   }
 
   // ==================================================
-  // OWNER: Cancel own cashout (PENDING → FAILED + refund)
+  // OWNER: Cancel own cashout (PENDING â†’ FAILED + refund)
   // ==================================================
   async cancelCashout(userId: number, cashoutId: number): Promise<CashoutRequest> {
     const savedCashout = await this.dataSource.transaction(async (manager) => {
@@ -870,7 +909,7 @@ export class WalletService {
 
       const amount = Number(cashout.amountCents);
 
-      // ✅ FIX: avoid bigint-string concat
+      // âœ… FIX: avoid bigint-string concat
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
@@ -942,7 +981,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient cashout balance');
       }
 
-      // ✅ FIX: avoid bigint-string concat/implicit types
+      // âœ… FIX: avoid bigint-string concat/implicit types
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
@@ -1098,3 +1137,4 @@ export class WalletService {
     });
   }
 }
+
