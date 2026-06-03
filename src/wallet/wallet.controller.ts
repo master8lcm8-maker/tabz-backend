@@ -1,4 +1,4 @@
-﻿// src/wallet/wallet.controller.ts
+// src/wallet/wallet.controller.ts
 import {
   BadRequestException,
   Body,
@@ -286,6 +286,46 @@ export class WalletController {
     }
   }
 
+
+  // ADMIN_HQ_PHASE_02Q_R2B_R10_R7_CASHOUT_PREFLIGHT_DIAGNOSTIC
+  // Read-only diagnostic: proves the pre-cashout gate inputs without creating a cashout.
+  @Get('cashout/preflight')
+  async cashoutPreflight(@Req() req) {
+    this.assertWalletRole(req);
+    const userId = this.getUserId(req);
+    const role = String(req?.user?.role ?? '').toLowerCase();
+
+    const identity: any = await this.identityService.getStatus(userId);
+    const bank = await this.bankInfoService.getForUser(userId);
+    const summary = await this.walletService.getSummary(userId);
+    const cashouts = await this.walletService.listCashoutsCanonical(userId, null);
+
+    const pendingForOwner = Array.isArray(cashouts?.items)
+      ? cashouts.items.filter((item: any) => item?.status === 'PENDING')
+      : [];
+
+    return {
+      ok: true,
+      scope: 'ADMIN_HQ_PHASE_02Q_R2B_R10_R7_CASHOUT_PREFLIGHT_DIAGNOSTIC',
+      userId,
+      role,
+      roleIsOwner: role === 'owner',
+      identityStatus: identity?.status ?? null,
+      identityVerified: identity?.status === 'verified',
+      bankFound: !!bank,
+      bankLast4: bank?.accountLast4 ?? null,
+      walletId: summary?.id ?? null,
+      cashoutAvailableCents: Number(summary?.cashoutAvailableCents ?? 0),
+      pendingOwnerCashoutIds: pendingForOwner.map((item: any) => item.id),
+      pendingOwnerCashoutCount: pendingForOwner.length,
+      canReachMinimumGate:
+        role === 'owner' &&
+        identity?.status === 'verified' &&
+        !!bank &&
+        Number(summary?.cashoutAvailableCents ?? 0) >= 500 &&
+        pendingForOwner.length === 0,
+    };
+  }
   // --------------------------------------------------
   // M6: UNIFIED CASHOUT HISTORY (canonical)
   // --------------------------------------------------
