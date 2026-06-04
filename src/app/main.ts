@@ -1,4 +1,4 @@
-﻿import { join } from 'path';
+import { join } from 'path';
 // src/app/main.ts
 
 //  FIX: ensure globalThis.crypto exists (needed by @nestjs/schedule on some Node runtimes)
@@ -13,7 +13,7 @@ import { AppModule } from './app.module';
 const express = require('express');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.useGlobalFilters(new HttpStatusBodySyncFilter());
   app.getHttpAdapter().getInstance().set('etag', false);
