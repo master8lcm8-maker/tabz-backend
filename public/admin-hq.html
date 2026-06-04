@@ -1336,7 +1336,26 @@
       </section>
 
       
-  <!-- ADMIN_HQ_MONEY_SYSTEM_10AG_PROVIDER_EVENT_VISIBLE_PANEL -->
+  
+  <!-- ADMIN_HQ_MONEY_SYSTEM_10AP_PROVIDER_LIFECYCLE_RECON_PANEL -->
+  <section class="panel admin-provider-lifecycle-recon-panel" id="adminProviderLifecycleReconPanel">
+    <h2>Provider Lifecycle Reconciliation <span class="legacy-disabled-pill">Read-only truth</span></h2>
+    <div class="provider-proof-lock">
+      <b>Bridge truth:</b> Provider events must connect to real TABZ orders, wallet/reservation state, ledger records, and venue/provider payout state. Missing rows stay RED/YELLOW; TABZ must not fake wallet or ledger movement.
+    </div>
+    <div class="ops-mini-grid">
+      <div><span>Real order link</span><b id="providerLifecycleOrderState">--</b></div>
+      <div><span>Provider event link</span><b id="providerLifecycleEventState">--</b></div>
+      <div><span>Wallet/reservation</span><b id="providerLifecycleWalletState">--</b></div>
+      <div><span>Ledger / venue txn</span><b id="providerLifecycleLedgerState">--</b></div>
+    </div>
+    <div class="ops-table" id="providerLifecycleReconRows">
+      <div class="ops-head"><span>Provider Event</span><span>Order</span><span>Wallet / Reservation</span><span>Ledger / Venue Txn</span></div>
+      <div class="ops-row"><span>Waiting for Admin API...</span><span>--</span><span>--</span><span>--</span></div>
+    </div>
+  </section>
+
+<!-- ADMIN_HQ_MONEY_SYSTEM_10AG_PROVIDER_EVENT_VISIBLE_PANEL -->
   <section class="panel admin-provider-events-panel" id="adminProviderEventsPanel">
     <h2>Provider Events / Stripe Webhooks <span class="legacy-disabled-pill">Provider-backed</span></h2>
     <div class="provider-proof-lock">
@@ -4185,6 +4204,167 @@ function openCommandModal(title, body){
       window.loadProviderEvents10AG=loadProviderEvents10AG;
       setTimeout(loadProviderEvents10AG, 1000);
       setInterval(loadProviderEvents10AG, 15000);
+    })();
+  </script>
+
+
+  <!-- ADMIN_HQ_MONEY_SYSTEM_10AP_PROVIDER_LIFECYCLE_RECON_SCRIPT -->
+  <script id="admin-hq-money-system-10ap-provider-lifecycle-recon-script">
+    (function(){
+      var TARGET_EVENT_ID='evt_tabz_10AN_real_drink_order_16_20260604_164042';
+      var TARGET_ORDER_ID='16';
+
+      function esc(v){
+        return String(v === undefined || v === null || v === '' ? '--' : v)
+          .replace(/[&<>"']/g,function(c){
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+          });
+      }
+
+      function token(){
+        try{
+          return localStorage.getItem('tabz_admin_token') ||
+                 localStorage.getItem('adminToken') ||
+                 localStorage.getItem('access_token') ||
+                 sessionStorage.getItem('tabz_admin_token') ||
+                 sessionStorage.getItem('adminToken') ||
+                 sessionStorage.getItem('access_token') ||
+                 '';
+        }catch(e){ return ''; }
+      }
+
+      function statusText(ok, good, missing){
+        if(ok) return good;
+        return missing;
+      }
+
+      async function loadProviderLifecycleRecon10AP(){
+        var box=document.getElementById('providerLifecycleReconRows');
+        var orderState=document.getElementById('providerLifecycleOrderState');
+        var eventState=document.getElementById('providerLifecycleEventState');
+        var walletState=document.getElementById('providerLifecycleWalletState');
+        var ledgerState=document.getElementById('providerLifecycleLedgerState');
+
+        if(!box) return;
+
+        var headers={};
+        var jwt=token();
+        if(jwt){ headers.Authorization='Bearer '+jwt; }
+
+        try{
+          var eventsRes=await fetch('/admin/stripe-events?limit=20&source=admin-hq-10ap',{headers:headers});
+          var opsRes=await fetch('/admin-hq/operations?source=admin-hq-10ap',{headers:headers});
+
+          var events=await eventsRes.json();
+          var ops=await opsRes.json();
+
+          if(!eventsRes.ok || !opsRes.ok){
+            box.innerHTML='<div class="ops-head"><span>Provider Event</span><span>Order</span><span>Wallet / Reservation</span><span>Ledger / Venue Txn</span></div>' +
+              '<div class="ops-row"><span>Admin auth required</span><span>'+esc(eventsRes.status+'/'+opsRes.status)+'</span><span>Login required</span><span>Refresh after login</span></div>';
+            if(orderState) orderState.textContent='Auth required';
+            if(eventState) eventState.textContent='Auth required';
+            if(walletState) walletState.textContent='Unknown';
+            if(ledgerState) ledgerState.textContent='Unknown';
+            return;
+          }
+
+          var recentEvents=Array.isArray(events.recent)?events.recent:[];
+          var event=recentEvents.find(function(e){
+            return String(e.stripeEventId||'')===TARGET_EVENT_ID || String(e.sourceId||'')===TARGET_ORDER_ID;
+          }) || recentEvents[0];
+
+          var sections=Array.isArray(ops.sections)?ops.sections:[];
+          var drinkSection=sections.find(function(s){ return s.key==='drink_orders' || s.table==='drink_orders'; });
+          var ledgerSection=sections.find(function(s){ return s.table==='credits_ledger_entry' || s.key==='credits_ledger_entry'; });
+          var venueTxnSection=sections.find(function(s){ return s.table==='venue_wallet_transactions' || s.key==='venue_wallet_transactions'; });
+
+          var drinkRows=drinkSection && Array.isArray(drinkSection.recent)?drinkSection.recent:[];
+          var order=drinkRows.find(function(o){ return String(o.id)===TARGET_ORDER_ID; });
+
+          var ledgerRows=ledgerSection && Array.isArray(ledgerSection.recent)?ledgerSection.recent:[];
+          var venueTxnRows=venueTxnSection && Array.isArray(venueTxnSection.recent)?venueTxnSection.recent:[];
+
+          // ADMIN_HQ_MONEY_SYSTEM_10AR_FALSE_POSITIVE_MATCHER_FIX
+          function exactLedgerLifecycleHit(r){
+            if(!r) return false;
+
+            var refType=String(r.refType || r.ref_type || '').toLowerCase();
+            var refId=String(r.refId || r.ref_id || '');
+            var type=String(r.type || '').toLowerCase();
+            var metadata=String(r.metadata || '');
+
+            var exactOrderRef =
+              refId===TARGET_ORDER_ID &&
+              (
+                refType.indexOf('drink')>=0 ||
+                refType.indexOf('order')>=0 ||
+                refType.indexOf('payment')>=0 ||
+                refType.indexOf('provider')>=0 ||
+                refType.indexOf('stripe')>=0
+              );
+
+            var exactProviderRef =
+              metadata.indexOf(TARGET_EVENT_ID)>=0 ||
+              metadata.indexOf('pi_tabz_10AN_real_drink_order_16_20260604_164042')>=0;
+
+            var rejectKnownNonLifecycle =
+              refType==='phase11_test' ||
+              refType==='gift' ||
+              type.indexOf('promo')>=0 ||
+              type.indexOf('gift_credit')>=0;
+
+            return !rejectKnownNonLifecycle && (exactOrderRef || exactProviderRef);
+          }
+
+          function exactVenueTxnLifecycleHit(r){
+            if(!r) return false;
+            var txt=JSON.stringify(r);
+            var refId=String(r.refId || r.ref_id || r.orderId || r.order_id || r.sourceId || r.source_id || '');
+            var refType=String(r.refType || r.ref_type || r.sourceType || r.source_type || '').toLowerCase();
+
+            return (
+              (refId===TARGET_ORDER_ID && (refType.indexOf('drink')>=0 || refType.indexOf('order')>=0 || refType.indexOf('provider')>=0 || refType.indexOf('stripe')>=0)) ||
+              txt.indexOf(TARGET_EVENT_ID)>=0 ||
+              txt.indexOf('pi_tabz_10AN_real_drink_order_16_20260604_164042')>=0
+            );
+          }
+
+          var ledgerHit=ledgerRows.find(exactLedgerLifecycleHit);
+          var venueTxnHit=venueTxnRows.find(exactVenueTxnLifecycleHit);
+
+          var orderOk=!!order;
+          var eventOk=!!event && String(event.sourceId||'')===TARGET_ORDER_ID;
+          var walletReservationState=order && order.walletReservationId ? ('order walletReservationId='+order.walletReservationId+'; reservation row not proven') : 'missing';
+          var ledgerOk=!!ledgerHit || !!venueTxnHit;
+
+          if(orderState) orderState.textContent=statusText(orderOk,'ORDER_LINKED','MISSING_ORDER');
+          if(eventState) eventState.textContent=statusText(eventOk,'EVENT_SOURCE_16','MISSING_EVENT_LINK');
+          if(walletState) walletState.textContent=walletReservationState;
+          if(ledgerState) ledgerState.textContent=statusText(ledgerOk,'DB_BACKED_LINK','MISSING_LEDGER_OR_VENUE_TXN');
+
+          box.innerHTML='<div class="ops-head"><span>Provider Event</span><span>Order</span><span>Wallet / Reservation</span><span>Ledger / Venue Txn</span></div>' +
+            '<div class="ops-row provider-lifecycle-recon-row" data-provider-event-id="'+esc(event && event.stripeEventId)+'" data-order-id="'+esc(TARGET_ORDER_ID)+'">' +
+              '<span>'+esc(event ? event.stripeEventId : 'missing provider event')+'</span>' +
+              '<span>'+esc(order ? ('drink_order '+order.id+' '+order.status+' '+(order.drinkName||'')) : 'missing order')+'</span>' +
+              '<span>'+esc(walletReservationState)+'</span>' +
+              '<span>'+esc(ledgerOk ? 'DB-backed ledger/venue txn link' : 'MISSING: credits_ledger_entry / venue_wallet_transactions provider bridge')+'</span>' +
+            '</div>';
+
+        }catch(e){
+          box.innerHTML='<div class="ops-head"><span>Provider Event</span><span>Order</span><span>Wallet / Reservation</span><span>Ledger / Venue Txn</span></div>' +
+            '<div class="ops-row"><span>10AP recon failed</span><span>'+esc(e.message)+'</span><span>YELLOW</span><span>Inspect API</span></div>';
+        }
+      }
+
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', loadProviderLifecycleRecon10AP);
+      } else {
+        loadProviderLifecycleRecon10AP();
+      }
+
+      window.loadProviderLifecycleRecon10AP=loadProviderLifecycleRecon10AP;
+      setTimeout(loadProviderLifecycleRecon10AP, 1000);
+      setInterval(loadProviderLifecycleRecon10AP, 15000);
     })();
   </script>
 
