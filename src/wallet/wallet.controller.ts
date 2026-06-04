@@ -58,6 +58,17 @@ export class WalletController {
     }
   }
 
+  private providerProofRequiredForAdminCashoutAction(action: string) {
+    throw new ForbiddenException({
+      code: 'provider_proof_required',
+      status: 'legacy_admin_cashout_action_disabled',
+      action,
+      reason:
+        'Admin cashout mutation is disabled until Stripe/provider transfer proof, idempotency, ledger accounting, refund/dispute/reversal reconciliation, and Admin HQ provider-backed controls are GREEN.',
+      safeAlternative: 'Use GET /wallet/admin/cashouts and GET /admin/payouts for read-only provider/accounting visibility.',
+    });
+  }
+
   @Get('admin/cashouts')
   async adminListCashouts(@Req() req: any, @Query('status') status?: string) {
     this.assertAdmin(req);
@@ -101,7 +112,7 @@ export class WalletController {
       throw new BadRequestException('Invalid cashout id');
     }
 
-    return this.walletService.adminCompleteCashout(cashoutId);
+    return this.providerProofRequiredForAdminCashoutAction('complete');
   }
 
   @Post('admin/cashouts/:id/fail')
@@ -117,10 +128,7 @@ export class WalletController {
       throw new BadRequestException('Invalid cashout id');
     }
 
-    return this.walletService.adminFailCashout(
-      cashoutId,
-      body?.failureReason ?? 'Cashout failed by admin',
-    );
+    return this.providerProofRequiredForAdminCashoutAction('fail');
   }
 
   @Post('admin/cashouts/:id/repair-refund')
@@ -132,7 +140,7 @@ export class WalletController {
       throw new BadRequestException('Invalid cashout id');
     }
 
-    return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+    return this.providerProofRequiredForAdminCashoutAction('repair-refund');
   }
 
   // --------------------------------------------------
@@ -361,7 +369,7 @@ export class WalletController {
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-    return this.walletService.adminCompleteCashout(cashoutId);
+    return this.providerProofRequiredForAdminCashoutAction('complete');
   }
 
   @Post('cashouts/:id/fail')
@@ -388,7 +396,7 @@ export class WalletController {
     if (!Number.isFinite(cashoutId) || cashoutId <= 0) {
       throw new BadRequestException('Invalid cashout id');
     }
-    return this.walletService.adminRepairFailedCashoutRefund(cashoutId);
+    return this.providerProofRequiredForAdminCashoutAction('repair-refund');
   }
 
   @Post('cashouts/:id/cancel')
@@ -475,4 +483,5 @@ export class WalletController {
     return this.walletService.listCashoutsCanonical(userId, 'completed');
   }
 }
+
 
