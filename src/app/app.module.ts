@@ -1,4 +1,4 @@
-﻿// src/app/app.module.ts
+// src/app/app.module.ts
 import { Module } from '@nestjs/common';
 
 import { AccountDeletionModule } from '../modules/account-deletion/account-deletion.module';
@@ -35,9 +35,10 @@ import { StaffConvenienceController } from '../modules/staff/staff-convenience.c
 import { OwnerConvenienceController } from '../owner/owner-convenience.controller';
 import { AdminConvenienceController } from '../modules/admin-hq/admin-convenience.controller';
 import { AdminHqConvenienceController } from '../modules/admin-hq/admin-hq-convenience.controller';
+import { ProviderEventReadModelService } from '../modules/admin-hq/provider-event-read-model.service';
 
 @Module({
-  providers: [AppService],
+  providers: [AppService, ProviderEventReadModelService],
   controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController, AdminConvenienceController, AdminHqConvenienceController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
