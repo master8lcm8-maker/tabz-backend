@@ -1,4 +1,4 @@
-﻿import {
+import {
   BadRequestException,
   Body,
   Controller,
@@ -110,6 +110,15 @@ export class AdminHqOperationsController {
       }),
     ]);
 
+    // ADMIN_HQ_MONEY_SYSTEM_10AP_PROVIDER_EVENTS_BRIDGE
+    // Provider-backed/no-custody operations bridge: expose the same real stripe_events
+    // feed used by /admin/stripe-events so Admin HQ operations is not static-only.
+    const providerEvents = await this.section({
+      key: 'stripe_events',
+      label: 'Stripe/payment events',
+      table: 'stripe_events',
+      statusColumn: 'eventType',
+    });
     return {
       ok: true,
       scope: 'phase26_admin_hq_operations_visibility',
@@ -134,7 +143,8 @@ export class AdminHqOperationsController {
         finalResolution: 'derived from visible status/type fields until dedicated final-resolution table exists',
         disputesRefundsExpirations: 'surfaced where existing status/type fields contain those states',
       },
-      sections,
+      providerEvents,
+      sections: [...sections, providerEvents],
     };
   }
 
