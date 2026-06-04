@@ -1,4 +1,4 @@
-﻿// src/wallet/wallet.service.ts
+// src/wallet/wallet.service.ts
 import {
   Injectable,
   BadRequestException,
@@ -6,19 +6,22 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, DeepPartial } from 'typeorm';
+import Stripe from 'stripe';
 
 import { Wallet } from './wallet.entity';
 import { CashoutRequest, CashoutStatus } from './cashout-request.entity';
 import { WalletTransaction } from './wallet-transaction.entity';
 import { BankInfoService } from './bank-info.service';
+import { PayoutAllocationService } from './payout-allocation.service';
 import { WebsocketGateway } from '../modules/websocket/websocket.gateway';
+import { OwnerBankInfo } from '../owner/owner-bank-info.entity';
 
 export type WalletSummary = {
   id: number;
   userId: number;
   balanceCents: number;
 
-  // ðŸ”’ M35: spendable is what remains after cashoutAvailable is reserved.
+  // Ã°Å¸â€â€™ M35: spendable is what remains after cashoutAvailable is reserved.
   // The invariant we lock/prove at the API boundary:
   //    balance = spendable + cashoutAvailable
   spendableBalanceCents: number;
@@ -28,7 +31,7 @@ export type WalletSummary = {
   // Informational only: derived from PENDING cashouts (does NOT participate in invariant)
   pendingHeldCents: number;
 
-  // âœ… M35 lock: server-side invariant assertion (balance = spendable + cashoutAvailable AND spendable non-negative)
+  // Ã¢Å“â€¦ M35 lock: server-side invariant assertion (balance = spendable + cashoutAvailable AND spendable non-negative)
   ok: boolean;
 
   createdAt: Date;
@@ -47,7 +50,7 @@ export type CashoutDto = {
   failureReason: string | null;
   destinationLast4: string | null;
   createdAt: string;
-  retryOfCashoutId: number | null; // âœ… ADDED
+  retryOfCashoutId: number | null; // Ã¢Å“â€¦ ADDED
 };
 
 export type CashoutListResponse = {
@@ -67,10 +70,25 @@ export class WalletService {
     @InjectRepository(WalletTransaction)
     private readonly txRepo: Repository<WalletTransaction>,
 
+    @InjectRepository(OwnerBankInfo)
+    private readonly ownerBankInfoRepo: Repository<OwnerBankInfo>,
+
     private readonly dataSource: DataSource,
     private readonly bankInfoService: BankInfoService,
     private readonly websocketGateway: WebsocketGateway,
+    private readonly payoutAllocationService: PayoutAllocationService,
   ) {}
+
+  private getStripeClient(): Stripe {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      throw new BadRequestException('stripe_secret_key_missing');
+    }
+
+    return new Stripe(secretKey, {
+      apiVersion: '2025-12-15.clover',
+    });
+  }
 
   // ==================================================
   // INTERNAL
@@ -111,7 +129,7 @@ export class WalletService {
     const wallet = await this.getOrCreateWallet(userId);
 
     // Informational: pending-held is the sum of PENDING cashouts (does NOT participate in invariant)
-    // âœ… FIX: do NOT reference raw FK column name; join relation so TypeORM resolves correct physical column (walletid vs "walletId")
+    // Ã¢Å“â€¦ FIX: do NOT reference raw FK column name; join relation so TypeORM resolves correct physical column (walletid vs "walletId")
     const raw = await this.cashoutRepo
       .createQueryBuilder('c')
       .innerJoin('c.wallet', 'w')
@@ -125,7 +143,7 @@ export class WalletService {
     const balanceCents = Number(wallet.balanceCents);
     const cashoutAvailableCents = Number(wallet.cashoutAvailableCents);
 
-    // ðŸ”’ M35 invariant (locked): balance = spendable + cashoutAvailable
+    // Ã°Å¸â€â€™ M35 invariant (locked): balance = spendable + cashoutAvailable
     // Spendable is derived as the remainder after reserving cashoutAvailable.
     // NOTE: We do NOT trust stored wallet.spendableBalanceCents here because it can drift
     // if not updated in every flow. The API boundary must remain conserved.
@@ -244,7 +262,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient funds');
       }
 
-      // âœ… FIX: avoid bigint-string concat/implicit types
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat/implicit types
       buyerWallet.balanceCents = Number(buyerWallet.balanceCents) - amountCents;
       buyerWallet.spendableBalanceCents = Number(buyerWallet.spendableBalanceCents) - amountCents;
       buyerWallet = await walletRepo.save(buyerWallet);
@@ -278,7 +296,7 @@ export class WalletService {
         });
       }
 
-      // âœ… FIX: avoid bigint-string concat
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat
       ownerWallet.balanceCents = Number(ownerWallet.balanceCents) + payoutCents;
       ownerWallet.cashoutAvailableCents = Number(ownerWallet.cashoutAvailableCents) + payoutCents;
 
@@ -346,7 +364,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient funds');
       }
 
-      // âœ… FIX: avoid bigint-string concat/implicit types
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat/implicit types
       senderWallet.balanceCents = Number(senderWallet.balanceCents) - amountCents;
       senderWallet.spendableBalanceCents = Number(senderWallet.spendableBalanceCents) - amountCents;
       senderWallet = await walletRepo.save(senderWallet);
@@ -370,7 +388,7 @@ export class WalletService {
         });
       }
 
-      // âœ… FIX: avoid bigint-string concat
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat
       receiverWallet.balanceCents = Number(receiverWallet.balanceCents) + amountCents;
       receiverWallet.spendableBalanceCents = Number(receiverWallet.spendableBalanceCents) + amountCents;
       receiverWallet = await walletRepo.save(receiverWallet);
@@ -407,7 +425,7 @@ export class WalletService {
       throw new BadRequestException('Insufficient cashout balance');
     }
 
-    // âœ… FIX: avoid bigint-string concat/implicit types
+    // Ã¢Å“â€¦ FIX: avoid bigint-string concat/implicit types
     wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amountCents;
     wallet.spendableBalanceCents = Number(wallet.spendableBalanceCents) + amountCents;
 
@@ -449,7 +467,7 @@ export class WalletService {
       const wallet = await walletRepo.findOne({ where: { userId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
-      // âœ… HARD GATE: only 1 PENDING cashout allowed per wallet
+      // Ã¢Å“â€¦ HARD GATE: only 1 PENDING cashout allowed per wallet
       const pendingCount = await cashoutRepo.count({
         where: { wallet: { id: wallet.id }, status: 'PENDING' as any } as any,
       });
@@ -461,7 +479,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient cashout balance');
       }
 
-      // âœ… FIX: avoid bigint-string concat/implicit types
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat/implicit types
       // ADMIN_HQ_PHASE_02H_R10_CASHOUT_BALANCE_INVARIANT
       // Cashout request moves value out of wallet balance into pending external payout.
       // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
@@ -537,7 +555,7 @@ export class WalletService {
   }
 
   // ==================================================
-  // M6: Cashouts â€” canonical listing (status filter + normalized output)
+  // M6: Cashouts Ã¢â‚¬â€ canonical listing (status filter + normalized output)
   // ==================================================
   private normalizeCashoutStatus(input?: string | null): CashoutStatusCanonical | 'ALL' {
     const v = String(input || '').trim().toLowerCase();
@@ -548,7 +566,7 @@ export class WalletService {
     return 'ALL';
   }
 
-  // âœ… HARDEN: prevent RangeError ("Invalid time value") from legacy/invalid createdAt values
+  // Ã¢Å“â€¦ HARDEN: prevent RangeError ("Invalid time value") from legacy/invalid createdAt values
   private safeIsoDate(value: any): string {
     try {
       if (!value) return new Date().toISOString();
@@ -606,7 +624,7 @@ export class WalletService {
 
     let wallet = await this.getOrCreateWallet(userId);
 
-    // âœ… FIX: avoid bigint-string concat
+    // Ã¢Å“â€¦ FIX: avoid bigint-string concat
     wallet.balanceCents = Number(wallet.balanceCents) + amountCents;
     wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amountCents;
 
@@ -629,63 +647,182 @@ export class WalletService {
   // ADMIN: Complete / Fail
   // ==================================================
   async adminCompleteCashout(cashoutId: number): Promise<CashoutRequest> {
-    // ADMIN_HQ_PHASE_02Q_R1_SAFE_COMPLETE_CASHOUT_GUARD
-    // Complete is a manual/dev settlement marker only until provider payout settlement is integrated/proven.
-    // Safety rules:
-    // - COMPLETED is idempotent.
-    // - FAILED can never become COMPLETED.
-    // - Only PENDING can transition to COMPLETED.
-    // - Atomic PENDING -> COMPLETED update prevents double-complete races.
+    // ADMIN_HQ_MONEY_SYSTEM_PATCH_10D_REAL_STRIPE_PROVIDER_RAIL
+    // This is not TABZ-held-money settlement.
+    // Stripe/provider moves funds. TABZ records provider IDs, payout amount, fee context, and ledger state.
+    const cashout = await this.cashoutRepo.findOne({
+      where: { id: cashoutId },
+      relations: ['wallet'],
+    });
+
+    if (!cashout) {
+      throw new NotFoundException('Cashout not found');
+    }
+
+    if (cashout.status === 'COMPLETED') {
+      return cashout;
+    }
+
+    if (cashout.status === 'FAILED') {
+      throw new BadRequestException('Cannot complete a failed cashout');
+    }
+
+    if (cashout.status !== 'PENDING') {
+      throw new BadRequestException('Only pending cashouts can be completed');
+    }
+
+    if (!cashout.wallet) {
+      throw new BadRequestException('Cashout wallet relation missing');
+    }
+
+    const ownerBank = await this.ownerBankInfoRepo.findOne({
+      where: { userId: cashout.wallet.userId },
+    });
+
+    if (!ownerBank?.stripeAccountId) {
+      throw new BadRequestException('owner_stripe_account_missing');
+    }
+
+    const stripe = this.getStripeClient();
+    const account = await stripe.accounts.retrieve(ownerBank.stripeAccountId);
+
+    await this.ownerBankInfoRepo.update(
+      { userId: cashout.wallet.userId },
+      {
+        stripePayoutsEnabled: Boolean(account.payouts_enabled),
+        stripeChargesEnabled: Boolean(account.charges_enabled),
+        stripeDetailsSubmitted: Boolean(account.details_submitted),
+      },
+    );
+
+    if (!account.payouts_enabled) {
+      throw new BadRequestException('owner_stripe_payouts_not_enabled');
+    }
+
+    const grossAmountCents = Number(cashout.amountCents);
+    const payoutCentsRaw = Number((cashout as any).payoutCents ?? cashout.amountCents);
+    const feeCentsRaw = Number((cashout as any).feeCents ?? 0);
+
+    if (!Number.isFinite(grossAmountCents) || grossAmountCents <= 0) {
+      throw new BadRequestException('Invalid gross cashout amount');
+    }
+
+    if (!Number.isFinite(payoutCentsRaw) || payoutCentsRaw <= 0) {
+      throw new BadRequestException('Invalid provider payout amount');
+    }
+
+    const allocation =
+      await this.payoutAllocationService.resolveSingleSourceForCashout(
+        cashout.id,
+      );
+
+    const paymentIntentId = allocation.paymentIntentId;
+    const sourceTransactionId = allocation.stripeChargeId;
+
     const saved = await this.dataSource.transaction(async (manager) => {
       const cashoutRepo = manager.getRepository(CashoutRequest);
+      const txRepo = manager.getRepository(WalletTransaction);
+      const fresh = await cashoutRepo.findOne({
+        where: { id: cashoutId },
+        relations: ['wallet'],
+      });
 
-      const existing = await cashoutRepo.findOne({ where: { id: cashoutId } });
-      if (!existing) throw new NotFoundException('Cashout not found');
-
-      if (existing.status === 'COMPLETED') {
-        return existing;
+      if (!fresh) {
+        throw new NotFoundException('Cashout not found');
       }
 
-      if (existing.status === 'FAILED') {
+      if (fresh.status === 'COMPLETED') {
+        return fresh;
+      }
+
+      if (fresh.status === 'FAILED') {
         throw new BadRequestException('Cannot complete a failed cashout');
       }
 
-      if (existing.status !== 'PENDING') {
+      if (fresh.status !== 'PENDING') {
         throw new BadRequestException('Only pending cashouts can be completed');
       }
 
-      const res = await cashoutRepo.update(
-        { id: cashoutId, status: 'PENDING' as any },
-        { status: 'COMPLETED' as any, failureReason: null },
+      if (!fresh.wallet) {
+        throw new BadRequestException('Cashout wallet relation missing');
+      }
+
+      const gross = Number(fresh.amountCents);
+      const payoutCents = Number((fresh as any).payoutCents ?? payoutCentsRaw);
+      const feeCents = Number((fresh as any).feeCents ?? feeCentsRaw);
+
+      if (!Number.isFinite(payoutCents) || payoutCents <= 0) {
+        throw new BadRequestException('Invalid provider payout amount');
+      }
+
+      const idempotencyKey = `cashout_provider_transfer_${fresh.id}_${sourceTransactionId}_${payoutCents}`;
+
+      const transfer = await stripe.transfers.create(
+        {
+          amount: payoutCents,
+          currency: 'usd',
+          destination: ownerBank.stripeAccountId,
+          source_transaction: sourceTransactionId,
+          metadata: {
+            cashoutId: String(fresh.id),
+            walletId: String((fresh as any).walletId ?? ''),
+            userId: String(fresh.wallet.userId),
+            purpose: 'admin_hq_real_money_provider_transfer',
+            paymentIntentId,
+            sourceTransactionId,
+            grossAmountCents: String(gross),
+            tabzFeeCents: String(Number.isFinite(feeCents) ? feeCents : 0),
+            providerPayoutCents: String(payoutCents),
+            noCustody: 'true',
+          },
+        },
+        {
+          idempotencyKey,
+        },
       );
 
-      if (!res.affected) {
-        const fresh = await cashoutRepo.findOne({ where: { id: cashoutId } });
-        if (!fresh) throw new NotFoundException('Cashout not found');
+      fresh.status = 'COMPLETED' as CashoutStatus;
+      fresh.failureReason = null;
+      (fresh as any).idempotencyKey = idempotencyKey;
+      (fresh as any).stripeTransferId = transfer.id;
+      (fresh as any).stripeAccountId = ownerBank.stripeAccountId;
+      (fresh as any).providerStatus = transfer.object;
+      (fresh as any).processedAt = new Date();
+      (fresh as any).settledAt = new Date();
 
-        if (fresh.status === 'COMPLETED') {
-          return fresh;
-        }
+      const updated = await cashoutRepo.save(fresh);
 
-        if (fresh.status === 'FAILED') {
-          throw new BadRequestException('Cannot complete a failed cashout');
-        }
+      const walletTx = txRepo.create() as any;
+      Object.assign(walletTx, {
+        walletId: Number((updated as any).walletId),
+        type: 'cashout_settled',
+        amountCents: payoutCents,
+        depositRef: transfer.id,
+        metadata: {
+          cashoutId: updated.id,
+          stripeTransferId: transfer.id,
+          stripeAccountId: ownerBank.stripeAccountId,
+          paymentIntentId,
+          sourceTransactionId,
+          grossAmountCents: gross,
+          tabzFeeCents: Number.isFinite(feeCents) ? feeCents : 0,
+          providerPayoutCents: payoutCents,
+          via: 'admin_hq_real_money_provider_transfer',
+          noCustody: true,
+        },
+      });
 
-        throw new BadRequestException('Only pending cashouts can be completed');
-      }
-
-      const updated = await cashoutRepo.findOne({ where: { id: cashoutId } });
-      if (!updated) throw new NotFoundException('Cashout not found');
-
+      const savedTx = await txRepo.save(walletTx as WalletTransaction);
+      // ADMIN_HQ_MONEY_SYSTEM_PATCH_10D_R3_LEDGER_DISABLED
+      // Active source has no LedgerEntry class. Provider/audit metadata is recorded on wallet_transactions.
+      // Dedicated ledger write must be restored only when the real active ledger entity/module is present.
       return updated;
     });
 
     this.websocketGateway.emitCashoutUpdated(saved);
-
     return saved;
   }
-
-  // âœ… UPDATED (PATCH): explicit QueryRunner txn to eliminate TransactionNotStartedError under concurrency (SQLite)
+  // Ã¢Å“â€¦ UPDATED (PATCH): explicit QueryRunner txn to eliminate TransactionNotStartedError under concurrency (SQLite)
   async adminFailCashout(cashoutId: number, failureReason: string): Promise<CashoutRequest> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -746,7 +883,7 @@ export class WalletService {
 
       const amount = Number(cashout.amountCents);
 
-      // âœ… FIX: avoid bigint-string concat
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat
       // ADMIN_HQ_PHASE_02H_R10_CASHOUT_FAIL_REFUND_INVARIANT
       // Admin fail refunds the pending cashout value back into wallet balance and cashout-available value.
       // Keep DB invariant: balanceCents = spendableBalanceCents + cashoutAvailableCents.
@@ -754,7 +891,7 @@ export class WalletService {
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
-      // âœ… Ledger refund entry
+      // Ã¢Å“â€¦ Ledger refund entry
       await txRepo.save(
         txRepo.create({
           walletId: wallet.id,
@@ -845,7 +982,7 @@ export class WalletService {
       const wallet = await walletRepo.findOne({ where: { id: cashout.walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
-      // âœ… FIX: avoid bigint-string concat
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
@@ -877,7 +1014,7 @@ export class WalletService {
   }
 
   // ==================================================
-  // OWNER: Cancel own cashout (PENDING â†’ FAILED + refund)
+  // OWNER: Cancel own cashout (PENDING Ã¢â€ â€™ FAILED + refund)
   // ==================================================
   async cancelCashout(userId: number, cashoutId: number): Promise<CashoutRequest> {
     const savedCashout = await this.dataSource.transaction(async (manager) => {
@@ -909,7 +1046,7 @@ export class WalletService {
 
       const amount = Number(cashout.amountCents);
 
-      // âœ… FIX: avoid bigint-string concat
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) + amount;
       await walletRepo.save(wallet);
 
@@ -981,7 +1118,7 @@ export class WalletService {
         throw new BadRequestException('Insufficient cashout balance');
       }
 
-      // âœ… FIX: avoid bigint-string concat/implicit types
+      // Ã¢Å“â€¦ FIX: avoid bigint-string concat/implicit types
       wallet.cashoutAvailableCents = Number(wallet.cashoutAvailableCents) - amount;
       await walletRepo.save(wallet);
 
