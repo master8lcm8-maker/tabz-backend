@@ -36,10 +36,11 @@ import { OwnerConvenienceController } from '../owner/owner-convenience.controlle
 import { AdminConvenienceController } from '../modules/admin-hq/admin-convenience.controller';
 import { AdminHqConvenienceController } from '../modules/admin-hq/admin-hq-convenience.controller';
 import { ProviderEventReadModelService } from '../modules/admin-hq/provider-event-read-model.service';
+import { ProviderWebhookController } from '../modules/admin-hq/provider-webhook.controller';
 
 @Module({
   providers: [AppService, ProviderEventReadModelService],
-  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController, AdminConvenienceController, AdminHqConvenienceController],
+  controllers: [AppController, AdminHqOperationsController, AdminHqControlController, StaffConvenienceController, OwnerConvenienceController, AdminConvenienceController, AdminHqConvenienceController, ProviderWebhookController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
