@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -939,6 +939,229 @@
     .risk-trust-table .ops-row{
       grid-template-columns:.85fr .65fr 1.2fr 1.55fr;
     }
+  
+    /* ADMIN_HQ_VISUAL_02_COMMAND_CENTER_LAYOUT_LOCK
+       Purpose: force the live Admin HQ into the 2028 command-center layout.
+       Scope: CSS-only visual/operational layout repair. No backend, DB, Stripe, or money mutation.
+    */
+    html{
+      background:#000;
+    }
+
+    body{
+      overflow-x:hidden !important;
+      background:
+        radial-gradient(circle at 50% 8%,rgba(123,255,0,.18),transparent 24%),
+        radial-gradient(circle at 70% 55%,rgba(123,255,0,.08),transparent 30%),
+        linear-gradient(180deg,#000 0%,#020900 54%,#000 100%) !important;
+    }
+
+    .shell{
+      grid-template-columns:220px minmax(0,1fr) !important;
+      width:100vw !important;
+      max-width:100vw !important;
+    }
+
+    main{
+      min-width:0 !important;
+      width:100% !important;
+      max-width:none !important;
+      padding:10px 14px 18px !important;
+      overflow-x:hidden !important;
+    }
+
+    header{
+      grid-template-columns:220px minmax(320px,1fr) 220px !important;
+      min-height:58px !important;
+      padding:8px 0 10px !important;
+      gap:10px !important;
+    }
+
+    h1{
+      font-size:32px !important;
+      line-height:1 !important;
+      text-shadow:0 0 20px rgba(123,255,0,.55) !important;
+    }
+
+    .sub{
+      font-size:9px !important;
+      letter-spacing:.55em !important;
+    }
+
+    .pill,.status{
+      min-width:0 !important;
+      height:48px !important;
+      padding:8px 12px !important;
+      overflow:hidden !important;
+    }
+
+    .kpis{
+      display:grid !important;
+      grid-template-columns:repeat(8,minmax(118px,1fr)) !important;
+      gap:8px !important;
+      margin:8px 0 10px !important;
+      align-items:start !important;
+    }
+
+    .kpi{
+      height:72px !important;
+      min-height:72px !important;
+      max-height:72px !important;
+      padding:9px 11px !important;
+      overflow:hidden !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+      border-left:2px solid rgba(123,255,0,.75) !important;
+      box-shadow:inset 0 0 22px rgba(123,255,0,.08),0 0 16px rgba(123,255,0,.12) !important;
+    }
+
+    .kpi small{
+      font-size:8px !important;
+      white-space:nowrap !important;
+    }
+
+    .kpi strong{
+      font-size:18px !important;
+      line-height:1.05 !important;
+      margin:4px 0 2px !important;
+      white-space:nowrap !important;
+    }
+
+    .grid-top{
+      display:grid !important;
+      grid-template-columns:minmax(560px,2.05fr) minmax(190px,.55fr) minmax(410px,1.15fr) !important;
+      gap:10px !important;
+      align-items:stretch !important;
+      margin-top:0 !important;
+    }
+
+    .grid-bottom{
+      display:grid !important;
+      grid-template-columns:1fr 1fr 1fr !important;
+      gap:10px !important;
+      margin-top:10px !important;
+      align-items:stretch !important;
+    }
+
+    .grid-wide{
+      display:grid !important;
+      grid-template-columns:1fr 1fr 1fr !important;
+      gap:10px !important;
+      margin-top:10px !important;
+      align-items:stretch !important;
+    }
+
+    .panel{
+      min-height:unset !important;
+      height:auto !important;
+      overflow:hidden !important;
+      position:relative !important;
+      box-shadow:inset 0 0 32px rgba(123,255,0,.08),0 0 20px rgba(123,255,0,.14) !important;
+    }
+
+    .panel h2{
+      font-size:13px !important;
+      line-height:1 !important;
+      margin:0 0 9px !important;
+      letter-spacing:.24em !important;
+    }
+
+    .grid-top > .panel:first-child{
+      min-height:372px !important;
+      display:grid !important;
+      grid-template-columns:210px minmax(360px,1fr) !important;
+      grid-template-rows:auto 1fr !important;
+      gap:10px !important;
+    }
+
+    .grid-top > .panel:first-child h2{
+      grid-column:1 / -1 !important;
+    }
+
+    .map{
+      min-height:320px !important;
+      height:320px !important;
+      border-radius:14px !important;
+      background:
+        radial-gradient(ellipse at center,rgba(123,255,0,.25),rgba(5,25,3,.14) 34%,rgba(0,0,0,.94) 75%),
+        repeating-linear-gradient(0deg,rgba(123,255,0,.055) 0 1px,transparent 1px 18px),
+        repeating-linear-gradient(90deg,rgba(123,255,0,.055) 0 1px,transparent 1px 18px) !important;
+      box-shadow:inset 0 0 70px rgba(123,255,0,.20),0 0 34px rgba(123,255,0,.22) !important;
+    }
+
+    .map-orb{
+      width:82% !important;
+      max-width:690px !important;
+      height:238px !important;
+      transform:translateY(-4px) !important;
+      filter:drop-shadow(0 0 24px rgba(123,255,0,.68)) !important;
+    }
+
+    .mini-chart{
+      height:52px !important;
+      min-height:52px !important;
+    }
+
+    .ops-row,
+    .ops-grid,
+    .mini-grid,
+    .stat-grid{
+      max-width:100% !important;
+      overflow:hidden !important;
+    }
+
+    .ops-row{
+      min-height:24px !important;
+    }
+
+    .ops-note{
+      font-size:10px !important;
+      line-height:1.35 !important;
+      max-height:70px !important;
+      overflow:auto !important;
+    }
+
+    .btn{
+      min-height:28px !important;
+      height:auto !important;
+      padding:7px 10px !important;
+      line-height:1.15 !important;
+    }
+
+    .readiness-orb,
+    .readiness-ring,
+    .orb{
+      max-width:180px !important;
+      max-height:180px !important;
+    }
+
+    [data-empty="true"],
+    .empty,
+    .missing,
+    .source-pending{
+      min-height:0 !important;
+    }
+
+    .panel:has(.ops-note),
+    .panel:has(.btn){
+      padding-bottom:12px !important;
+    }
+
+    @media (max-width:1500px){
+      .kpis{grid-template-columns:repeat(4,1fr) !important}
+      .grid-top{grid-template-columns:1fr !important}
+      .grid-bottom,.grid-wide{grid-template-columns:1fr 1fr !important}
+      .grid-top > .panel:first-child{grid-template-columns:1fr !important}
+      .map{height:300px !important}
+    }
+
+    @media (max-width:980px){
+      .shell{grid-template-columns:1fr !important}
+      aside{position:relative !important;height:auto !important}
+      header{grid-template-columns:1fr !important}
+      .kpis,.grid-bottom,.grid-wide{grid-template-columns:1fr !important}
+    }
   </style>
 </head>
 <body>
@@ -1012,7 +1235,20 @@
         <div class="pill"><span id="clock">--:--:-- UTC</span><br><b>8TABZ ADMIN</b><br><span class="up">Super Admin</span></div>
       </header>
 
-      <section class="kpis">
+            <!-- ADMIN_HQ_VISUAL_06B_DIRECT_STRUCTURAL_TOP_REPAIR
+           True compact KPI strip. The original .kpis operational deck is no longer allowed to own the top viewport.
+      -->
+      <section class="hq-true-kpi-strip" aria-label="8TABZ Admin HQ compact KPI strip">
+        <article class="hq-true-kpi"><small>Total Users</small><strong data-hq-sync-from="kUsers">--</strong><span data-hq-sync-status="users">Connected state</span></article>
+        <article class="hq-true-kpi"><small>Active Venues</small><strong data-hq-sync-from="kVenues">--</strong><span data-hq-sync-status="venues">Connected state</span></article>
+        <article class="hq-true-kpi"><small>Total Wallets</small><strong data-hq-sync-from="kWallets">--</strong><span data-hq-sync-status="wallets">Connected state</span></article>
+        <article class="hq-true-kpi"><small>Total Volume</small><strong data-hq-sync-from="kVolume">--</strong><span>Connected</span></article>
+        <article class="hq-true-kpi"><small>Gross Merch</small><strong data-hq-sync-from="kGrossMerch">--</strong><span>Connected</span></article>
+        <article class="hq-true-kpi"><small>Platform Take Rate</small><strong data-hq-sync-from="kTakeRate">2.45%</strong><span>policy</span></article>
+        <article class="hq-true-kpi"><small>Disbursed</small><strong data-hq-sync-from="kDisbursed">$0</strong><span>cashouts</span></article>
+        <article class="hq-true-kpi"><small>System Health</small><strong data-hq-sync-from="kSystemHealth">98.7%</strong><span>live</span></article>
+      </section>
+<section class="kpis hq-operational-detail-deck" aria-label="8TABZ operational detail deck">
         <div class="kpi" id="users"><small>Total Users</small><strong id="kUsers">--</strong><span class="up">Connected state</span></div>
         <div class="kpi" id="venues"><small>Active Venues</small><strong id="kVenues">--</strong><span class="up">Connected state</span></div>
         <div class="kpi" id="wallets"><small>Total Wallets</small><strong id="kWallets">--</strong><span class="up">Connected state</span></div>
@@ -1099,7 +1335,26 @@
         </div>
       </section>
 
-      <section class="grid-wide">
+      
+  <!-- ADMIN_HQ_MONEY_SYSTEM_10AG_PROVIDER_EVENT_VISIBLE_PANEL -->
+  <section class="panel admin-provider-events-panel" id="adminProviderEventsPanel">
+    <h2>Provider Events / Stripe Webhooks <span class="legacy-disabled-pill">Provider-backed</span></h2>
+    <div class="provider-proof-lock">
+      <b>No-custody proof:</b> TABZ does not hold money. Stripe/provider events are read-only operational truth for payment, transfer, payout, refund, dispute, and reconciliation visibility.
+    </div>
+    <div class="ops-mini-grid">
+      <div><span>Provider table</span><b id="providerEventsTableState">--</b></div>
+      <div><span>Total events</span><b id="providerEventsTotal">--</b></div>
+      <div><span>Latest status</span><b id="providerEventsLatestStatus">--</b></div>
+      <div><span>Latest type</span><b id="providerEventsLatestType">--</b></div>
+    </div>
+    <div class="ops-table provider-events-table" id="providerEventsRows">
+      <div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Source</span></div>
+      <div class="ops-row"><span>Waiting for authenticated provider event feed...</span><span>--</span><span>--</span><span>--</span></div>
+    </div>
+  </section>
+
+<section class="grid-wide">
         <div class="kpi"><small>Users</small><strong id="stripUsers">--</strong></div>
         <div class="kpi"><small>Venues</small><strong id="stripVenues">--</strong></div>
         <div class="kpi"><small>Staff</small><strong id="stripStaff">--</strong></div>
@@ -2206,6 +2461,1733 @@ function openCommandModal(title, body){
     bindCommandButtons();
     if(token){ showApp(); loadAdminHQ(); }
   </script>
+
+  <!-- ADMIN_HQ_VISUAL_03_FORCE_TOP_COMMAND_CENTER_STAGE
+       Purpose: force Admin HQ top viewport into the 2028 reference command-center composition.
+       Scope: visual/DOM layout only. No backend, DB, Stripe, or money mutation.
+  -->
+  <style id="admin-hq-visual-03-style">
+    body.admin-hq-visual-03 main{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:10px !important;
+    }
+
+    body.admin-hq-visual-03 .kpis{
+      order:1 !important;
+      display:grid !important;
+      grid-template-columns:repeat(8,minmax(120px,1fr)) !important;
+      gap:8px !important;
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      margin:8px 0 0 !important;
+    }
+
+    body.admin-hq-visual-03 .kpis > *{
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      padding:8px 10px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+    }
+
+    body.admin-hq-visual-03 .kpis table,
+    body.admin-hq-visual-03 .kpis .ops-note,
+    body.admin-hq-visual-03 .kpis .btn,
+    body.admin-hq-visual-03 .kpis button,
+    body.admin-hq-visual-03 .kpis .mini-grid,
+    body.admin-hq-visual-03 .kpis .stat-grid,
+    body.admin-hq-visual-03 .kpis .ops-grid,
+    body.admin-hq-visual-03 .kpis .provider-proof-lock{
+      display:none !important;
+    }
+
+    body.admin-hq-visual-03 .kpis small{
+      font-size:8px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+
+    body.admin-hq-visual-03 .kpis strong{
+      font-size:18px !important;
+      line-height:1 !important;
+      margin:4px 0 1px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage{
+      order:2 !important;
+      display:grid !important;
+      grid-template-columns:minmax(620px,2.1fr) minmax(210px,.55fr) minmax(430px,1.2fr) !important;
+      gap:10px !important;
+      align-items:stretch !important;
+      width:100% !important;
+      min-height:382px !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage > .panel{
+      min-height:382px !important;
+      max-height:382px !important;
+      overflow:hidden !important;
+      margin:0 !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage > .panel.hq-visual03-system{
+      display:grid !important;
+      grid-template-columns:210px minmax(390px,1fr) !important;
+      grid-template-rows:auto 1fr !important;
+      gap:10px !important;
+      padding:12px !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage > .panel.hq-visual03-system h2{
+      grid-column:1 / -1 !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage .map{
+      height:322px !important;
+      min-height:322px !important;
+      max-height:322px !important;
+      margin:0 !important;
+      align-self:stretch !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage .map-orb{
+      width:86% !important;
+      max-width:720px !important;
+      height:240px !important;
+      filter:drop-shadow(0 0 28px rgba(123,255,0,.75)) !important;
+      transform:translateY(-2px) !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage > .panel.hq-visual03-realtime{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:8px !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-stage > .panel.hq-visual03-financial{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:8px !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-after-stage{
+      order:3 !important;
+      display:grid !important;
+      grid-template-columns:repeat(4,minmax(190px,1fr)) !important;
+      gap:10px !important;
+      min-height:56px !important;
+    }
+
+    body.admin-hq-visual-03 .hq-visual03-after-stage > *{
+      min-height:54px !important;
+      max-height:96px !important;
+      overflow:hidden !important;
+    }
+
+    body.admin-hq-visual-03 main > .grid-top,
+    body.admin-hq-visual-03 main > .grid-bottom,
+    body.admin-hq-visual-03 main > .grid-wide{
+      order:4 !important;
+    }
+
+    body.admin-hq-visual-03 .panel{
+      border-color:rgba(156,255,0,.48) !important;
+      background:
+        linear-gradient(180deg,rgba(4,15,0,.94),rgba(0,0,0,.88)),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 18px) !important;
+      box-shadow:inset 0 0 34px rgba(156,255,0,.08),0 0 18px rgba(156,255,0,.15) !important;
+    }
+
+    body.admin-hq-visual-03 .panel h2{
+      font-size:13px !important;
+      line-height:1 !important;
+      margin:0 0 9px !important;
+      letter-spacing:.24em !important;
+      white-space:nowrap !important;
+    }
+
+    @media (max-width:1500px){
+      body.admin-hq-visual-03 .kpis{grid-template-columns:repeat(4,1fr) !important;height:auto !important;max-height:none !important}
+      body.admin-hq-visual-03 .hq-visual03-stage{grid-template-columns:1fr !important}
+      body.admin-hq-visual-03 .hq-visual03-stage > .panel{max-height:none !important}
+      body.admin-hq-visual-03 .hq-visual03-stage > .panel.hq-visual03-system{grid-template-columns:1fr !important}
+    }
+  </style>
+
+  <script id="admin-hq-visual-03-script">
+    (function(){
+      function textOf(node){
+        return ((node && node.innerText) || '').replace(/\s+/g,' ').trim().toUpperCase();
+      }
+
+      function findPanelByText(parts){
+        var panels = Array.prototype.slice.call(document.querySelectorAll('main .panel'));
+        return panels.find(function(panel){
+          var t = textOf(panel);
+          return parts.every(function(part){ return t.indexOf(part.toUpperCase()) !== -1; });
+        }) || null;
+      }
+
+      function bootVisual03(){
+        document.body.classList.add('admin-hq-visual-03');
+
+        var main = document.querySelector('main');
+        if(!main || document.querySelector('.hq-visual03-stage')) return;
+
+        var kpis = main.querySelector('.kpis');
+        var system = findPanelByText(['SYSTEM OVERVIEW']) || (document.querySelector('.map') ? document.querySelector('.map').closest('.panel') : null);
+        var realtime = findPanelByText(['REAL-TIME TRANSACTIONS']) || findPanelByText(['SUCCESS RATE','SYSTEM LOAD']);
+        var financial = findPanelByText(['FINANCIAL COMMAND CENTER']) || findPanelByText(['WALLET BALANCES','PENDING PAYOUTS']);
+
+        if(system) system.classList.add('hq-visual03-system');
+        if(realtime) realtime.classList.add('hq-visual03-realtime');
+        if(financial) financial.classList.add('hq-visual03-financial');
+
+        if(system || realtime || financial){
+          var stage = document.createElement('section');
+          stage.className = 'hq-visual03-stage';
+          stage.setAttribute('aria-label','8TABZ Admin HQ command center stage');
+
+          if(kpis && kpis.parentNode === main){
+            kpis.insertAdjacentElement('afterend', stage);
+          } else if(main.firstChild){
+            main.insertBefore(stage, main.firstChild);
+          } else {
+            main.appendChild(stage);
+          }
+
+          [system,realtime,financial].forEach(function(panel){
+            if(panel) stage.appendChild(panel);
+          });
+        }
+
+        var after = document.createElement('section');
+        after.className = 'hq-visual03-after-stage';
+        after.setAttribute('aria-label','8TABZ Admin HQ operational summary strip');
+
+        var wanted = [
+          ['USERS'],
+          ['VENUES'],
+          ['STAFF'],
+          ['WALLETS'],
+          ['PAYOUTS'],
+          ['DISPUTES'],
+          ['FRAUD'],
+          ['REGIONS']
+        ];
+
+        var panels = Array.prototype.slice.call(document.querySelectorAll('main .panel'));
+        wanted.forEach(function(parts){
+          var panel = panels.find(function(p){
+            var t = textOf(p);
+            return !p.closest('.hq-visual03-stage') && parts.every(function(part){ return t.indexOf(part) !== -1; });
+          });
+          if(panel) after.appendChild(panel);
+        });
+
+        var stageNode = document.querySelector('.hq-visual03-stage');
+        if(stageNode && after.children.length){
+          stageNode.insertAdjacentElement('afterend', after);
+        }
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', bootVisual03);
+      } else {
+        bootVisual03();
+      }
+
+      setTimeout(bootVisual03, 500);
+      setTimeout(bootVisual03, 1500);
+    })();
+  </script>
+
+  <!-- ADMIN_HQ_VISUAL_04_FORCE_KPI_STRIP_KILL_GIANT_WINDOWS
+       Purpose: force top KPI/status area into compact reference strip; prevent operational tables/buttons from making giant top windows.
+       Scope: visual/CSS/DOM only. No backend, DB, Stripe, or money mutation.
+  -->
+  <style id="admin-hq-visual-04-style">
+    main > .kpis{
+      display:grid !important;
+      grid-template-columns:repeat(8,minmax(112px,1fr)) !important;
+      gap:7px !important;
+      height:76px !important;
+      min-height:76px !important;
+      max-height:76px !important;
+      overflow:hidden !important;
+      margin:8px 0 10px !important;
+      align-items:stretch !important;
+      align-content:stretch !important;
+    }
+
+    main > .kpis > *,
+    main > .kpis > .kpi,
+    main > .kpis > .panel{
+      height:76px !important;
+      min-height:76px !important;
+      max-height:76px !important;
+      width:auto !important;
+      min-width:0 !important;
+      overflow:hidden !important;
+      padding:8px 10px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+      align-items:flex-start !important;
+    }
+
+    main > .kpis > * small,
+    main > .kpis > * .label,
+    main > .kpis > * .eyebrow{
+      display:block !important;
+      font-size:8px !important;
+      line-height:1.05 !important;
+      max-height:10px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      color:#9fb992 !important;
+      text-transform:uppercase !important;
+    }
+
+    main > .kpis > * strong,
+    main > .kpis > * .value,
+    main > .kpis > * h2,
+    main > .kpis > * h3{
+      display:block !important;
+      font-size:17px !important;
+      line-height:1 !important;
+      margin:4px 0 2px !important;
+      padding:0 !important;
+      max-height:20px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      color:#f2ffe8 !important;
+    }
+
+    main > .kpis > * .up,
+    main > .kpis > * .down,
+    main > .kpis > * em,
+    main > .kpis > * span{
+      font-size:10px !important;
+      line-height:1.1 !important;
+      max-height:12px !important;
+      overflow:hidden !important;
+    }
+
+    main > .kpis table,
+    main > .kpis thead,
+    main > .kpis tbody,
+    main > .kpis tr,
+    main > .kpis td,
+    main > .kpis th,
+    main > .kpis button,
+    main > .kpis .btn,
+    main > .kpis .ops-note,
+    main > .kpis .ops-row,
+    main > .kpis .ops-grid,
+    main > .kpis .mini-grid,
+    main > .kpis .stat-grid,
+    main > .kpis .provider-proof-lock,
+    main > .kpis [class*="table"],
+    main > .kpis [class*="row"],
+    main > .kpis [class*="grid"]{
+      display:none !important;
+      visibility:hidden !important;
+      height:0 !important;
+      min-height:0 !important;
+      max-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      overflow:hidden !important;
+    }
+
+    main > .kpis > *:before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:8px;
+      bottom:8px;
+      width:2px;
+      background:linear-gradient(180deg,transparent,#9cff00,transparent);
+      box-shadow:0 0 12px rgba(156,255,0,.75);
+    }
+
+    main > .kpis > *{
+      position:relative !important;
+    }
+
+    main > .kpis + .hq-visual03-stage,
+    main > .kpis + .grid-top{
+      margin-top:0 !important;
+    }
+
+    .hq-visual03-stage{
+      margin-top:0 !important;
+    }
+
+    @media (max-width:1500px){
+      main > .kpis{
+        grid-template-columns:repeat(4,minmax(120px,1fr)) !important;
+        height:auto !important;
+        max-height:none !important;
+      }
+
+      main > .kpis > *,
+      main > .kpis > .kpi,
+      main > .kpis > .panel{
+        height:70px !important;
+        min-height:70px !important;
+        max-height:70px !important;
+      }
+    }
+  </style>
+
+  <script id="admin-hq-visual-04-script">
+    (function(){
+      function compactKpis(){
+        var kpis = document.querySelector('main > .kpis');
+        if(!kpis) return;
+
+        kpis.setAttribute('data-visual04-compact','true');
+
+        Array.prototype.slice.call(kpis.children).forEach(function(card){
+          card.setAttribute('data-visual04-kpi-card','true');
+
+          var label = card.querySelector('small') || card.querySelector('.label') || card.querySelector('.eyebrow');
+          var value = card.querySelector('strong') || card.querySelector('.value') || card.querySelector('h2') || card.querySelector('h3');
+
+          if(label && !card.getAttribute('data-visual04-label')){
+            card.setAttribute('data-visual04-label', label.textContent.trim());
+          }
+
+          if(value && !card.getAttribute('data-visual04-value')){
+            card.setAttribute('data-visual04-value', value.textContent.trim());
+          }
+
+          Array.prototype.slice.call(card.querySelectorAll('table,button,.btn,.ops-note,.provider-proof-lock,.ops-grid,.mini-grid,.stat-grid')).forEach(function(el){
+            el.setAttribute('data-visual04-hidden-from-kpi','true');
+          });
+        });
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', compactKpis);
+      } else {
+        compactKpis();
+      }
+
+      setTimeout(compactKpis, 300);
+      setTimeout(compactKpis, 900);
+      setTimeout(compactKpis, 1800);
+    })();
+  </script>
+
+  <!-- ADMIN_HQ_VISUAL_05_MOVE_GIANT_KPI_DECK_BELOW_STAGE
+       Purpose: original .kpis contains full operational panels; move that giant deck below the command stage and create a true compact KPI strip.
+       Scope: visual/CSS/DOM only. No backend, DB, Stripe, or money mutation.
+  -->
+  <style id="admin-hq-visual-05-style">
+    body.admin-hq-visual-05 main{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:10px !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-strip{
+      order:1 !important;
+      display:grid !important;
+      grid-template-columns:repeat(8,minmax(110px,1fr)) !important;
+      gap:8px !important;
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      margin:8px 0 0 !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-tile{
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      padding:8px 11px !important;
+      border:1px solid rgba(156,255,0,.52) !important;
+      border-radius:9px !important;
+      background:
+        linear-gradient(180deg,rgba(5,20,0,.92),rgba(0,0,0,.88)),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 12px) !important;
+      box-shadow:inset 0 0 22px rgba(156,255,0,.10),0 0 16px rgba(156,255,0,.18) !important;
+      position:relative !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+      align-items:flex-start !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-tile:before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:8px;
+      bottom:8px;
+      width:2px;
+      background:linear-gradient(180deg,transparent,#9cff00,transparent);
+      box-shadow:0 0 14px rgba(156,255,0,.75);
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-label{
+      font-size:8px !important;
+      line-height:1 !important;
+      color:#a9c79a !important;
+      text-transform:uppercase !important;
+      letter-spacing:.12em !important;
+      white-space:nowrap !important;
+      max-width:100% !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-value{
+      font-size:18px !important;
+      line-height:1 !important;
+      color:#f2ffe8 !important;
+      font-weight:800 !important;
+      margin:5px 0 2px !important;
+      white-space:nowrap !important;
+      max-width:100% !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      text-shadow:0 0 14px rgba(156,255,0,.28) !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual05-kpi-status{
+      font-size:10px !important;
+      line-height:1 !important;
+      color:#9cff00 !important;
+      white-space:nowrap !important;
+      max-width:100% !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual03-stage{
+      order:2 !important;
+      margin-top:0 !important;
+      display:grid !important;
+      grid-template-columns:minmax(620px,2.1fr) minmax(210px,.55fr) minmax(430px,1.2fr) !important;
+      gap:10px !important;
+      min-height:382px !important;
+    }
+
+    body.admin-hq-visual-05 .hq-visual03-stage > .panel{
+      min-height:382px !important;
+      max-height:382px !important;
+      overflow:hidden !important;
+    }
+
+    body.admin-hq-visual-05 main > .kpis.hq-visual05-original-kpis{
+      order:6 !important;
+      display:grid !important;
+      grid-template-columns:repeat(4,minmax(220px,1fr)) !important;
+      gap:10px !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:none !important;
+      overflow:visible !important;
+      margin-top:10px !important;
+    }
+
+    body.admin-hq-visual-05 main > .kpis.hq-visual05-original-kpis > *{
+      height:auto !important;
+      min-height:120px !important;
+      max-height:260px !important;
+      overflow:auto !important;
+      padding:10px !important;
+    }
+
+    body.admin-hq-visual-05 main > .kpis.hq-visual05-original-kpis:before{
+      content:"OPERATIONAL DETAIL PANELS";
+      grid-column:1 / -1;
+      color:#9cff00;
+      font-size:12px;
+      letter-spacing:.28em;
+      padding:4px 2px 0;
+      text-transform:uppercase;
+      text-shadow:0 0 14px rgba(156,255,0,.45);
+    }
+
+    body.admin-hq-visual-05 main > .grid-top,
+    body.admin-hq-visual-05 main > .grid-bottom,
+    body.admin-hq-visual-05 main > .grid-wide{
+      order:7 !important;
+    }
+
+    @media (max-width:1500px){
+      body.admin-hq-visual-05 .hq-visual05-kpi-strip{
+        grid-template-columns:repeat(4,minmax(120px,1fr)) !important;
+        height:auto !important;
+        max-height:none !important;
+      }
+
+      body.admin-hq-visual-05 .hq-visual03-stage{
+        grid-template-columns:1fr !important;
+      }
+
+      body.admin-hq-visual-05 main > .kpis.hq-visual05-original-kpis{
+        grid-template-columns:1fr 1fr !important;
+      }
+    }
+  </style>
+
+  <script id="admin-hq-visual-05-script">
+    (function(){
+      function cleanText(v){
+        return String(v || '').replace(/\s+/g,' ').trim();
+      }
+
+      function textOf(node){
+        return cleanText((node && node.innerText) || '').toUpperCase();
+      }
+
+      function findPanelByText(parts){
+        var panels = Array.prototype.slice.call(document.querySelectorAll('main .panel'));
+        return panels.find(function(panel){
+          var t = textOf(panel);
+          return parts.every(function(part){ return t.indexOf(part.toUpperCase()) !== -1; });
+        }) || null;
+      }
+
+      function makeTile(card, fallbackIndex){
+        var labelNode = card.querySelector('small') || card.querySelector('.label') || card.querySelector('.eyebrow');
+        var valueNode = card.querySelector('strong') || card.querySelector('.value') || card.querySelector('h2') || card.querySelector('h3');
+
+        var raw = cleanText(card.innerText);
+        var words = raw.split(' ').filter(Boolean);
+
+        var label = cleanText(labelNode ? labelNode.textContent : words.slice(0,3).join(' '));
+        var value = cleanText(valueNode ? valueNode.textContent : (words[3] || words[0] || '—'));
+
+        if(!label) label = 'KPI ' + fallbackIndex;
+        if(!value) value = '—';
+
+        var status = 'Connected';
+        var lower = raw.toLowerCase();
+        if(lower.indexOf('source pending') !== -1) status = 'Source pending';
+        else if(lower.indexOf('policy') !== -1) status = 'policy';
+        else if(lower.indexOf('cashouts') !== -1) status = 'cashouts';
+        else if(lower.indexOf('live') !== -1) status = 'live';
+
+        var tile = document.createElement('article');
+        tile.className = 'hq-visual05-kpi-tile';
+        tile.innerHTML =
+          '<div class="hq-visual05-kpi-label"></div>' +
+          '<div class="hq-visual05-kpi-value"></div>' +
+          '<div class="hq-visual05-kpi-status"></div>';
+
+        tile.querySelector('.hq-visual05-kpi-label').textContent = label;
+        tile.querySelector('.hq-visual05-kpi-value').textContent = value;
+        tile.querySelector('.hq-visual05-kpi-status').textContent = status;
+
+        return tile;
+      }
+
+      function ensureStage(main, afterNode){
+        var stage = document.querySelector('.hq-visual03-stage');
+
+        var system = findPanelByText(['SYSTEM OVERVIEW']) || (document.querySelector('.map') ? document.querySelector('.map').closest('.panel') : null);
+        var realtime = findPanelByText(['REAL-TIME TRANSACTIONS']) || findPanelByText(['SUCCESS RATE','SYSTEM LOAD']);
+        var financial = findPanelByText(['FINANCIAL COMMAND CENTER']) || findPanelByText(['WALLET BALANCES','PENDING PAYOUTS']);
+
+        if(system) system.classList.add('hq-visual03-system');
+        if(realtime) realtime.classList.add('hq-visual03-realtime');
+        if(financial) financial.classList.add('hq-visual03-financial');
+
+        if(!stage){
+          stage = document.createElement('section');
+          stage.className = 'hq-visual03-stage';
+          stage.setAttribute('aria-label','8TABZ Admin HQ command center stage');
+          if(afterNode && afterNode.parentNode === main){
+            afterNode.insertAdjacentElement('afterend', stage);
+          } else {
+            main.insertBefore(stage, main.firstChild);
+          }
+        }
+
+        [system,realtime,financial].forEach(function(panel){
+          if(panel && panel.parentNode !== stage){
+            stage.appendChild(panel);
+          }
+        });
+
+        return stage;
+      }
+
+      function bootVisual05(){
+        document.body.classList.add('admin-hq-visual-05');
+
+        var main = document.querySelector('main');
+        if(!main) return;
+
+        var originalKpis = main.querySelector('.kpis:not(.hq-visual05-kpi-strip)');
+        if(!originalKpis) return;
+
+        originalKpis.classList.add('hq-visual05-original-kpis');
+
+        var strip = main.querySelector('.hq-visual05-kpi-strip');
+        if(!strip){
+          strip = document.createElement('section');
+          strip.className = 'hq-visual05-kpi-strip';
+          strip.setAttribute('aria-label','8TABZ Admin HQ compact KPI strip');
+
+          Array.prototype.slice.call(originalKpis.children).slice(0,8).forEach(function(card, index){
+            strip.appendChild(makeTile(card, index + 1));
+          });
+
+          main.insertBefore(strip, originalKpis);
+        }
+
+        var stage = ensureStage(main, strip);
+
+        if(stage && originalKpis.previousElementSibling !== stage){
+          stage.insertAdjacentElement('afterend', originalKpis);
+        }
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', bootVisual05);
+      } else {
+        bootVisual05();
+      }
+
+      setTimeout(bootVisual05, 250);
+      setTimeout(bootVisual05, 900);
+      setTimeout(bootVisual05, 1800);
+    })();
+  </script>
+
+  <!-- ADMIN_HQ_VISUAL_06B_DIRECT_STRUCTURAL_TOP_REPAIR_STYLE
+       Scope: visual/CSS/DOM only. No backend, DB, Stripe, money mutation, or cleanup.
+  -->
+  <style id="admin-hq-visual-06b-style">
+    body.admin-hq-visual-06b main{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:10px !important;
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi-strip{
+      order:1 !important;
+      display:grid !important;
+      grid-template-columns:repeat(8,minmax(112px,1fr)) !important;
+      gap:8px !important;
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      margin:8px 0 0 !important;
+      width:100% !important;
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi{
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      overflow:hidden !important;
+      padding:8px 11px !important;
+      border:1px solid rgba(156,255,0,.56) !important;
+      border-radius:9px !important;
+      background:
+        linear-gradient(180deg,rgba(5,20,0,.92),rgba(0,0,0,.88)),
+        repeating-linear-gradient(0deg,rgba(156,255,0,.035) 0 1px,transparent 1px 12px) !important;
+      box-shadow:inset 0 0 22px rgba(156,255,0,.10),0 0 16px rgba(156,255,0,.18) !important;
+      position:relative !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+      align-items:flex-start !important;
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi:before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:8px;
+      bottom:8px;
+      width:2px;
+      background:linear-gradient(180deg,transparent,#9cff00,transparent);
+      box-shadow:0 0 14px rgba(156,255,0,.75);
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi small{
+      color:#a9c79a !important;
+      font-size:8px !important;
+      line-height:1 !important;
+      letter-spacing:.12em !important;
+      text-transform:uppercase !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      max-width:100% !important;
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi strong{
+      color:#f2ffe8 !important;
+      font-size:18px !important;
+      line-height:1 !important;
+      font-weight:800 !important;
+      margin:5px 0 2px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      max-width:100% !important;
+      text-shadow:0 0 14px rgba(156,255,0,.28) !important;
+    }
+
+    body.admin-hq-visual-06b .hq-true-kpi span{
+      color:#9cff00 !important;
+      font-size:10px !important;
+      line-height:1 !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      max-width:100% !important;
+    }
+
+    body.admin-hq-visual-06b main > .grid-top{
+      order:2 !important;
+      margin-top:0 !important;
+      display:grid !important;
+      grid-template-columns:2.2fr .55fr 1.35fr !important;
+      gap:10px !important;
+      align-items:stretch !important;
+      min-height:382px !important;
+    }
+
+    body.admin-hq-visual-06b main > .grid-top > .panel{
+      min-height:382px !important;
+      max-height:382px !important;
+      overflow:hidden !important;
+    }
+
+    body.admin-hq-visual-06b main > .grid-top .system-overview-command{
+      min-height:382px !important;
+      max-height:382px !important;
+    }
+
+    body.admin-hq-visual-06b .hq-overview-hero{
+      min-height:318px !important;
+      max-height:326px !important;
+      overflow:hidden !important;
+    }
+
+    body.admin-hq-visual-06b .hq-operational-detail-deck{
+      order:6 !important;
+      display:grid !important;
+      grid-template-columns:repeat(4,minmax(220px,1fr)) !important;
+      gap:10px !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:none !important;
+      overflow:visible !important;
+      margin-top:10px !important;
+    }
+
+    body.admin-hq-visual-06b .hq-operational-detail-deck:before{
+      content:"OPERATIONAL DETAIL PANELS";
+      grid-column:1 / -1;
+      color:#9cff00;
+      font-size:12px;
+      letter-spacing:.28em;
+      padding:4px 2px 0;
+      text-transform:uppercase;
+      text-shadow:0 0 14px rgba(156,255,0,.45);
+    }
+
+    body.admin-hq-visual-06b .hq-operational-detail-deck > .kpi{
+      height:auto !important;
+      min-height:120px !important;
+      max-height:260px !important;
+      overflow:auto !important;
+      padding:10px !important;
+    }
+
+    body.admin-hq-visual-06b main > .grid-bottom,
+    body.admin-hq-visual-06b main > .grid-wide{
+      order:7 !important;
+    }
+
+    @media (max-width:1500px){
+      body.admin-hq-visual-06b .hq-true-kpi-strip{
+        grid-template-columns:repeat(4,minmax(120px,1fr)) !important;
+        height:auto !important;
+        max-height:none !important;
+      }
+
+      body.admin-hq-visual-06b main > .grid-top{
+        grid-template-columns:1fr !important;
+      }
+
+      body.admin-hq-visual-06b .hq-operational-detail-deck{
+        grid-template-columns:1fr 1fr !important;
+      }
+    }
+  </style>
+
+  <script id="admin-hq-visual-06b-script">
+    (function(){
+      function syncTrueKpis(){
+        document.body.classList.add('admin-hq-visual-06b');
+
+        document.querySelectorAll('[data-hq-sync-from]').forEach(function(target){
+          var sourceId = target.getAttribute('data-hq-sync-from');
+          var source = document.getElementById(sourceId);
+          if(source && source.textContent && source.textContent.trim()){
+            target.textContent = source.textContent.trim();
+          }
+        });
+
+        var detailDeck = document.querySelector('main > .hq-operational-detail-deck');
+        var gridTop = document.querySelector('main > .grid-top');
+
+        if(detailDeck && gridTop && detailDeck.previousElementSibling !== gridTop){
+          gridTop.insertAdjacentElement('afterend', detailDeck);
+        }
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', syncTrueKpis);
+      } else {
+        syncTrueKpis();
+      }
+
+      setTimeout(syncTrueKpis, 250);
+      setTimeout(syncTrueKpis, 900);
+      setTimeout(syncTrueKpis, 1800);
+      setInterval(syncTrueKpis, 2500);
+    })();
+  </script>
+
+  <!-- ADMIN_HQ_VISUAL_09_PURE_BLACK_NEON_GREEN_THEME_LOCK
+       Scope: palette only. Keep current structure. Force cleaner black + neon green visual system.
+  -->
+  <style id="admin-hq-visual-09-style">
+    :root{
+      --tabz-black:#000000;
+      --tabz-black-soft:#020202;
+      --tabz-panel:#040404;
+      --tabz-panel-2:#070707;
+      --tabz-grid:rgba(95,255,0,.07);
+      --tabz-neon:#9cff00;
+      --tabz-neon-strong:#b7ff00;
+      --tabz-neon-soft:rgba(156,255,0,.16);
+      --tabz-neon-line:rgba(156,255,0,.58);
+      --tabz-text:#efffe8;
+      --tabz-dim:#99b38d;
+    }
+
+    html,
+    body{
+      background:#000 !important;
+      color:var(--tabz-text) !important;
+    }
+
+    body{
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.985),rgba(0,0,0,.985)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(156,255,0,.03) 0 1px,
+          transparent 1px 20px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(156,255,0,.025) 0 1px,
+          transparent 1px 20px
+        ) !important;
+    }
+
+    body:before,
+    body:after{
+      background:none !important;
+      opacity:0 !important;
+    }
+
+    main,
+    .app,
+    .shell,
+    .layout,
+    .dashboard{
+      background:transparent !important;
+    }
+
+    .panel,
+    .kpi,
+    .hq-true-kpi,
+    .hq-operational-detail-deck > .kpi,
+    .grid-top > .panel,
+    .grid-bottom > .panel,
+    .grid-wide > .panel,
+    .sidebar,
+    aside,
+    nav,
+    header,
+    .modal,
+    .dialog,
+    .card,
+    .tile{
+      background:
+        linear-gradient(180deg,rgba(5,5,5,.97),rgba(0,0,0,.97)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(156,255,0,.028) 0 1px,
+          transparent 1px 18px
+        ) !important;
+      border-color:var(--tabz-neon-line) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(156,255,0,.18),
+        inset 0 0 22px rgba(156,255,0,.055),
+        0 0 10px rgba(156,255,0,.10) !important;
+      color:var(--tabz-text) !important;
+    }
+
+    .panel:hover,
+    .kpi:hover,
+    .hq-true-kpi:hover,
+    .card:hover{
+      box-shadow:
+        inset 0 0 0 1px rgba(156,255,0,.22),
+        inset 0 0 22px rgba(156,255,0,.065),
+        0 0 14px rgba(156,255,0,.16) !important;
+    }
+
+    .hq-true-kpi-strip .hq-true-kpi,
+    .kpis > .kpi,
+    .hq-operational-detail-deck > .kpi{
+      background:
+        linear-gradient(180deg,rgba(6,6,6,.985),rgba(0,0,0,.985)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(156,255,0,.022) 0 1px,
+          transparent 1px 14px
+        ) !important;
+    }
+
+    .sidebar,
+    aside{
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.995),rgba(0,0,0,.985)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(156,255,0,.03) 0 1px,
+          transparent 1px 18px
+        ) !important;
+    }
+
+    .sidebar *,
+    aside *,
+    nav *,
+    header *{
+      color:var(--tabz-text) !important;
+    }
+
+    h1,h2,h3,h4,h5,h6,
+    .title,
+    .heading,
+    strong,
+    b{
+      color:var(--tabz-text) !important;
+      text-shadow:0 0 8px rgba(156,255,0,.16) !important;
+    }
+
+    small,
+    .label,
+    .eyebrow,
+    .muted,
+    .subtle,
+    .hint{
+      color:var(--tabz-dim) !important;
+    }
+
+    a,
+    .accent,
+    .status,
+    .online,
+    .green{
+      color:var(--tabz-neon) !important;
+      text-shadow:0 0 8px rgba(156,255,0,.22) !important;
+    }
+
+    .btn,
+    button,
+    input[type="submit"],
+    input[type="button"]{
+      background:
+        linear-gradient(180deg,rgba(10,24,0,.92),rgba(6,14,0,.96)) !important;
+      color:#f3ffe9 !important;
+      border:1px solid rgba(156,255,0,.65) !important;
+      box-shadow:
+        inset 0 0 12px rgba(156,255,0,.08),
+        0 0 10px rgba(156,255,0,.12) !important;
+    }
+
+    .btn:hover,
+    button:hover,
+    input[type="submit"]:hover,
+    input[type="button"]:hover{
+      background:
+        linear-gradient(180deg,rgba(18,38,0,.96),rgba(10,22,0,.98)) !important;
+      box-shadow:
+        inset 0 0 14px rgba(156,255,0,.12),
+        0 0 14px rgba(156,255,0,.18) !important;
+    }
+
+    input,
+    select,
+    textarea{
+      background:#030303 !important;
+      color:var(--tabz-text) !important;
+      border:1px solid rgba(156,255,0,.45) !important;
+      box-shadow:inset 0 0 8px rgba(156,255,0,.04) !important;
+    }
+
+    table,
+    tr,
+    td,
+    th{
+      background:transparent !important;
+      color:var(--tabz-text) !important;
+      border-color:rgba(156,255,0,.22) !important;
+    }
+
+    hr{
+      border-color:rgba(156,255,0,.28) !important;
+      opacity:1 !important;
+    }
+
+    .chart,
+    canvas,
+    svg{
+      background:transparent !important;
+    }
+
+    .panel::before,
+    .panel::after,
+    .kpi::before,
+    .kpi::after,
+    .hq-true-kpi::before,
+    .hq-true-kpi::after{
+      border-color:rgba(156,255,0,.55) !important;
+    }
+
+    .map,
+    .hq-overview-hero,
+    .globe,
+    .orb{
+      background:
+        radial-gradient(circle at center, rgba(18,40,0,.28), rgba(0,0,0,0) 58%),
+        transparent !important;
+    }
+
+    .topbar,
+    .navbar,
+    header{
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.985),rgba(0,0,0,.965)) !important;
+      border-color:rgba(156,255,0,.40) !important;
+    }
+
+    .real-time-transactions,
+    [aria-label="8TABZ Admin HQ compact KPI strip"],
+    .hq-true-kpi-strip,
+    .grid-top,
+    .grid-bottom,
+    .grid-wide{
+      background:transparent !important;
+    }
+  </style>
+
+  <!-- ADMIN_HQ_VISUAL_10_TRUE_BLACK_SURFACE_LOCK
+       Scope: palette only. No structure movement. Force pure black surfaces and sharp neon green accents.
+  -->
+  <style id="admin-hq-visual-10-style">
+    :root{
+      --bg:#000000 !important;
+      --panel:#000000 !important;
+      --panel2:#000000 !important;
+      --lime:#9cff00 !important;
+      --lime2:#b7ff00 !important;
+      --line:rgba(156,255,0,.72) !important;
+      --muted:#94ad87 !important;
+      --text:#f3ffe9 !important;
+      --glow:0 0 12px rgba(156,255,0,.18) !important;
+    }
+
+    html,
+    body{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      color:#f3ffe9 !important;
+    }
+
+    body,
+    body.admin-hq-visual-03,
+    body.admin-hq-visual-05,
+    body.admin-hq-visual-06b{
+      background:#000000 !important;
+      background-image:none !important;
+    }
+
+    body:before,
+    body:after,
+    main:before,
+    main:after,
+    .shell:before,
+    .shell:after{
+      background:none !important;
+      background-image:none !important;
+      opacity:0 !important;
+      display:none !important;
+    }
+
+    .shell,
+    main,
+    aside,
+    header,
+    nav,
+    .nav,
+    .panel,
+    .kpi,
+    .hq-true-kpi,
+    .hq-true-kpi-strip,
+    .hq-operational-detail-deck,
+    .hq-operational-detail-deck > .kpi,
+    .grid-top,
+    .grid-bottom,
+    .grid-wide,
+    .grid-top > .panel,
+    .grid-bottom > .panel,
+    .grid-wide > .panel,
+    .node-card,
+    .status,
+    .pill,
+    .card,
+    .tile,
+    .modal,
+    .dialog,
+    .drawer,
+    .topbar,
+    .navbar,
+    .ops-row,
+    .mini-grid,
+    .stat-grid,
+    .telemetry-card,
+    .financial-card,
+    .activity-feed,
+    .presence-stack,
+    .hq-presence-stack,
+    .hq-telemetry-stack,
+    .hq-overview-hero,
+    .premium-command-hero,
+    .world-command-map,
+    .image-command-map,
+    .map,
+    .chart,
+    .mini-chart{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+      color:#f3ffe9 !important;
+      border-color:rgba(156,255,0,.70) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(156,255,0,.16),
+        0 0 10px rgba(156,255,0,.16) !important;
+    }
+
+    .panel,
+    .kpi,
+    .hq-true-kpi,
+    .status,
+    .pill,
+    .node-card,
+    .telemetry-card,
+    .financial-card,
+    .activity-feed,
+    .hq-overview-hero,
+    .world-command-map,
+    .image-command-map{
+      border:1px solid rgba(156,255,0,.72) !important;
+      border-radius:10px !important;
+    }
+
+    .panel:hover,
+    .kpi:hover,
+    .hq-true-kpi:hover,
+    .status:hover,
+    .pill:hover,
+    .node-card:hover{
+      background:#000000 !important;
+      background-image:none !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(183,255,0,.26),
+        0 0 14px rgba(156,255,0,.22) !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    strong,
+    b,
+    .telemetry-value,
+    .presence-big,
+    .presence-venues strong,
+    .hq-true-kpi strong,
+    .kpi strong{
+      color:#f5ffef !important;
+      text-shadow:0 0 8px rgba(156,255,0,.24) !important;
+    }
+
+    small,
+    .sub,
+    .muted,
+    .presence-title,
+    .presence-label,
+    .telemetry-title,
+    .telemetry-sub,
+    .hq-true-kpi small,
+    .kpi small{
+      color:#a8bd9a !important;
+    }
+
+    a,
+    .up,
+    .green,
+    .accent,
+    .active,
+    .nav a:hover,
+    .hq-true-kpi span{
+      color:#9cff00 !important;
+      text-shadow:0 0 9px rgba(156,255,0,.30) !important;
+    }
+
+    .active,
+    .nav a:hover{
+      background:#020500 !important;
+      background-image:none !important;
+      border-color:#9cff00 !important;
+      box-shadow:
+        inset 0 0 10px rgba(156,255,0,.14),
+        0 0 10px rgba(156,255,0,.14) !important;
+    }
+
+    button,
+    .btn,
+    input,
+    select,
+    textarea{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+      color:#f3ffe9 !important;
+      border:1px solid rgba(156,255,0,.72) !important;
+      box-shadow:
+        inset 0 0 8px rgba(156,255,0,.10),
+        0 0 8px rgba(156,255,0,.10) !important;
+    }
+
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+      color:#f3ffe9 !important;
+      border-color:rgba(156,255,0,.28) !important;
+    }
+
+    .line-up,
+    .line-soft,
+    .line-flat,
+    .bars-rise,
+    .loading-bar,
+    .progress,
+    .sparkline{
+      background-color:#000000 !important;
+    }
+
+    .line-up,
+    .line-soft,
+    .line-flat,
+    .bars-rise{
+      background-image:
+        linear-gradient(135deg,transparent 0 40%,rgba(156,255,0,.80) 40% 48%,transparent 48% 100%) !important;
+    }
+
+    .command-globe-img,
+    img.command-globe-img{
+      filter:drop-shadow(0 0 18px rgba(156,255,0,.65)) saturate(1.18) contrast(1.08) !important;
+    }
+
+    ::selection{
+      background:rgba(156,255,0,.35) !important;
+      color:#000 !important;
+    }
+  </style>
+
+  <!-- ADMIN_HQ_VISUAL_11_KILL_REMAINING_GREEN_WASH_BACKGROUND_ONLY
+       Scope: palette/background only. Keep structure. Kill all page-wide green/gray wash; preserve neon borders/text/globe.
+  -->
+  <style id="admin-hq-visual-11-style">
+    html,
+    body,
+    .shell,
+    main,
+    aside{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+    }
+
+    body::before,
+    body::after,
+    html::before,
+    html::after,
+    main::before,
+    main::after,
+    .shell::before,
+    .shell::after,
+    aside::before,
+    aside::after{
+      content:none !important;
+      display:none !important;
+      opacity:0 !important;
+      visibility:hidden !important;
+      background:none !important;
+      background-image:none !important;
+      box-shadow:none !important;
+      filter:none !important;
+    }
+
+    main{
+      box-shadow:none !important;
+      filter:none !important;
+    }
+
+    .grid-top,
+    .grid-bottom,
+    .grid-wide,
+    .hq-true-kpi-strip,
+    .hq-operational-detail-deck,
+    section,
+    article{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+    }
+
+    .panel,
+    .kpi,
+    .hq-true-kpi,
+    .status,
+    .pill,
+    .node-card,
+    .telemetry-card,
+    .financial-card,
+    .activity-feed,
+    .ops-row,
+    .mini-grid,
+    .stat-grid,
+    .provider-proof-lock,
+    .presence-grid > div,
+    .presence-venues,
+    .row,
+    table,
+    tr,
+    td,
+    th{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+      border-color:rgba(156,255,0,.78) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(156,255,0,.12),
+        0 0 7px rgba(156,255,0,.12) !important;
+    }
+
+    .hq-overview-hero,
+    .premium-command-hero,
+    .world-command-map,
+    .image-command-map{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(156,255,0,.12),
+        0 0 8px rgba(156,255,0,.12) !important;
+    }
+
+    .command-globe-img,
+    img.command-globe-img{
+      background:transparent !important;
+      filter:
+        drop-shadow(0 0 14px rgba(156,255,0,.70))
+        saturate(1.22)
+        contrast(1.12) !important;
+    }
+
+    .image-map-glass,
+    .image-map-base-ring{
+      background:transparent !important;
+      background-image:none !important;
+      box-shadow:none !important;
+    }
+
+    .line-up,
+    .line-soft,
+    .line-flat,
+    .bars-rise,
+    .mini-chart{
+      background:#000000 !important;
+      background-color:#000000 !important;
+    }
+
+    .line-up,
+    .line-soft,
+    .line-flat,
+    .bars-rise{
+      background-image:
+        linear-gradient(135deg,transparent 0 42%,rgba(156,255,0,.88) 42% 49%,transparent 49% 100%) !important;
+    }
+
+    .active,
+    .nav a:hover{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+    }
+
+    .btn,
+    button,
+    input,
+    select,
+    textarea{
+      background:#000000 !important;
+      background-color:#000000 !important;
+      background-image:none !important;
+    }
+  </style>
+
+  <!-- ADMIN_HQ_VISUAL_12_REMOVE_DUPLICATE_TOP_KPI_ROW_ONLY
+       Scope: visual/DOM cleanup only. Keep one top KPI strip. No backend, DB, Stripe, money, or structure redesign.
+  -->
+  <style id="admin-hq-visual-12-style">
+    /* Keep the real KPI strip */
+    main > .hq-true-kpi-strip{
+      display:grid !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      height:74px !important;
+      min-height:74px !important;
+      max-height:74px !important;
+      margin:8px 0 8px !important;
+      order:1 !important;
+    }
+
+    /* Kill old duplicate KPI strip created by failed Visual 05 */
+    main > .hq-visual05-kpi-strip,
+    .hq-visual05-kpi-strip,
+    .hq-visual05-kpi-tile{
+      display:none !important;
+      visibility:hidden !important;
+      opacity:0 !important;
+      height:0 !important;
+      min-height:0 !important;
+      max-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      overflow:hidden !important;
+      pointer-events:none !important;
+    }
+
+    /* Do not allow original operational detail deck to appear between KPI strip and System Overview */
+    main > .hq-true-kpi-strip + .hq-operational-detail-deck,
+    main > .hq-true-kpi-strip + .kpis,
+    main > .hq-true-kpi-strip + section.kpis{
+      display:none !important;
+      visibility:hidden !important;
+      opacity:0 !important;
+      height:0 !important;
+      min-height:0 !important;
+      max-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      overflow:hidden !important;
+    }
+
+    /* System Overview must sit directly after the single KPI strip */
+    main > .grid-top{
+      order:2 !important;
+      margin-top:0 !important;
+    }
+
+    /* The operational detail deck is only allowed lower after the command sections */
+    main > .hq-operational-detail-deck{
+      order:8 !important;
+      margin-top:10px !important;
+    }
+  </style>
+
+  <script id="admin-hq-visual-12-script">
+    (function(){
+      function fixDuplicateTopKpis(){
+        var main = document.querySelector('main');
+        if(!main) return;
+
+        var trueStrip = main.querySelector(':scope > .hq-true-kpi-strip');
+        var gridTop = main.querySelector(':scope > .grid-top');
+
+        /* Remove any old dynamic Visual 05 strip */
+        Array.prototype.slice.call(main.querySelectorAll(':scope > .hq-visual05-kpi-strip')).forEach(function(node){
+          node.setAttribute('data-visual12-removed-duplicate','true');
+          node.remove();
+        });
+
+        /* If duplicate KPI/deck is sitting between true strip and grid-top, move it below grid-top */
+        if(trueStrip && gridTop){
+          var node = trueStrip.nextElementSibling;
+          while(node && node !== gridTop){
+            var next = node.nextElementSibling;
+            if(
+              node.classList &&
+              (
+                node.classList.contains('kpis') ||
+                node.classList.contains('hq-operational-detail-deck') ||
+                node.classList.contains('hq-visual05-kpi-strip')
+              )
+            ){
+              node.setAttribute('data-visual12-moved-below-command','true');
+              gridTop.insertAdjacentElement('afterend', node);
+            }
+            node = next;
+          }
+        }
+      }
+
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', fixDuplicateTopKpis);
+      } else {
+        fixDuplicateTopKpis();
+      }
+
+      setTimeout(fixDuplicateTopKpis, 250);
+      setTimeout(fixDuplicateTopKpis, 900);
+      setTimeout(fixDuplicateTopKpis, 1800);
+      setInterval(fixDuplicateTopKpis, 2500);
+    })();
+  </script>
+
+  <!-- ADMIN_HQ_MONEY_SYSTEM_10AG_PROVIDER_EVENT_VISIBLE_PANEL_SCRIPT -->
+  <script id="admin-hq-money-system-10ag-provider-events-script">
+    (function(){
+      function text(v){
+        return String(v === undefined || v === null || v === '' ? '--' : v)
+          .replace(/[&<>"']/g,function(c){
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+          });
+      }
+
+      function token(){
+        try{
+          return localStorage.getItem('tabz_admin_token') ||
+                 localStorage.getItem('adminToken') ||
+                 localStorage.getItem('access_token') ||
+                 sessionStorage.getItem('tabz_admin_token') ||
+                 sessionStorage.getItem('adminToken') ||
+                 sessionStorage.getItem('access_token') ||
+                 '';
+        }catch(e){ return ''; }
+      }
+
+      async function loadProviderEvents10AG(){
+        var rowsBox=document.getElementById('providerEventsRows');
+        var totalBox=document.getElementById('providerEventsTotal');
+        var tableBox=document.getElementById('providerEventsTableState');
+        var statusBox=document.getElementById('providerEventsLatestStatus');
+        var typeBox=document.getElementById('providerEventsLatestType');
+        if(!rowsBox) return;
+
+        var headers={};
+        var jwt=token();
+        if(jwt){ headers.Authorization='Bearer '+jwt; }
+
+        try{
+          var res=await fetch('/admin/stripe-events?limit=20&source=admin-hq-10ag',{headers:headers});
+          var data=await res.json();
+
+          if(!res.ok){
+            rowsBox.innerHTML='<div class="ops-head"><span>Provider Events</span><span>Status</span><span>Auth</span><span>Action</span></div>' +
+              '<div class="ops-row"><span>/admin/stripe-events</span><span>'+text(res.status)+'</span><span>Admin token required</span><span>Login then refresh</span></div>';
+            if(totalBox) totalBox.textContent='Auth required';
+            if(tableBox) tableBox.textContent='Protected';
+            if(statusBox) statusBox.textContent='Not visible';
+            if(typeBox) typeBox.textContent='--';
+            return;
+          }
+
+          var recent=Array.isArray(data.recent)?data.recent:[];
+          if(totalBox) totalBox.textContent=String(data.total || recent.length || 0);
+          if(tableBox) tableBox.textContent=data.controlState || (data.tableExists?'LIVE_TABLE':'YELLOW');
+          if(statusBox) statusBox.textContent=recent[0] ? text(recent[0].providerStatus || recent[0].status || 'VISIBLE') : 'No events';
+          if(typeBox) typeBox.textContent=recent[0] ? text(recent[0].eventType || recent[0].type || '--') : '--';
+
+          var html='<div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Source</span></div>';
+          if(!recent.length){
+            html+='<div class="ops-row"><span>No provider events visible</span><span>--</span><span>--</span><span>--</span></div>';
+          } else {
+            recent.slice(0,8).forEach(function(ev){
+              html+='<div class="ops-row provider-event-row" data-provider-event-id="'+text(ev.stripeEventId || ev.eventId || ev.id)+'">' +
+                '<span>'+text(ev.stripeEventId || ev.eventId || ev.id)+'</span>' +
+                '<span>'+text(ev.eventType || ev.type)+'</span>' +
+                '<span>'+text(ev.providerStatus || ev.status)+'</span>' +
+                '<span>'+text((ev.sourceType || 'source') + ':' + (ev.sourceId || '--'))+'</span>' +
+              '</div>';
+            });
+          }
+          rowsBox.innerHTML=html;
+        }catch(e){
+          rowsBox.innerHTML='<div class="ops-head"><span>Provider Events</span><span>Error</span><span>State</span><span>Next</span></div>' +
+            '<div class="ops-row"><span>/admin/stripe-events</span><span>'+text(e.message)+'</span><span>YELLOW</span><span>Inspect browser auth</span></div>';
+        }
+      }
+
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', loadProviderEvents10AG);
+      } else {
+        loadProviderEvents10AG();
+      }
+
+      window.loadProviderEvents10AG=loadProviderEvents10AG;
+      setTimeout(loadProviderEvents10AG, 1000);
+      setInterval(loadProviderEvents10AG, 15000);
+    })();
+  </script>
+
 </body>
 </html>
 
