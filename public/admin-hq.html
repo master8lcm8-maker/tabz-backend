@@ -190,6 +190,37 @@
     .command-modal h3{margin:0 0 8px;font-size:15px;letter-spacing:.18em}
     .command-modal p{color:#dfffd2;font-size:12px;line-height:1.5;margin:0 0 12px}
     .command-modal button{width:auto;padding:8px 14px}
+    /* ADMIN_HQ_MONEY_SYSTEM_10M_PROVIDER_PROOF_UI_LOCK */
+    .provider-proof-lock{
+      margin:8px 0 10px;
+      padding:10px 12px;
+      border:1px solid rgba(255,207,77,.42);
+      border-radius:10px;
+      background:linear-gradient(135deg,rgba(255,207,77,.10),rgba(123,255,0,.05));
+      color:#ffe8a3;
+      font-size:12px;
+      line-height:1.45;
+      box-shadow:0 0 18px rgba(255,207,77,.08);
+    }
+    .provider-proof-lock b{
+      color:#fff4c2;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .legacy-disabled-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-left:6px;
+      padding:3px 8px;
+      border:1px solid rgba(255,207,77,.45);
+      border-radius:999px;
+      color:#ffe8a3;
+      background:rgba(255,207,77,.10);
+      font-size:10px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
     .mini-chart{
       height:70px;border-radius:8px;border:1px solid rgba(123,255,0,.18);
       background:
@@ -988,7 +1019,7 @@
         <div class="kpi"><small>Total Volume</small><strong id="kVolume">--</strong><span class="up">Connected</span></div>
         <div class="kpi"><small>Gross Merch</small><strong id="kMerch">--</strong><span class="up">Connected</span></div>
         <div class="kpi"><small>Platform Take Rate</small><strong id="kTake">--</strong><span class="up">policy</span></div>
-        <div class="kpi"><small>Disbursed</small><strong id="kDisbursed">--</strong><span class="up">cashouts</span></div>
+        <div class="kpi"><small>Provider Disbursed</small><strong id="kDisbursed">--</strong><span class="up">read-only / Stripe proof required</span></div>
         <div class="kpi"><small>System Health</small><strong id="kHealth">--</strong><span class="up">live</span></div>
       </section>
 
@@ -1007,7 +1038,7 @@
               <div class="presence-venues"><strong id="heroVenues">2,457</strong><span>Venues Live</span></div>
               <div class="activity-feed">
                 <div><b>△</b><span>New venue onboarded in Miami, FL</span><em>2m ago</em></div>
-                <div><b>△</b><span>Payout executed: $49,210.00</span><em>3m ago</em></div>
+                <div><b>△</b><span>Provider payout pending Stripe proof: $49,210.00</span><em>3m ago</em></div>
                 <div><b>△</b><span>Dispute resolved: OP-9822-11</span><em>5m ago</em></div>
                 <div><b class="warn-dot">△</b><span>High risk transaction blocked</span><em>11m ago</em></div>
                 <div><b>△</b><span>New sponsorship deal activated</span><em>11m ago</em></div>
@@ -1055,12 +1086,15 @@
           <div class="row"><span>System Load</span><b id="systemLoad">--</b></div>
         </div>
         <div class="panel" id="ledger">
-          <h2>Financial Command Center</h2>
-          <div class="row"><span>Wallet Balances</span><b id="walletBalances">--</b></div>
-          <div class="row"><span>Pending Payouts</span><b id="pendingPayouts">--</b></div>
-          <div class="row"><span>Reserved / Holds</span><b id="reservedHolds">--</b></div>
-          <div class="row"><span>Ledger Status</span><b id="ledgerStatus">Checking</b></div>
-          <div class="row"><span>Disputes Open</span><b id="disputesOpen">--</b></div>
+          <h2>Financial Command Center <span class="legacy-disabled-pill">Provider-proof required</span></h2>
+          <div class="provider-proof-lock">
+            <b>Right-money-system lock:</b> TABZ does not hold venue/user money. Stripe/provider moves funds. Admin HQ is read-only for cashout/payout mutation until Stripe transfer proof, idempotency, ledger accounting, refund/dispute/reversal reconciliation, and provider-backed controls are GREEN.
+          </div>
+          <div class="row"><span>Wallet / entitlement balances</span><b id="walletBalances">--</b></div>
+          <div class="row"><span>Pending provider payouts</span><b id="pendingPayouts">--</b></div>
+          <div class="row"><span>Reserved / provider holds</span><b id="reservedHolds">--</b></div>
+          <div class="row"><span>Ledger / reconciliation status</span><b id="ledgerStatus">Provider proof required</b></div>
+          <div class="row"><span>Disputes / reversals open</span><b id="disputesOpen">--</b></div>
           <div class="mini-chart"></div>
         </div>
       </section>
@@ -1070,7 +1104,7 @@
         <div class="kpi"><small>Venues</small><strong id="stripVenues">--</strong></div>
         <div class="kpi"><small>Staff</small><strong id="stripStaff">--</strong></div>
         <div class="kpi"><small>Wallets</small><strong id="stripWallets">--</strong></div>
-        <div class="kpi"><small>Payouts</small><strong id="stripPayouts">--</strong></div>
+        <div class="kpi"><small>Provider payouts</small><strong id="stripPayouts">--</strong><span class="up">read-only</span></div>
         <div class="kpi"><small>Disputes</small><strong id="stripDisputes">--</strong></div>
         <div class="kpi"><small>Fraud / Risk</small><strong id="stripRisk">--</strong></div>
         <div class="kpi"><small>Regions</small><strong id="stripRegions">--</strong></div>
@@ -1128,7 +1162,7 @@
       <section class="grid-wide">
         <div class="panel" id="refunds"><h2>Refunds</h2><div id="refundRows"></div></div>
         <div class="panel" id="disputes"><h2>Disputes</h2><div id="disputeRows"></div></div>
-        <div class="panel" id="payouts"><h2>Payouts / Cashouts</h2><div id="cashoutRows"></div></div>
+        <div class="panel" id="payouts"><h2>Provider Payouts / Cashouts <span class="legacy-disabled-pill">Read-only</span></h2><div class="provider-proof-lock"><b>Mutation lock:</b> Complete/fail/repair cashout actions are legacy-disabled until Stripe/provider transfer proof, idempotency, ledger accounting, and refund/dispute/reversal reconciliation are GREEN.</div><div id="cashoutRows"></div></div>
       </section>
 
       <section class="grid-wide">
@@ -1312,7 +1346,7 @@ renderRiskTrustCompliance(riskTrustCompliance);
         set('walletBalances', walletTransactionTotal ? String(walletTransactionTotal) + ' wallet txns' : 'Source pending');
         set('pendingPayouts', String(pendingCashouts));
         set('reservedHolds', String(failedCashouts) + ' failed cashouts');
-        set('ledgerStatus','In Sync');
+        set('ledgerStatus','Provider proof required');
         set('disputesOpen', String(disputesTotal));
         set('txCount', String(operationsCount) + ' sections');
         set('riskScore','23');
