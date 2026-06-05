@@ -1169,8 +1169,8 @@
     <div class="login-card">
       <h2>8TABZ ADMIN HQ ACCESS</h2>
       <p style="color:var(--muted)">Admin command center requires protected admin authentication.</p>
-      <input id="adminEmail" value="admin@tabz.app" autocomplete="username" />
-      <input id="adminPassword" value="password" type="password" autocomplete="current-password" />
+      <input id="adminEmail" value="" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Admin email" />
+      <input id="adminPassword" value="" type="password" autocomplete="new-password" placeholder="Admin password" />
       <button class="btn" onclick="loginAdmin()">ENTER ADMIN HQ</button>
       <p id="loginStatus" style="color:var(--warn);font-size:12px"></p>
     </div>
@@ -1483,7 +1483,8 @@
 
   <script>
     var API_BASE = location.origin;
-    var token = localStorage.getItem('tabz_admin_token') || '';
+    try{ localStorage.removeItem("tabz_admin_token"); localStorage.removeItem("adminToken"); localStorage.removeItem("access_token"); }catch(e){}
+    var token = sessionStorage.getItem('tabz_admin_token') || '';
     function money(cents){
       var n = Number(cents || 0) / 100;
       return '$' + n.toLocaleString(undefined,{maximumFractionDigits:2});
@@ -1509,7 +1510,7 @@
         var data=await res.json();
         if(!res.ok || !data.access_token){ throw new Error('Admin login failed: ' + res.status); }
         token=data.access_token;
-        localStorage.setItem('tabz_admin_token',token);
+        sessionStorage.setItem('tabz_admin_token',token);
         showApp();
         await loadAdminHQ();
       }catch(err){
@@ -2500,7 +2501,7 @@ function openCommandModal(title, body){
     }
 
     bindCommandButtons();
-    if(token){ showApp(); loadAdminHQ(); }
+    if(token){ set('loginStatus','Admin session token exists for this tab. Re-enter credentials to unlock Admin HQ.'); }
   </script>
 
   <!-- ADMIN_HQ_VISUAL_03_FORCE_TOP_COMMAND_CENTER_STAGE
@@ -4155,13 +4156,7 @@ function openCommandModal(title, body){
 
       function token(){
         try{
-          return localStorage.getItem('tabz_admin_token') ||
-                 localStorage.getItem('adminToken') ||
-                 localStorage.getItem('access_token') ||
-                 sessionStorage.getItem('tabz_admin_token') ||
-                 sessionStorage.getItem('adminToken') ||
-                 sessionStorage.getItem('access_token') ||
-                 '';
+          return sessionStorage.getItem('tabz_admin_token') || '';
         }catch(e){ return ''; }
       }
 
@@ -4383,13 +4378,7 @@ async function loadProviderEvents10AG(){
 
       function token(){
         try{
-          return localStorage.getItem('tabz_admin_token') ||
-                 localStorage.getItem('adminToken') ||
-                 localStorage.getItem('access_token') ||
-                 sessionStorage.getItem('tabz_admin_token') ||
-                 sessionStorage.getItem('adminToken') ||
-                 sessionStorage.getItem('access_token') ||
-                 '';
+          return sessionStorage.getItem('tabz_admin_token') || '';
         }catch(e){ return ''; }
       }
 
@@ -4545,13 +4534,7 @@ async function loadProviderEvents10AG(){
 
       function token(){
         try{
-          return localStorage.getItem('tabz_admin_token') ||
-                 localStorage.getItem('adminToken') ||
-                 localStorage.getItem('access_token') ||
-                 sessionStorage.getItem('tabz_admin_token') ||
-                 sessionStorage.getItem('adminToken') ||
-                 sessionStorage.getItem('access_token') ||
-                 '';
+          return sessionStorage.getItem('tabz_admin_token') || '';
         }catch(e){ return ''; }
       }
 
