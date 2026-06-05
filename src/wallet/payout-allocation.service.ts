@@ -9,7 +9,7 @@ import { PayoutSource } from './payout-source.entity';
 
 @Injectable()
 export class PayoutAllocationService {
-  private stripe: Stripe;
+  private stripe?: Stripe;
 
   constructor(
     @InjectRepository(CashoutRequest)
@@ -20,10 +20,22 @@ export class PayoutAllocationService {
 
     @InjectRepository(PayoutSource)
     private readonly payoutSourceRepo: Repository<PayoutSource>,
-  ) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-      apiVersion: '2025-12-15.clover',
-    });
+  ) {}
+
+  private getStripe(): Stripe {
+    const secretKey = String(process.env.STRIPE_SECRET_KEY || '').trim();
+
+    if (!secretKey) {
+      throw new BadRequestException('stripe_secret_key_missing');
+    }
+
+    if (!this.stripe) {
+      this.stripe = new Stripe(secretKey, {
+        apiVersion: '2025-12-15.clover',
+      });
+    }
+
+    return this.stripe;
   }
 
   async tryResolveFromRetryLineage(
@@ -65,7 +77,7 @@ export class PayoutAllocationService {
 
 const alreadyAllocated = Number(result?.[0]?.total || 0);
 
-        const charge = await this.stripe.charges.retrieve(
+        const charge = await this.getStripe().charges.retrieve(
           priorSource.stripeChargeId,
         );
 
@@ -139,7 +151,7 @@ const alreadyAllocated = Number(result?.[0]?.total || 0);
 
       if (!paymentIntentId) continue;
 
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(
+      const paymentIntent = await this.getStripe().paymentIntents.retrieve(
         paymentIntentId,
       );
 
@@ -149,7 +161,7 @@ const alreadyAllocated = Number(result?.[0]?.total || 0);
 
       if (!stripeChargeId) continue;
 
-      const charge = await this.stripe.charges.retrieve(stripeChargeId);
+      const charge = await this.getStripe().charges.retrieve(stripeChargeId);
 
       const result = await this.payoutSourceRepo.manager.query(
         `
