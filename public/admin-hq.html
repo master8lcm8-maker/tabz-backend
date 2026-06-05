@@ -1374,8 +1374,8 @@
     </div>
   </section>
 
-<!-- ADMIN_HQ_MONEY_SYSTEM_10AG_PROVIDER_EVENT_VISIBLE_PANEL -->
-  <section class="panel admin-provider-events-panel" id="adminProviderEventsPanel">
+<!-- ADMIN_HQ_MONEY_SYSTEM_10AX_PROVIDER_EVENTS_DIRECT_PANEL -->
+  <section class="panel admin-provider-events-panel" id="adminProviderEventsPanel" data-provider-events-direct-panel="10AX">
     <h2>Provider Events / Stripe Webhooks <span class="legacy-disabled-pill">Provider-backed</span></h2>
     <div class="provider-proof-lock">
       <b>No-custody proof:</b> TABZ does not hold money. Stripe/provider events are read-only operational truth for payment, transfer, payout, refund, dispute, and reconciliation visibility.
@@ -1386,8 +1386,11 @@
       <div><span>Latest status</span><b id="providerEventsLatestStatus">--</b></div>
       <div><span>Latest type</span><b id="providerEventsLatestType">--</b></div>
     </div>
-    <div class="ops-table provider-events-table" id="providerEventsRows">
-      <div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Source</span></div>
+    <div class="provider-proof-lock" style="margin-top:8px">
+      <b>Click rule:</b> Only the visible VIEW button opens the detail drawer. Black table cells, labels, empty panel space, and event text are not click targets.
+    </div>
+    <div class="ops-table provider-events-table provider-events-direct-table" id="providerEventsRows" data-provider-events-direct-table="10AX">
+      <div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Action</span></div>
       <div class="ops-row"><span>Waiting for authenticated provider event feed...</span><span>--</span><span>--</span><span>--</span></div>
     </div>
   </section>
@@ -4162,12 +4165,143 @@ function openCommandModal(title, body){
         }catch(e){ return ''; }
       }
 
-      async function loadProviderEvents10AG(){
+      
+      // ADMIN_HQ_MONEY_SYSTEM_10BB_PROVIDER_EVENTS_DRAWER_SUPPORT
+      function ensureProviderEventDrawer10BB(){
+        var existing=document.getElementById('providerEventDrawer10BB');
+        if(existing) return existing;
+
+        if(!document.getElementById('providerEventDrawer10BBStyle')){
+          var style=document.createElement('style');
+          style.id='providerEventDrawer10BBStyle';
+          style.textContent =
+            '#adminProviderEventsPanel,#adminProviderEventsPanel *{cursor:default!important;}' +
+            '#adminProviderEventsPanel .provider-event-view-btn-10bb{cursor:pointer!important;border:1px solid #7CFF00!important;background:#000!important;color:#E9FFE0!important;padding:4px 10px!important;font-size:10px!important;font-weight:900!important;letter-spacing:.14em!important;text-transform:uppercase!important;box-shadow:0 0 10px rgba(124,255,0,.22)!important;}' +
+            '#adminProviderEventsPanel .provider-event-view-btn-10bb:hover{background:rgba(124,255,0,.16)!important;color:#7CFF00!important;}' +
+            '#providerEventDrawer10BB{position:fixed;right:18px;top:86px;width:min(780px,calc(100vw - 42px));max-height:calc(100vh - 120px);overflow:auto;display:none;z-index:999999;border:1px solid #7CFF00;background:#000;color:#E9FFE0;box-shadow:0 0 34px rgba(124,255,0,.30),inset 0 0 24px rgba(124,255,0,.06);}' +
+            '#providerEventDrawer10BB.open{display:block;}' +
+            '#providerEventDrawer10BB .drawer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid rgba(124,255,0,.45);padding:10px 12px;background:linear-gradient(90deg,rgba(124,255,0,.13),#000);}' +
+            '#providerEventDrawer10BB .drawer-body{padding:12px;}' +
+            '#providerEventDrawer10BB .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px;}' +
+            '#providerEventDrawer10BB .detail-cell{border:1px solid rgba(124,255,0,.36);padding:7px 8px;background:rgba(124,255,0,.04);min-width:0;}' +
+            '#providerEventDrawer10BB .detail-cell label{display:block;color:#8ea084;font-size:9px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;}' +
+            '#providerEventDrawer10BB .detail-cell div{font-size:11px;overflow-wrap:anywhere;}' +
+            '#providerEventDrawer10BB pre{white-space:pre-wrap;border:1px solid rgba(124,255,0,.34);background:#010400;color:#e9ffe0;padding:10px;font-size:10px;max-height:360px;overflow:auto;}' +
+            '#providerEventDrawer10BB button{border:1px solid #7CFF00;background:#061000;color:#E9FFE0;padding:6px 8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}';
+          document.head.appendChild(style);
+        }
+
+        var drawer=document.createElement('div');
+        drawer.id='providerEventDrawer10BB';
+        drawer.setAttribute('aria-hidden','true');
+        drawer.innerHTML='<div class="drawer-head"><strong>Provider Event Detail</strong><button type="button" id="providerEventDrawer10BBClose">Close</button></div><div class="drawer-body" id="providerEventDrawer10BBBody"></div>';
+        document.body.appendChild(drawer);
+        return drawer;
+      }
+
+      function providerDetailCell10BB(label,value){
+        if(value === undefined || value === null || value === '') return '';
+        return '<div class="detail-cell"><label>'+text(label)+'</label><div>'+text(value)+'</div></div>';
+      }
+
+      function openProviderEventDrawer10BB(index){
+        var rows=window.__tabzProviderEvents10BB || [];
+        var ev=rows[index];
+        var drawer=ensureProviderEventDrawer10BB();
+        var body=document.getElementById('providerEventDrawer10BBBody');
+        if(!body) return;
+
+        if(!ev){
+          body.innerHTML='<div class="detail-cell"><label>Error</label><div>No provider event row found for index '+text(index)+'</div></div>';
+        } else {
+          var obj=(ev.payload && ev.payload.data && ev.payload.data.object) || (ev.payload && ev.payload.object) || {};
+          body.innerHTML =
+            '<div class="detail-grid">' +
+              providerDetailCell10BB('Event ID', ev.stripeEventId || ev.eventId || ev.id) +
+              providerDetailCell10BB('Type', ev.eventType || ev.type) +
+              providerDetailCell10BB('Provider Status', ev.providerStatus || ev.status) +
+              providerDetailCell10BB('Source Type', ev.sourceType) +
+              providerDetailCell10BB('Source ID', ev.sourceId) +
+              providerDetailCell10BB('Payment ID', obj.payment_intent || (String(obj.id || '').indexOf('pi_') === 0 ? obj.id : '')) +
+              providerDetailCell10BB('Transfer ID', ev.stripeTransferId || obj.transfer || (String(obj.id || '').indexOf('tr_') === 0 ? obj.id : '')) +
+              providerDetailCell10BB('Refund ID', ev.stripeRefundId || obj.refund || (String(obj.id || '').indexOf('re_') === 0 ? obj.id : '')) +
+              providerDetailCell10BB('Dispute ID', ev.stripeDisputeId || obj.dispute || (String(obj.id || '').indexOf('dp_') === 0 ? obj.id : '')) +
+              providerDetailCell10BB('Processed At', ev.processedAt) +
+              providerDetailCell10BB('Created At', ev.createdAt) +
+              providerDetailCell10BB('Updated At', ev.updatedAt) +
+            '</div>' +
+            '<div class="detail-cell" style="margin-bottom:10px;border-color:rgba(255,230,109,.55);color:#ffe66d;"><label>Action safety</label><div>Read-only provider truth. Admin HQ cannot fake payout, refund, dispute, transfer, or ledger movement from this drawer.</div></div>' +
+            '<label style="display:block;color:#8ea084;font-size:10px;text-transform:uppercase;letter-spacing:.14em;margin:8px 0;">Raw provider payload</label>' +
+            '<pre>'+text(JSON.stringify(ev,null,2))+'</pre>';
+        }
+
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+      }
+
+      document.addEventListener('click', function(ev){
+        var viewBtn=ev.target && ev.target.closest ? ev.target.closest('[data-provider-event-view-10bb]') : null;
+        if(viewBtn){
+          ev.preventDefault();
+          ev.stopPropagation();
+          ev.stopImmediatePropagation();
+          openProviderEventDrawer10BB(Number(viewBtn.getAttribute('data-provider-event-view-10bb')));
+          return;
+        }
+
+        var closeBtn=ev.target && ev.target.closest ? ev.target.closest('#providerEventDrawer10BBClose') : null;
+        if(closeBtn){
+          ev.preventDefault();
+          ev.stopPropagation();
+          ev.stopImmediatePropagation();
+          var drawer=document.getElementById('providerEventDrawer10BB');
+          if(drawer){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+          return;
+        }
+
+        var providerPanel=ev.target && ev.target.closest ? ev.target.closest('#adminProviderEventsPanel') : null;
+        if(providerPanel){
+          ev.stopPropagation();
+        }
+      }, true);
+
+
+      // ADMIN_HQ_MONEY_SYSTEM_10BF_SMALL_AS_ROWS_HELPER
+      function asRows(payload){
+        if(Array.isArray(payload)) return payload;
+        if(!payload || typeof payload !== 'object') return [];
+        if(Array.isArray(payload.recent)) return payload.recent;
+        if(Array.isArray(payload.rows)) return payload.rows;
+        if(Array.isArray(payload.items)) return payload.items;
+        if(Array.isArray(payload.data)) return payload.data;
+        return [];
+      }
+
+      // ADMIN_HQ_MONEY_SYSTEM_10BG_EVENT_STATUS_HELPER
+      function eventStatus(ev){
+        if(!ev || typeof ev !== 'object') return '--';
+        return ev.providerStatus || ev.status || ev.stripeStatus || ev.eventStatus || '--';
+      }
+
+      // ADMIN_HQ_MONEY_SYSTEM_10BG_EVENT_TYPE_HELPER
+      function eventType(ev){
+        if(!ev || typeof ev !== 'object') return '--';
+        return ev.eventType || ev.type || ev.stripeEventType || ev.providerEventType || '--';
+      }
+
+      // ADMIN_HQ_MONEY_SYSTEM_10BH_SHORT_HELPER
+      function short(value, max){
+        var s = String(value === undefined || value === null || value === '' ? '--' : value);
+        var n = Number(max || 56);
+        return s.length > n ? s.slice(0, n - 1) + '…' : s;
+      }
+async function loadProviderEvents10AG(){
         var rowsBox=document.getElementById('providerEventsRows');
         var totalBox=document.getElementById('providerEventsTotal');
         var tableBox=document.getElementById('providerEventsTableState');
         var statusBox=document.getElementById('providerEventsLatestStatus');
         var typeBox=document.getElementById('providerEventsLatestType');
+
         if(!rowsBox) return;
 
         var headers={};
@@ -4175,10 +4309,11 @@ function openCommandModal(title, body){
         if(jwt){ headers.Authorization='Bearer '+jwt; }
 
         try{
-          var res=await fetch('/admin/stripe-events?limit=20&source=admin-hq-10ag',{headers:headers});
+          var res=await fetch('/admin/stripe-events?limit=20&source=admin-hq-10bb',{headers:headers, cache:'no-store'});
           var data=await res.json();
 
           if(!res.ok){
+            window.__tabzProviderEvents10BB=[];
             rowsBox.innerHTML='<div class="ops-head"><span>Provider Events</span><span>Status</span><span>Auth</span><span>Action</span></div>' +
               '<div class="ops-row"><span>/admin/stripe-events</span><span>'+text(res.status)+'</span><span>Admin token required</span><span>Login then refresh</span></div>';
             if(totalBox) totalBox.textContent='Auth required';
@@ -4188,27 +4323,33 @@ function openCommandModal(title, body){
             return;
           }
 
-          var recent=Array.isArray(data.recent)?data.recent:[];
+          var recent=asRows(data);
+          window.__tabzProviderEvents10BB=recent;
+
           if(totalBox) totalBox.textContent=String(data.total || recent.length || 0);
           if(tableBox) tableBox.textContent=data.controlState || (data.tableExists?'LIVE_TABLE':'YELLOW');
-          if(statusBox) statusBox.textContent=recent[0] ? text(recent[0].providerStatus || recent[0].status || 'VISIBLE') : 'No events';
-          if(typeBox) typeBox.textContent=recent[0] ? text(recent[0].eventType || recent[0].type || '--') : '--';
+          if(statusBox) statusBox.textContent=recent[0] ? text(eventStatus(recent[0]) || 'VISIBLE') : 'No events';
+          if(typeBox) typeBox.textContent=recent[0] ? text(eventType(recent[0]) || '--') : '--';
 
-          var html='<div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Source</span></div>';
+          var html='<div class="ops-head"><span>Event ID</span><span>Type</span><span>Status</span><span>Action</span></div>';
+
           if(!recent.length){
             html+='<div class="ops-row"><span>No provider events visible</span><span>--</span><span>--</span><span>--</span></div>';
           } else {
-            recent.slice(0,8).forEach(function(ev){
-              html+='<div class="ops-row provider-event-row" data-provider-event-id="'+text(ev.stripeEventId || ev.eventId || ev.id)+'">' +
-                '<span>'+text(ev.stripeEventId || ev.eventId || ev.id)+'</span>' +
-                '<span>'+text(ev.eventType || ev.type)+'</span>' +
-                '<span>'+text(ev.providerStatus || ev.status)+'</span>' +
-                '<span>'+text((ev.sourceType || 'source') + ':' + (ev.sourceId || '--'))+'</span>' +
+            recent.slice(0,8).forEach(function(ev,index){
+              html+='<div class="ops-row provider-event-row-10bb" data-provider-event-row-10bb="true">' +
+                '<span>'+text(short(ev.stripeEventId || ev.eventId || ev.id,56))+'</span>' +
+                '<span>'+text(short(ev.eventType || ev.type,42))+'</span>' +
+                '<span>'+text(short(ev.providerStatus || ev.status,30))+'</span>' +
+                '<span><button type="button" class="provider-event-view-btn-10bb" data-provider-event-view-10bb="'+index+'">VIEW</button></span>' +
               '</div>';
             });
           }
+
           rowsBox.innerHTML=html;
+          rowsBox.setAttribute('data-provider-events-renderer','10BB');
         }catch(e){
+          window.__tabzProviderEvents10BB=[];
           rowsBox.innerHTML='<div class="ops-head"><span>Provider Events</span><span>Error</span><span>State</span><span>Next</span></div>' +
             '<div class="ops-row"><span>/admin/stripe-events</span><span>'+text(e.message)+'</span><span>YELLOW</span><span>Inspect browser auth</span></div>';
         }
@@ -4528,6 +4669,7 @@ function openCommandModal(title, body){
       setInterval(loadVenuePayoutTruth10AY, 15000);
     })();
   </script>
+
 
 </body>
 </html>
