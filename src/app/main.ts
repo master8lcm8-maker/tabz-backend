@@ -46,7 +46,7 @@ async function bootstrap() {
     'x-dev-seed-secret'
   ];
 
-  // âœ… HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
+  // HARD FIX: guarantee OPTIONS preflight never hits Nest route layer (prevents 404 on OPTIONS)
   // This is minimal and safe: it only affects OPTIONS requests.
   app.getHttpAdapter().getInstance().use((req, res, next) => {
     if (req.method !== 'OPTIONS') return next();
@@ -86,6 +86,36 @@ async function bootstrap() {
   // Serve the staged public 8TABZ web face from backend/public.
   // Existing API routes such as /health remain available.
   const publicRoot = join(process.cwd(), 'public');
+// ADMIN_HQ_SECURITY_10SEC_ENV_B_R1_DEV_ONLY_ADMIN_HQ
+// Public production must never receive the Admin HQ shell HTML.
+// Localhost/dev remains available as Troy's work environment.
+// Only shell routes are blocked. Protected admin APIs remain JWT/admin protected.
+app.use((req, res, next) => {
+  const rawHost = String(req.headers.host || '').toLowerCase();
+  const host = rawHost.split(':')[0];
+  const path = (String(req.path || '').toLowerCase().replace(/\/+$/, '') || '/');
+
+  const isLocalDevHost =
+    host === 'localhost' ||
+    host === '127.0.0.1' ||
+    host === '::1' ||
+    host === '[::1]';
+
+  const isAdminShellRoute =
+    path === '/admin-hq' ||
+    path === '/admin' ||
+    path === '/admin/dashboard';
+
+  if (isAdminShellRoute && !isLocalDevHost) {
+    return res
+      .status(404)
+      .type('text/plain')
+      .send('Not found');
+  }
+
+  return next();
+});
+
 
   // PHASE26_PUBLIC_LEGAL_SUPPORT_CLEAN_ROUTES
   const publicCleanRoutes: Record<string, string> = {
@@ -153,6 +183,7 @@ async function bootstrap() {
   console.log('TABZ backend bound to:', addr);
 }
 bootstrap();
+
 
 
 
